@@ -26,6 +26,8 @@ DEFAULTS = {
     "port": 8765,
     "lan_token": "",              # if set, LAN (non-loopback) clients must send it
     "library_dir": "",            # imported media; blank = Documents\\OrcPixels Library (installed)
+    "update_check": True,         # check GitHub Releases at startup + every 24 h (never auto-installs)
+    "update_channel": "stable",   # stable | beta (beta also offers prereleases)
 }
 INSTALL = _CFG / "install.json"   # written by the Windows installer (library folder choice)
 PER_DISPLAY = {

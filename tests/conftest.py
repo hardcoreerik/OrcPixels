@@ -1,9 +1,13 @@
 """Shared test setup: a fixed sample place and time zone, so Live Data tests don't depend on
 the machine's settings or zone. The sample location is downtown Portland, OR (a public city
 centre matching the recorded API fixtures), not anyone's home."""
+import os
+
 import pytest
 
 from orcpixels import place as PLACE
+
+os.environ.setdefault("ORCPIXELS_NO_UPDATE_CHECK", "1")    # never call GitHub from tests
 
 SAMPLE = {"home_lat": 45.5152, "home_lon": -122.6784, "home_label": "PDX", "timezone": "us-pacific",
           "livedata_alerts_label": "OREGON", "livedata_quake_label": "PNW", "livedata_nws_station": "KPDX",

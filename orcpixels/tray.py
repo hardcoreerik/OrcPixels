@@ -159,6 +159,28 @@ def build_menu(pystray, srv: Server, on_quit):
         except OSError as e:
             log.warning("autostart: %s", e)
 
+    from . import updater as UP
+
+    def upd_status():
+        try:
+            return UP.status()
+        except Exception:  # noqa: BLE001
+            return {}
+
+    def upd_text(it):
+        st = upd_status()
+        return f"Update available v{st['latest']['version']}" if st.get("available") else "Up to date"
+
+    def upd_now(icon, it):
+        st = upd_status()
+        if st.get("can_install"):
+            webbrowser.open(url + "/#update")         # confirm + progress in the web UI
+        else:
+            webbrowser.open((st.get("latest") or {}).get("url") or UP.RELEASES_PAGE)
+
+    def upd_check(icon, it):
+        threading.Thread(target=lambda: (UP.check(True), icon.update_menu()), daemon=True).start()
+
     addr_items = [item(a + "  (copy)", copier(a)) for a in addresses(srv.port, srv.lan)]
     if not srv.lan:
         addr_items.append(item("LAN off (Settings > listen_lan)", None, enabled=False))
@@ -167,6 +189,8 @@ def build_menu(pystray, srv: Server, on_quit):
         item("Settings", opener("/#settings")),
         item("Server address", Menu(*addr_items)),
         Menu.SEPARATOR,
+        item(upd_text, upd_now, visible=lambda it: bool(upd_status().get("available"))),
+        item("Check for updates", upd_check),
         item("Start with Windows", toggle_autostart, checked=lambda it: autostart_enabled(),
              visible=os.name == "nt"),
         item("Quit", on_quit),
@@ -205,6 +229,19 @@ def main(argv: list[str] | None = None) -> int:
         icon.stop()
 
     icon = pystray.Icon("OrcPixels", icon_image(), "OrcPixels", build_menu(pystray, srv, on_quit))
+    from . import updater as UP
+    UP.SHUTDOWN = lambda: on_quit(icon, None)        # "Update now": clean stop, the installer relaunches
+
+    def refresh():                                   # pick up background check results
+        while srv.thread and srv.thread.is_alive():
+            time.sleep(60)
+            try:
+                icon.update_menu()
+                st = UP.status()
+                icon.title = f"OrcPixels {st['current']}" + (f" (update v{st['latest']['version']})" if st.get("available") else "")
+            except Exception:  # noqa: BLE001
+                pass
+    threading.Thread(target=refresh, daemon=True).start()
     icon.run()
     srv.stop()
     return 0

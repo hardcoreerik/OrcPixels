@@ -185,3 +185,7 @@ See [docs/](docs/README.md), in particular [docs/DESIGN.md](docs/DESIGN.md): how
 ## Animated GIF import
 
 Image Converter: drop a GIF (or click to choose). Every frame is decoded with its own timing (partial frames and disposal are composited), and the source line shows the frame count, length and loop count. Trim start/end, speed (0.25x to 4x), fps, max frames, layout (adaptive / contain / crop at the selected display's size), colours and seamless-loop fixes (ping-pong, crossfade). "Fit to the sign's limits" keeps BLE uploads within the 15 KB / 64-frame budget: fewer colours first, then every other frame at double the frame time, so the speed and loop stay the same. "Save as preset" writes it to your presets (the 64x64 set on a 64x64 sign) and keeps the original GIF in the Library folder under `imports/`. "+ playlist" then adds it to the playlist editor.
+
+## Updates
+
+The installed app checks GitHub Releases at startup and every 24 h (it can be turned off, and has a stable or beta channel). It installs only when you click **Update now**: the installer is downloaded, checked against SHA256SUMS, run silently, and OrcPixels restarts. Source checkouts only show a `git pull` notice. See [docs/UPDATES.md](docs/UPDATES.md), which covers rollback and code signing.

@@ -27,4 +27,7 @@ if (-not $iscc) { throw "Inno Setup 6 not found (winget install JRSoftware.InnoS
 & $iscc /Q "/DAppVersion=$Version" "/DSrcDir=$root\dist\OrcPixels" packaging\OrcPixels.iss
 if ($LASTEXITCODE) { throw "ISCC failed" }
 $exe = Join-Path $root "dist\OrcPixels-Setup-$Version.exe"
+# SHA256SUMS (sha256sum format) for the in-app updater's verification
+$h = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
+[IO.File]::WriteAllText((Join-Path $root "dist\SHA256SUMS"), "$h  OrcPixels-Setup-$Version.exe`n")
 "{0}  {1:N1} MB" -f $exe, ((Get-Item $exe).Length / 1MB)

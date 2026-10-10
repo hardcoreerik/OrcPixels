@@ -54,6 +54,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\OrcPixels.exe"; Description: "Start OrcPixels now"; Flags: nowait postinstall skipifsilent
+; OTA update (/SILENT /RELAUNCH=1 from the running app): start it again, as the normal user
+Filename: "{app}\OrcPixels.exe"; Parameters: "--no-browser"; Flags: nowait runasoriginaluser; Check: IsRelaunch
 
 [UninstallRun]
 Filename: "{sys}\taskkill.exe"; Parameters: "/IM OrcPixels.exe"; Flags: runhidden; RunOnceId: "StopOrcPixels"
@@ -76,6 +78,11 @@ begin
     False, 'OrcPixels Library');
   LibPage.Add('');
   LibPage.Values[0] := ExpandConstant('{param:LIBRARYDIR|{userdocs}\OrcPixels Library}');
+end;
+
+function IsRelaunch(): Boolean;
+begin
+  Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
 end;
 
 function JsonEscape(S: String): String;

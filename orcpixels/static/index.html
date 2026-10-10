@@ -303,6 +303,13 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
 <!-- ================= SETTINGS ================= -->
 <section class="tab" id="tab-settings">
  <div class="grid2">
+  <div class="card" id="update"><h2>Updates <span class="muted" id="updcur"></span></h2>
+   <div class="row"><label class="chk"><input type="checkbox" id="upd_on" onchange="updSet()"> Check for updates at startup and every 24 h</label></div>
+   <div class="row">Channel <select id="upd_ch" onchange="updSet()"><option value="stable">stable</option><option value="beta">beta (prereleases too)</option></select>
+    <button class="alt" onclick="updCheck()">Check for updates</button></div>
+   <div class="muted" id="updinfo"></div>
+   <div class="muted" style="font-size:12px">Updates install only when you click Update now: the installer is downloaded, checked against the release's SHA256SUMS, run silently (Windows may ask for admin rights), and OrcPixels restarts. Your settings, displays, playlists and Library stay as they are. Older installers stay on the <a href="https://github.com/hardcoreerik/OrcPixels/releases" target="_blank" rel="noopener">Releases page</a> if you need to go back.</div>
+  </div>
   <div class="card"><h2>Connection</h2>
    <div class="muted">Each display has its own link, settings, rotation, playlists and Live. Pick which one this page controls; signs are only ever connected by their saved address. New panels are found with an explicit scan.</div>
    <div id="displist2" style="margin:6px 0"></div>
@@ -343,6 +350,12 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
 
 <!-- ================= STATUS PANEL ================= -->
 <aside class="side">
+ <div class="card" id="updcard" style="display:none;border-color:#2a7fff"><h2>Update available <span class="badge" id="updver"></span></h2>
+  <div class="muted" id="updsub"></div>
+  <details id="upddet" open><summary>Release notes</summary><div id="updnotes" style="max-height:260px;overflow:auto;font-size:13px;line-height:1.5"></div></details>
+  <div class="row"><button id="updnow" onclick="updInstall()">Update now</button><a id="updlink" target="_blank" rel="noopener" class="muted">release page</a></div>
+  <div class="muted mono" id="updstate"></div>
+ </div>
  <div class="card"><h2>Displays <button class="alt sm" style="margin-left:auto" onclick="dispScan()">Scan / add</button></h2>
   <div id="displist" class="muted">loading.</div>
  </div>
@@ -928,6 +941,29 @@ async function adAdd(){ const p=PROFS.find(x=>x.id===$('adprof').value); if(!p) 
   if(r){ toast(`added <b>${esc(r.label||r.id)}</b>: press Connect`,'ok',5000); dispLoad(); } }
 adLoad();
 if(location.hash==='#add-display'){ showTab('settings'); $('addnet').open=true; setTimeout(()=>$('addnet').scrollIntoView(),300); }
+// ---- updates (docs/UPDATES.md)
+function mdLite(t){ return esc(t||'').split(/\r?\n/).map(l=>{ let h=l.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  if(/^#{1,6} /.test(l)) return '<b>'+h.replace(/^#+ /,'')+'</b>'; if(/^\s*[-*] /.test(l)) return '&bull; '+h.replace(/^\s*[-*] /,''); return h; }).join('<br>'); }
+let UPD=null;
+function updShow(st){ UPD=st; if(!st) return; $('updcur').textContent='v'+st.current+' \u00b7 '+(st.mode==='installed'?'installed build':'source checkout');
+  $('upd_on').checked=st.enabled; $('upd_ch').value=st.channel;
+  $('updinfo').textContent=(st.available?`Update available: v${st.latest.version}. `:(st.latest_seen?`Up to date (latest ${st.channel}: v${st.latest_seen}). `:''))+(st.checked?`Last checked ${st.checked}. `:'Not checked yet. ')+(st.error?'Last check: '+st.error:'');
+  const c=$('updcard'); c.style.display=st.available?'':'none'; if(!st.available) return;
+  $('updver').textContent='v'+st.latest.version+(st.latest.prerelease?' beta':''); $('updsub').textContent=`You have v${st.current}.`+(st.notice?' '+st.notice:'');
+  $('updnotes').innerHTML=mdLite(st.latest.notes)||'<span class="muted">no notes</span>'; $('updlink').href=st.latest.url;
+  $('updnow').style.display=st.can_install?'':'none';
+  const i=st.install; $('updstate').textContent=i&&i.version===st.latest.version?`${i.state}${i.progress!=null&&i.state==='downloading'?' '+i.progress+'%':''}${i.error?': '+i.error:''}`:''; }
+async function updLoad(){ const r=await fetch('/api/update').catch(()=>null); if(r&&r.ok) updShow(await r.json()); }
+async function updCheck(){ $('updinfo').textContent='checking\u2026'; const r=await fetch('/api/update/check',{method:'POST'}); const j=await r.json().catch(()=>null); if(r.ok) updShow(j); else $('updinfo').textContent='Error: '+((j&&j.detail)||r.statusText); }
+async function updSet(){ const r=await api('/api/update/settings',{update_check:$('upd_on').checked,update_channel:$('upd_ch').value}); if(r) updShow(r); }
+async function updInstall(){ if(!UPD||!UPD.can_install) return;
+  if(!confirm(`Install OrcPixels v${UPD.latest.version} now?\n\nOrcPixels will download the installer, verify it, close (Live stops, signs disconnect normally) and restart after the update. Windows may ask for permission.`)) return;
+  $('updstate').textContent='downloading and verifying\u2026'; $('updnow').disabled=true;
+  const r=await fetch('/api/update/install',{method:'POST'}); const j=await r.json().catch(()=>({}));
+  if(r.ok){ $('updstate').textContent=`verified; installing v${j.version}. OrcPixels restarts in a moment.`; setTimeout(function w(){ fetch('/api/update').then(x=>x.json()).then(s=>{ if(s.current===j.version){ toast('updated to v'+s.current,'ok',6000); updShow(s); $('updnow').disabled=false; } else setTimeout(w,3000); }).catch(()=>setTimeout(w,3000)); },8000); }
+  else { $('updstate').textContent='Update failed: '+(j.detail||r.statusText); $('updnow').disabled=false; } }
+updLoad(); setInterval(updLoad,10*60*1000);
+if(location.hash==='#update'){ showTab('settings'); setTimeout(()=>$('update').scrollIntoView(),300); }
 // ---- Try the resolution (docs/DESIGN.md)
 const TS_SIZES=['16x16','32x32','64x16','64x32','64x64','96x24','96x32','128x16','128x32','128x64','128x128','256x16','16x64','32x64','custom'];
 let TSSTRAT='adaptive';

@@ -112,6 +112,11 @@ class SettingsReq(BaseModel):
     sign_idle_action: Optional[str] = Field(None, pattern="^(play|disconnect)$")
 
 
+class UpdateSettingsReq(BaseModel):
+    update_check: Optional[bool] = None
+    update_channel: Optional[str] = Field(None, pattern="^(stable|beta)$")
+
+
 def _png(img: Image.Image, scale: int = 1) -> Response:
     if scale > 1:
         img = img.resize((img.width * scale, img.height * scale), Image.Resampling.NEAREST)
@@ -822,7 +827,7 @@ class MultiDisplayApp:
         return self.primary, scope
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] == "lifespan" or scope.get("path", "").startswith("/api/displays"):
+        if scope["type"] == "lifespan" or scope.get("path", "").startswith(("/api/displays", "/api/update")):
             return await self.root(scope, receive, send)
         did, scope = self.pick(scope)
         tok = self.D.CURRENT.set(self.displays[did])
@@ -855,13 +860,57 @@ class MultiDisplayApp:
 
         @asynccontextmanager
         async def lifespan(_app):
+            from . import updater as UP
             self._stack = AsyncExitStack()
-            async with self._stack:
-                for did in list(self.apps):
-                    await self._enter(did)
-                yield
+            upd = UP.start_background()                 # startup + 24 h update check (notice only)
+            try:
+                async with self._stack:
+                    for did in list(self.apps):
+                        await self._enter(did)
+                    yield
+            finally:
+                upd.stop_event.set()
 
         root = FastAPI(title="OrcPixels displays", lifespan=lifespan)
+
+        # ---- updates (docs/UPDATES.md): check / notice / explicit "Update now" only
+        @root.get("/api/update")
+        async def update_status():
+            from . import updater as UP
+            return UP.status()
+
+        @root.post("/api/update/check")
+        async def update_check():
+            from . import updater as UP
+            return await asyncio.to_thread(UP.check, True)
+
+        @root.post("/api/update/settings")
+        async def update_settings(r: UpdateSettingsReq):
+            from . import settings as S
+            from . import updater as UP
+            ch = {}
+            if r.update_check is not None:
+                ch["update_check"] = bool(r.update_check)
+            if r.update_channel is not None:
+                ch["update_channel"] = r.update_channel
+            tok = D.CURRENT.set(None)                  # shared setting, not per display
+            try:
+                S.save(ch)
+            finally:
+                D.CURRENT.reset(tok)
+            return UP.status()
+
+        @root.post("/api/update/install")
+        async def update_install():
+            from . import updater as UP
+            try:
+                return await asyncio.to_thread(UP.install, UP.request_shutdown)
+            except PermissionError as e:
+                raise HTTPException(403, str(e))
+            except ValueError as e:
+                raise HTTPException(409, str(e))
+            except OSError as e:
+                raise HTTPException(502, str(e))
 
         def selected(request: Request) -> str:
             c = request.cookies.get(COOKIE)
