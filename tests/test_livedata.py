@@ -32,7 +32,18 @@ ROUTES = {"stations/KPDX": "nws_obs.json", "api.weather.gov/points/": "nws_point
           "frankfurter": "frankfurter.json", "v0/topstories": "hn_top.json", "v0/item/": "hn_item.json",
           "feeds.npr.org": "npr.xml", "feeds.bbci.co.uk": "bbc.xml", "opb.org": "opb.xml",
           "oregonlive.com": "oregonlive.xml", "arstechnica": "ars.xml", "theverge.com": "verge.xml",
-          "arrl.org": "arrl.xml", "reddit.com": "reddit_ham.xml"}
+          "arrl.org": "arrl.xml", "reddit.com": "reddit_ham.xml",
+          # sports + entertainment (milestone 2; real responses captured 2026-10-10, trimmed)
+          "sports/football/nfl/": "espn_nfl.json", "sports/basketball/nba/": "espn_nba.json",
+          "sports/baseball/mlb/": "espn_mlb.json", "sports/hockey/nhl/": "espn_nhl.json",
+          "sports/soccer/usa.1/": "espn_mls.json", "sports/football/college-football/": "espn_ncaaf.json",
+          "sports/basketball/mens-college-basketball/": "espn_ncaab.json",
+          "sports/basketball/wnba/": "espn_wnba.json", "sports/soccer/eng.1/": "espn_epl.json",
+          "api.tvmaze.com/schedule?": "tvmaze_us.json", "api.tvmaze.com/schedule/web": "tvmaze_web.json",
+          "api.tvmaze.com/singlesearch": "tvmaze_search.json",
+          "rss/topsongs": "itunes_topsongs.json", "rss/topalbums": "itunes_topalbums.json",
+          "rss/topmovies": "itunes_topmovies.json", "rss/toppodcasts": "itunes_toppodcasts.json",
+          "wikimedia.org/api/rest_v1/metrics/pageviews": "wiki_top.json"}
 
 
 class FakeNet:
@@ -229,10 +240,11 @@ MARKETS = {"stocks", "indexes", "commod", "rates", "spark", "crypto"}
 def test_polite_poll_intervals():
     feeds = SC.make_feeds()
     for k, f in feeds.items():
-        assert f.poll_s >= (30 if k == "iss" else 120 if k in MARKETS else 15 if k.startswith("ft8_") else 300), k
+        assert f.poll_s >= (30 if k == "iss" else 120 if k in MARKETS or k.startswith("sports_") else
+                            15 if k.startswith("ft8_") else 300), k
     assert feeds["hf_bands"].poll_s >= 3600 and feeds["aircraft"].poll_s >= 300
     assert all(f.key_env in (None, "GITHUB_TOKEN", "USGS_API_KEY", "X_BEARER_TOKEN") for f in feeds.values())
-    assert len(feeds) == 39 and set(feeds) == set(SC.SCREENS) and SC.OPTIONAL == {"x_feed"}
+    assert len(feeds) == len(SC.SCREENS) >= 61 and set(feeds) == set(SC.SCREENS) and SC.OPTIONAL == {"x_feed"}
 
 
 def test_http_get_sends_user_agent(monkeypatch):
@@ -597,10 +609,12 @@ def app(tmp_path, monkeypatch):
 def test_routes_list_preview_config(app):
     from tests.test_routes_http import asgi
     st, r = asgi(app, "GET", "/api/livedata/screens")
-    assert st == 200 and len(r["screens"]) == 39
+    assert st == 200 and len(r["screens"]) == len(SC.SCREENS) >= 61
     assert {s["key"] for s in r["screens"]} == set(SC.SCREENS)
     assert all(s["needs_key"] is (s["key"] == "x_feed") for s in r["screens"])
-    assert {s["group"] for s in r["screens"]} == {"Weather, sky + radio", "Markets", "News", "Optional", "FT8 / FT4"}
+    assert {s["category"] for s in r["screens"]} == {"apps", "weather", "markets", "news", "space", "ham",
+                                                     "sports", "entertainment", "local"}
+    assert [c["id"] for c in r["categories"]][:3] == ["apps", "weather", "markets"]
     st, body = asgi(app, "GET", "/api/livedata/screens/clock/frame.png", query="scale=2")
     assert st == 200 and body[:4] == b"\x89PNG"
     st, body = asgi(app, "GET", "/api/livedata/screens/tides/led.gif", query="scale=2")

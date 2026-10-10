@@ -25,6 +25,7 @@ from typing import Optional
 from PIL import Image
 from pydantic import BaseModel
 
+from . import categories as CAT
 from . import livedata_screens as SC
 from . import settings as S
 from .orcsdr_live import OrcSDRLive, png_bytes
@@ -318,7 +319,7 @@ def screen_list(live: DataLive) -> list[dict]:
         f = live.feeds[k]
         out.append({"key": k, "title": f.title, "source": f.source, "url": _safe_url(f), "poll_s": f.poll_s,
                     "key_env": f.key_env, "needs_key": bool(getattr(f, "needs_key", False)), "local": f.local,
-                    "group": scr.group, "optional": k in SC.OPTIONAL,
+                    "group": scr.group, "optional": k in SC.OPTIONAL, "category": CAT.of(k, scr),
                     "loop": SC.loop_len(k, f, live.size()), "selected": k in live.screens,
                     "age_s": None if f.ok_at is None else round(now - f.ok_at), **f.state()})
     return out
@@ -361,7 +362,7 @@ def install(app, sign, auto=None, feeds=None) -> DataLive:
             pass
 
     def payload():
-        return {"live": live.info(), "screens": screen_list(live)}
+        return {"live": live.info(), "screens": screen_list(live), "categories": CAT.as_json(SC.SCREENS)}
 
     @app.get("/api/livedata/screens")
     async def ld_screens(warm_all: bool = False):

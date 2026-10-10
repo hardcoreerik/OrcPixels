@@ -692,6 +692,8 @@ from . import livedata_screens2 as _S2  # noqa: E402  (markets + news, 2026-10-0
 SCREENS.update({s.key: s for s in _S2.SCREENS2 + _S2.OPTIONAL2})
 OPTIONAL = {s.key for s in _S2.OPTIONAL2}      # needs a key; listed, never auto-selected
 from . import livedata_ft8 as _FT8  # noqa: E402,F401  (FT8/FT4 from OrcSDR; registers itself in SCREENS)
+from . import live_plugins as _PLUG  # noqa: E402  (Sports, Entertainment, ...: milestone 2)
+_PLUG.load(SCREENS)
 
 
 def make_feeds() -> dict[str, LF.Feed]:
@@ -699,6 +701,8 @@ def make_feeds() -> dict[str, LF.Feed]:
 
 
 def loop_len(key: str, feed: LF.Feed, size: tuple[int, int] | None = None) -> int:
+    if getattr(SCREENS[key], "adaptive", False):
+        return max(1, SCREENS[key].loop_at(feed.value, tuple(size or (W, H))))
     if size is not None and tuple(size) == (64, 64):
         from . import live64
         return live64.loop_len(key, feed)
@@ -709,10 +713,13 @@ def render(key: str, feed: LF.Feed, k: int = 0, now: float | None = None,
            size: tuple[int, int] | None = None) -> Image.Image:
     """One frame of screen `key` at loop index k (wrapped to the screen's loop length).
     size=(64, 64) -> the curated 64x64 layout (live64.py); default / (64, 16) -> this set."""
+    scr = SCREENS[key]
+    if getattr(scr, "adaptive", False):                 # draws natively at any size
+        from . import live_adaptive
+        return live_adaptive.render(scr, feed, k, time.time() if now is None else now, tuple(size or (W, H)))
     if size is not None and tuple(size) == (64, 64):
         from . import live64
         return live64.render(key, feed, k, now)
-    scr = SCREENS[key]
     now = time.time() if now is None else now
     img = Image.new("RGB", (W, H))
     v = feed.value

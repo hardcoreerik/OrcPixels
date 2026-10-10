@@ -62,6 +62,7 @@ img.th{image-rendering:pixelated;background:#000;border-radius:4px;flex:none;ver
 .ldtile img{width:256px;height:64px;image-rendering:pixelated;background:#000;display:block;margin:0 auto 4px;border-radius:4px}
 .ldtile .t{font-size:12px;color:var(--text);display:flex;justify-content:space-between;gap:6px;align-items:center}
 .ldtile .s{font-size:11px;color:var(--mute);margin-top:2px}
+.ldcat{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}.ldcat>summary{cursor:pointer;font-size:14px}.ldcat>summary .chk{margin-left:8px;font-size:12px}
 .plitem{display:flex;gap:8px;align-items:center;margin:2px 0;background:#11151a;padding:3px 6px;border-radius:6px;cursor:grab}
 .bar{flex:1;height:12px;background:#0a0c0f;border:1px solid #2a3039;border-radius:6px;overflow:hidden}.bar div{height:100%;width:0;background:var(--acc)}
 .drop{border:2px dashed #333a44;border-radius:10px;padding:16px;text-align:center;color:var(--mute);cursor:pointer}
@@ -100,7 +101,7 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
 <main>
 <!-- ================= LIVE ================= -->
 <section class="tab" id="tab-live">
- <div class="card"><h2>OrcSDR Live</h2>
+ <div class="card" id="card-orcsdr"><h2>OrcSDR Live</h2>
   <div class="row"><button id="sdrbtn" onclick="sdrToggle()">Start Live</button>
    <b id="sdrstate" title="While armed, Live falls back to the on-device playlist when OrcSDR drops and resumes by itself when it is back">Live: off</b>
    <label class="chk"><input type="checkbox" id="sdrwf" onchange="api('/api/orcsdr/config',{waterfall:this.checked}).then(sdrPoll)"> waterfall</label>
@@ -124,8 +125,11 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
   <div class="row" style="align-items:flex-start;gap:16px"><div><div class="muted" id="ldprevt">preview</div><img id="ldprev" class="panel p512" alt="Live Data preview"></div>
    <div class="muted mono" id="ldinfo" style="white-space:pre-wrap;max-width:420px">.</div></div>
   <div class="muted">Click a tile to pick it (Start shows the picked screen); tick boxes choose the rotation. A red dot top-right on the sign = source down, last good value shown.</div>
-  <div class="ldgrid" id="ldgrid"></div>
-  <details id="ldfc" ontoggle="if(this.open) ldFcLoad()"><summary class="muted">Markets &amp; news sources (symbols, currencies, RSS, optional X token) + FT8 decoder (OrcSDR port / URL, my call, home grid)</summary>
+  <div class="row" style="margin-top:6px"><input id="ldq" type="search" placeholder="Search screens (name, source, category)" style="min-width:280px" oninput="ldFilter()">
+   <button class="alt sm" onclick="ldFold(true)">Expand all</button><button class="alt sm" onclick="ldFold(false)">Collapse all</button>
+   <span class="muted" id="ldqn"></span></div>
+  <div id="ldgrid"></div>
+  <details id="ldfc" ontoggle="if(this.open) ldFcLoad()"><summary class="muted">Live sources: place, markets &amp; news (symbols, currencies, RSS, optional X token), sports favourite teams, TV country + my shows, FT8 decoder (OrcSDR port / URL, my call, home grid)</summary>
    <div class="muted">Comma-separated Yahoo symbols (e.g. AAPL, ^GSPC, GC=F, BTC-USD). Empty = default. Feeds refetch once after a change.</div>
    <div id="ldfcf" style="display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;max-width:820px;margin:6px 0"></div>
    <div class="row"><label>X bearer token <input type="password" id="ldxtok" placeholder="not set" autocomplete="off" style="width:240px"></label>
@@ -133,7 +137,7 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <div class="row"><button class="alt" onclick="ldFcSave()">Save sources</button><button class="alt sm" onclick="ldFcSave(true)">Clear X token</button><span class="muted" id="ldfcmsg"></span></div>
   </details>
  </div>
- <div class="card"><h2>Auto status &amp; buddy</h2>
+ <div class="card" id="card-ai"><h2>Auto status &amp; buddy</h2>
   <div class="row"><label class="chk"><input type="checkbox" id="auto" onchange="setAuto(this.checked)"> Follow active coding app (Codex / Claude / Grok)</label>
    <label class="chk"><input type="checkbox" id="aien" onchange="api('/api/ai/config',{enabled:this.checked}).then(aiPoll)"> AI status feature (reads which AI app is in front)</label>
    <label class="chk"><input type="checkbox" id="buddy" onchange="api('/api/ai/config',{buddy:this.checked}).then(aiPoll)"> Buddy (what the agent is doing)</label>
@@ -642,7 +646,7 @@ async function sdrPoll(){
 }
 // ------------------------------------------------------------------ Live Data
 let ldOn=false, LDPICK=localStorage.ldPick||null, LDSRC={}, LDDATA=null, LDCHK=null;
-function ldChecked(){ return [...document.querySelectorAll('#ldgrid input[type=checkbox]:checked')].map(c=>c.dataset.k); }
+function ldChecked(){ return [...document.querySelectorAll('#ldgrid .ldtile input[type=checkbox]:checked')].map(c=>c.dataset.k); }
 function ldBody(){ const rot=$('ldrot').checked; let scr;
   if(rot){ scr=ldChecked(); if(LDPICK&&scr.includes(LDPICK)) scr=[LDPICK,...scr.filter(k=>k!==LDPICK)]; if(!scr.length&&LDPICK) scr=[LDPICK]; }
   else scr=[LDPICK||(LDDATA&&LDDATA.live.current)||'wx_now'];
@@ -681,11 +685,18 @@ function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
     (l.state==='waiting'?`waiting for data (outage #${l.outages}); sign on ${l.showing||'?'}`+(l.data_error?'\n'+l.data_error:''):
     `LIVE: ${l.current_title}, ${l.frames_sent} frames${l.frames_per_s?', '+l.frames_per_s+' fps':''}${l.rotate?`, rotating ${l.screens.length} every ${l.rotate_s} s`:''}${l.resumes?', auto-resumed '+l.resumes+'x':''}`);
   $('ldinfo').textContent=st+(l.send_error?'\nsend error: '+l.send_error:'');
-  const g=$('ldgrid'); const sig=d.screens.map(s=>s.key).join();
-  if(g.dataset.sig!==sig){ g.dataset.sig=sig; g.innerHTML=d.screens.map((s,i)=>(i===0||d.screens[i-1].group!==s.group?`<div class="ldgroup muted" style="grid-column:1/-1;margin-top:6px;font-weight:600">${esc(s.group||'')}</div>`:'')+`<div class="ldtile" data-k="${s.key}" onclick="ldPick('${s.key}')">
+  const g=$('ldgrid'); const sig=d.screens.map(s=>s.key).join()+'|'+(d.categories||[]).map(c=>c.id).join();
+  if(g.dataset.sig!==sig){ g.dataset.sig=sig; const by={}; for(const s of d.screens) by[s.key]=s;
+    const cats=d.categories&&d.categories.length?d.categories:[{id:'all',title:'Screens',screens:d.screens.map(s=>s.key),links:[]}];
+    const shut=new Set(JSON.parse(localStorage.ldShut||'[]'));
+    g.innerHTML=cats.map(c=>`<details class="ldcat" data-c="${c.id}" ${shut.has(c.id)?'':'open'} ontoggle="ldCatToggle(this)">
+     <summary><b style="color:${c.color||'var(--text)'}">${esc(c.title)}</b> <span class="muted ldcn"></span> <span class="muted">${esc(c.blurb||'')}</span>
+      ${c.screens.length?`<label class="chk" onclick="event.stopPropagation()" title="turn every screen in this category on / off"><input type="checkbox" class="ldall" onchange="ldCatAll('${c.id}',this.checked)"> all</label>`:''}</summary>
+     ${(c.links||[]).length?`<div class="row" style="margin:4px 0">${c.links.map(x=>`<button class="alt sm" onclick="document.getElementById('${x.card}').scrollIntoView({behavior:'smooth'})">${esc(x.title)}</button>`).join('')}</div>`:''}
+     <div class="ldgrid">${c.screens.filter(k=>by[k]).map(k=>{ const s=by[k]; return `<div class="ldtile" data-k="${s.key}" data-q="${esc((s.title+' '+s.key+' '+s.source+' '+c.title).toLowerCase())}" onclick="ldPick('${s.key}')">
      <img alt="${esc(s.title)}"><div class="t"><span><b>${esc(s.title)}</b></span><span class="badge"></span>
-     <label class="chk" onclick="event.stopPropagation()" title="include in rotation"><input type="checkbox" data-k="${s.key}" onchange="ldCfg()"></label></div>
-     <div class="s"></div></div>`).join(''); }
+     <label class="chk sw" onclick="event.stopPropagation()" title="enable: include this screen in the rotation"><input type="checkbox" data-k="${s.key}" onchange="ldCfg()"> on</label></div>
+     <div class="s"></div></div>`; }).join('')}</div></details>`).join(''); ldFilter(); }
   const chk=new Set(l.screens);
   for(const s of d.screens){ const t=g.querySelector(`.ldtile[data-k="${s.key}"]`); if(!t) continue;
     t.classList.toggle('sel',s.key===LDPICK);
@@ -693,7 +704,8 @@ function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
     const [cls,txt]=ldStatus(s); const b=t.querySelector('.badge'); b.className='badge '+cls; b.textContent=txt;
     t.querySelector('.s').textContent=`${s.source}${s.key_env?(s.needs_key?' (needs '+s.key_env+')':' (optional '+s.key_env+')'):''} · every ${s.poll_s>=60?Math.round(s.poll_s/60)+' min':s.poll_s+' s'} · ${ldAge(s.age_s)}`+(s.error?' · '+s.error.slice(0,80):'');
     const im=t.querySelector('img'); const src=`/api/livedata/screens/${s.key}/led.gif?scale=4&v=${s.ok_at||0}${s.stale?'s':''}${Math.floor(Date.now()/60000)}`;
-    if(im.dataset.src!==src && $('tab-live').classList.contains('on')){ im.dataset.src=src; im.src=src; } }
+    if(im.dataset.src!==src && $('tab-live').classList.contains('on') && t.closest('details').open && t.style.display!=='none'){ im.dataset.src=src; im.src=src; } }
+  ldCounts();
   ldPrev(false); }
 async function ldFcLoad(){ try{ const c=await (await fetch('/api/livedata/feed-config')).json();
   $('ldfcf').innerHTML=c.fields.map(f=>`<label class="muted" for="ldfc_${f.key}">${esc(f.label)}</label><input type="text" id="ldfc_${f.key}" data-k="${f.key}" value="${esc(f.value)}" placeholder="${esc(f.default)}" style="width:100%">`).join('');
@@ -702,6 +714,16 @@ async function ldFcSave(clearTok){ const values={}; document.querySelectorAll('#
   if(clearTok) values.livedata_x_bearer_token=''; else if($('ldxtok').value.trim()) values.livedata_x_bearer_token=$('ldxtok').value.trim();
   const r=await api('/api/livedata/feed-config',{values}); $('ldxtok').value='';
   if(r){ $('ldfcmsg').textContent='saved '+ptTime(Date.now()/1000)+' '+TZL; ldRender(r); ldFcLoad(); } }
+function ldCounts(){ document.querySelectorAll('#ldgrid details.ldcat').forEach(dd=>{ const cs=[...dd.querySelectorAll('.ldtile input[type=checkbox]')];
+  const on=cs.filter(c=>c.checked).length; dd.querySelector('.ldcn').textContent=`(${on}/${cs.length} on)`; const a=dd.querySelector('.ldall'); if(a){ a.checked=cs.length>0&&on===cs.length; a.indeterminate=on>0&&on<cs.length; } }); }
+function ldCatAll(cid,on){ document.querySelectorAll(`#ldgrid details[data-c="${cid}"] .ldtile input[type=checkbox]`).forEach(c=>c.checked=on); ldCounts(); ldCfg(); }
+function ldCatToggle(dd){ const shut=new Set(JSON.parse(localStorage.ldShut||'[]')); dd.open?shut.delete(dd.dataset.c):shut.add(dd.dataset.c);
+  localStorage.ldShut=JSON.stringify([...shut]); if(dd.open&&LDDATA){ $('ldgrid').dataset.sig2=''; ldRender(LDDATA); } }
+function ldFold(open){ document.querySelectorAll('#ldgrid details.ldcat').forEach(dd=>dd.open=open); }
+function ldFilter(){ const q=($('ldq')&&$('ldq').value||'').trim().toLowerCase(); let n=0, tot=0;
+  document.querySelectorAll('#ldgrid details.ldcat').forEach(dd=>{ let m=0; dd.querySelectorAll('.ldtile').forEach(t=>{ tot++; const ok=!q||t.dataset.q.includes(q); t.style.display=ok?'':'none'; if(ok){m++;n++;} });
+    dd.style.display=(!q||m||(dd.dataset.c&&dd.querySelector('summary').textContent.toLowerCase().includes(q)))?'':'none'; if(q&&m) dd.open=true; });
+  if($('ldqn')) $('ldqn').textContent=q?`${n} of ${tot} screens`:`${tot} screens`; if(q&&LDDATA) setTimeout(()=>ldRender(LDDATA),0); }
 async function ldPoll(){ try{ ldRender(await (await fetch('/api/livedata/screens')).json()); }catch(e){ $('ldinfo').textContent='status unavailable'; } }
 async function setAuto(on){ const s=await api('/api/auto',{enabled:on}); if(!s) $('auto').checked=false; aiPoll(); sdrPoll(); }
 let aiKey='';

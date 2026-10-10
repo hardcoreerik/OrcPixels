@@ -1234,6 +1234,8 @@ class Ft8Alert64(S64):
 
 # ================================================================== render
 def loop_len(key: str, feed) -> int:
+    if getattr(SC.SCREENS.get(key), "adaptive", False):        # draws natively at 64x64 too
+        return SC.loop_len(key, feed, (64, 64))
     v = feed.value
     lay = DRAW.get(key)
     if lay is None:
