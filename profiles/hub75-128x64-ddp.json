@@ -1,0 +1,17 @@
+{
+  "id": "hub75-128x64-ddp",
+  "label": "ESP32 HUB75 128x64, two panels (DDP)",
+  "driver": "udp",
+  "width": 128,
+  "height": 64,
+  "rotation": 0,
+  "protocol": {
+    "transport": "ddp"
+  },
+  "limits": {
+    "max_fps": 30,
+    "max_brightness": 70
+  },
+  "status": "experimental",
+  "notes": "Two chained 64x64 panels."
+}

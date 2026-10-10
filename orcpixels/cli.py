@@ -92,6 +92,7 @@ def _parser() -> argparse.ArgumentParser:
     pl.add_argument("--server", default="http://127.0.0.1:8765",
                     help="use the running web server's BLE connection if reachable ('' = direct BLE)")
 
+    sub.add_parser("tray", help="run the server in the background with a tray icon (installed app)")
     w = sub.add_parser("serve", help="run local web UI/API")
     w.add_argument("--host", default="127.0.0.1")
     w.add_argument("--port", type=int, default=8765)
@@ -180,6 +181,9 @@ def main(argv=None) -> int:
     if a.cmd == "playlist":
         from .playlist_cli import main as pl_main
         return pl_main(a)
+    if a.cmd == "tray":
+        from .tray import main as tray_main
+        return tray_main([])
     if a.cmd == "serve":
         from .web import serve
         serve(a.host, a.port, a.address or None)

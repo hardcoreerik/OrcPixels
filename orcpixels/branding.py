@@ -19,7 +19,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "config"
+from .paths import CONFIG, config_file  # noqa: E402
 BRAND_ICON = ROOT / "assets" / "orc_16.png"
 
 
@@ -45,7 +45,7 @@ class Brand:
 
 
 def _load(name: str) -> dict[str, Brand]:
-    p = CONFIG / name
+    p = config_file(name)
     if not p.exists():
         return {}
     raw = json.loads(p.read_text(encoding="utf-8"))
@@ -142,7 +142,7 @@ def project_frame(key: str, kind: str = "banner", size: tuple[int, int] | None =
     b = projects().get(key) or find_project(key)
     if b is None:
         raise KeyError(f"unknown project {key!r} (see config/projects.json)")
-    raw = _json.loads((CONFIG / "projects.json").read_text(encoding="utf-8")).get(b.key, {})
+    raw = _json.loads(config_file("projects.json").read_text(encoding="utf-8")).get(b.key, {})
     if kind not in ("banner", "wave", "icon"):          # allow a preset name as kind
         from .presets import preview_image
         return preview_image(kind)
@@ -166,7 +166,7 @@ def project_frame64(key: str, kind: str = "banner") -> Image.Image:
     b = projects().get(key) or find_project(key)
     if b is None:
         raise KeyError(f"unknown project {key!r} (see config/projects.json)")
-    raw = _json.loads((CONFIG / "projects.json").read_text(encoding="utf-8")).get(b.key, {})
+    raw = _json.loads(config_file("projects.json").read_text(encoding="utf-8")).get(b.key, {})
     img = Image.new("RGB", (64, 64))
     ic = b.icon_image()
     if ic:
@@ -197,4 +197,4 @@ def default_preset(key: str) -> str | None:
     b = projects().get(key) or find_project(key)
     if b is None:
         return None
-    return _json.loads((CONFIG / "projects.json").read_text(encoding="utf-8")).get(b.key, {}).get("default_preset")
+    return _json.loads(config_file("projects.json").read_text(encoding="utf-8")).get(b.key, {}).get("default_preset")

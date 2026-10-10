@@ -1,0 +1,33 @@
+name: Windows installer
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build (tests, PyInstaller, Inno Setup)
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart("v")
+          if ($v -notmatch '^\d+\.\d+\.\d+') { $v = "" }
+          ./tools/build_installer.ps1 -Version $v -Python python
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OrcPixels-Setup
+          path: dist/OrcPixels-Setup-*.exe
+      - name: Release (tags only, after a clean build)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/OrcPixels-Setup-*.exe
+          generate_release_notes: true

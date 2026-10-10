@@ -30,7 +30,8 @@ from . import buddy as BD
 log = logging.getLogger("orcpixels.ai_watcher")
 HOME = Path(os.path.expanduser("~"))
 APPDATA = Path(os.environ.get("APPDATA", HOME / "AppData" / "Roaming"))
-CONFIG = Path(__file__).resolve().parents[2] / "config" / "apps.json"
+from ..paths import APP as _APP, CONFIG as _UCFG  # noqa: E402
+CONFIG = _APP / "config" / "apps.json"
 IS_WIN = os.name == "nt"
 _NOWIN = 0x08000000 if IS_WIN else 0      # CREATE_NO_WINDOW
 
@@ -79,7 +80,7 @@ class Detection:
 
 
 # ------------------------------------------------------------------ config
-LOCAL = CONFIG.with_name("apps.local.json")      # per-machine overrides (gitignored)
+LOCAL = _UCFG / "apps.local.json"      # per-machine overrides (gitignored)
 
 
 def load_apps() -> dict:

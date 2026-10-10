@@ -293,6 +293,16 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <div id="displist2" style="margin:6px 0"></div>
    <div class="row"><button class="alt" onclick="dispScan()">Scan for new displays</button><span class="muted" id="scanst"></span></div>
    <div id="scanres"></div>
+   <details id="addnet" style="margin:6px 0"><summary><b>Add display</b> (Wi-Fi / USB / virtual panels)</summary>
+    <div class="row"><label>Profile <select id="adprof" onchange="adProf()"></select></label></div>
+    <div class="muted" id="adnote"></div>
+    <div class="row"><label>Label <input id="adlabel" size="18"></label>
+     <label id="adhostl">Host / IP <input id="adhost" size="18" placeholder="192.168.x.y or name.local"></label>
+     <label id="adportl">Port <input id="adport" size="6" placeholder="default"></label>
+     <label id="adserl">Serial <input id="adser" size="12" placeholder="COM5 or /dev/ttyACM0"></label>
+     <label id="addevl">Device id <input id="addev" size="14"></label></div>
+    <div class="row"><button onclick="adAdd()">Add display</button><span class="muted">Nothing is sent until you press Connect.</span></div>
+   </details>
    <div class="row"><span class="dot" id="dot2"></span><span id="conn">.</span></div>
    <div class="row"><button class="alt" onclick="api('/api/connect')">Connect</button><button class="alt" onclick="api('/api/disconnect')">Disconnect</button></div>
    <div class="muted" id="err"></div>
@@ -853,7 +863,7 @@ function dispDot(d){ return d.connected?'on':(d.want_connected||d.link_state==='
 function dispRow(d,full){
   const st=d.connected?'connected':(d.link_state||'disconnected');
   return `<div class="disp${d.selected?' sel':''}" onclick="dispSelect('${d.id}')" title="${esc(d.name||'')} ${esc(d.address||'')}">
-   <span class="dot ${dispDot(d)}"></span><span style="flex:1"><b>${esc(d.label||d.id)}</b> <span class="a">${d.width}x${d.height} &middot; ${esc(st)}${d.showing?' &middot; '+esc(d.showing):''}</span>
+   <span class="dot ${dispDot(d)}"></span><span style="flex:1"><b>${esc(d.label||d.id)}</b>${d.driver&&d.driver!=='ipixel'?` <span class="badge${d.driver_status==='experimental'?' warn':''}">${esc(d.driver)}${d.driver_status==='experimental'?' · experimental':''}</span>`:''} <span class="a">${d.width}x${d.height} &middot; ${esc(st)}${d.showing?' &middot; '+esc(d.showing):''}</span>
    ${full?`<br><span class="a mono">${esc(d.name||'')} ${esc(d.address||'')} &middot; rotate ${d.rotate_180==null?'(global)':(d.rotate_180?'180':'off')} &middot; autoconnect ${d.autoconnect?'on':'off'}</span>`:''}</span>
    <button class="alt sm" onclick="event.stopPropagation();dispConn('${d.id}',${!d.connected&&!d.want_connected})">${d.connected||d.want_connected?'Disconnect':'Connect'}</button>
    ${full&&!d.primary?`<button class="warn sm" onclick="event.stopPropagation();dispRemove('${d.id}')">Remove</button>`:''}</div>`; }
@@ -879,6 +889,24 @@ async function dispAdd(addr,name){ const sz=$('sz_'+addr.replace(/:/g,'')).value
   const label=prompt('Label for this display', name||addr); if(label===null) return;
   const r=await api('/api/displays/add',{address:addr,name:name||null,label,width:sz[0],height:sz[1]});
   if(r){ toast(`added <b>${esc(r.label||r.id)}</b> (not connected yet: press Connect)`,'ok',5000); dispScan(); dispLoad(); } }
+// ---- Add display (driver profiles)
+let PROFS=[];
+async function adLoad(){ try{ const r=await (await fetch('/api/displays/profiles')).json(); PROFS=(r.profiles||[]).filter(p=>p.driver!=='ipixel'); }catch(e){ return; }
+  $('adprof').innerHTML=PROFS.map(p=>`<option value="${esc(p.id)}">${esc(p.label)} · ${p.width}x${p.height}${p.status==='experimental'?' · experimental':''}</option>`).join(''); adProf(); }
+function adProf(){ const p=PROFS.find(x=>x.id===$('adprof').value); if(!p) return;
+  const net=['wled','udp','pixoo'].includes(p.driver)||(p.driver==='tidbyt');
+  $('adhostl').style.display=net?'':'none'; $('adportl').style.display=['wled','udp','pixoo'].includes(p.driver)?'':'none';
+  $('adserl').style.display=p.driver==='serial'?'':'none'; $('addevl').style.display=p.driver==='tidbyt'?'':'none';
+  $('adhost').placeholder=p.driver==='tidbyt'?'server URL (blank = profile default)':'192.168.x.y or name.local';
+  $('adnote').innerHTML=(p.status==='experimental'?'<span class="badge warn">experimental, untested on hardware</span> ':'<span class="badge ok">stable</span> ')+esc(p.notes||'')
+    +(p.driver==='tidbyt'?' API key: environment variable '+esc((p.protocol||{}).token_env||'TIDBYT_API_KEY')+'.':''); $('adlabel').placeholder=p.label; }
+async function adAdd(){ const p=PROFS.find(x=>x.id===$('adprof').value); if(!p) return;
+  const b={profile:p.id,driver:p.driver,label:$('adlabel').value.trim()||null,width:p.width,height:p.height};
+  if($('adhost').value.trim()) b.host=$('adhost').value.trim(); if($('adport').value.trim()) b.port=+$('adport').value;
+  if($('adser').value.trim()) b.serial=$('adser').value.trim(); if($('addev').value.trim()) b.options={device_id:$('addev').value.trim()};
+  const r=await api('/api/displays/add',b);
+  if(r){ toast(`added <b>${esc(r.label||r.id)}</b>: press Connect`,'ok',5000); dispLoad(); } }
+adLoad();
 if(SQ){ $('cvled').width=$('cvled').height=384; $('edled').width=$('edled').height=384; $('ed').width=DW*7; $('ed').height=DH*7; }
 
 // playlist create / rename

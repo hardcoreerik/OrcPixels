@@ -1,0 +1,14 @@
+{
+  "id": "ipixel-32x32",
+  "label": "iPixel Color 32x32 (BLE)",
+  "driver": "ipixel",
+  "width": 32,
+  "height": 32,
+  "rotation": 0,
+  "protocol": {},
+  "limits": {
+    "max_fps": 4
+  },
+  "status": "experimental",
+  "notes": "Reported size; not tested here."
+}

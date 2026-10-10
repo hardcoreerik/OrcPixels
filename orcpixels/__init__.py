@@ -3,4 +3,4 @@ from .ble_sign import SignClient, scan, DEFAULT_ADDRESS, NAME_PREFIX
 from .protocol import TextAnimation
 
 __all__ = ["SignClient", "scan", "DEFAULT_ADDRESS", "NAME_PREFIX", "TextAnimation"]
-__version__ = "0.1.0"
+__version__ = "0.2.0"

@@ -1,0 +1,18 @@
+{
+  "id": "wled-32x32-realtime",
+  "label": "WLED 32x32 (UDP realtime)",
+  "driver": "wled",
+  "width": 32,
+  "height": 32,
+  "rotation": 0,
+  "protocol": {
+    "transport": "realtime",
+    "realtime_timeout_s": 2
+  },
+  "limits": {
+    "max_fps": 30,
+    "max_brightness": 60
+  },
+  "status": "experimental",
+  "notes": "Uses WLED's DNRGB realtime protocol on UDP 21324."
+}

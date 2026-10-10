@@ -1,0 +1,18 @@
+{
+  "id": "wled-32x8",
+  "label": "WLED matrix 32x8 (DDP)",
+  "driver": "wled",
+  "width": 32,
+  "height": 8,
+  "rotation": 0,
+  "protocol": {
+    "transport": "ddp"
+  },
+  "limits": {
+    "max_fps": 30,
+    "max_brightness": 60,
+    "power_limit": 0.5
+  },
+  "status": "experimental",
+  "notes": "WS2812 32x8 panel on WLED 0.14+ with 2D set up in WLED; size is read from /json/info."
+}

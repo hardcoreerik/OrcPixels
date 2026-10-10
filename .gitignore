@@ -29,3 +29,9 @@ config/apps.local.json
 !.env.example
 tools/launch.local.ps1
 *.bak
+
+# installer build output
+build/
+dist/
+library/
+config/install.json

@@ -12,7 +12,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PATH = ROOT / "config" / "settings.json"
+from .paths import CONFIG as _CFG  # noqa: E402
+PATH = _CFG / "settings.json"
 DEFAULTS = {
     "rotate_180": False,  # set True if the panel is mounted upside-down
     "orcsdr_url": "",   # OrcSDR companion web console (read-only)
@@ -21,7 +22,12 @@ DEFAULTS = {
     # this many seconds is resolved (play the saved playlist, or let go of the sign)
     "sign_stuck_timeout_s": 30,
     "sign_idle_action": "play",   # play (0x8008 saved playlist) | disconnect
+    "listen_lan": False,          # tray app / serve: also listen on the LAN (0.0.0.0)
+    "port": 8765,
+    "lan_token": "",              # if set, LAN (non-loopback) clients must send it
+    "library_dir": "",            # imported media; blank = Documents\\OrcPixels Library (installed)
 }
+INSTALL = _CFG / "install.json"   # written by the Windows installer (library folder choice)
 PER_DISPLAY = {
     "rotate_180", "orcsdr_live_armed", "orcsdr_interval", "orcsdr_waterfall", "orcsdr_transport",
     "livedata_armed", "livedata_screens", "livedata_rotate", "livedata_rotate_s",
@@ -50,6 +56,7 @@ def _scope():
 
 def load() -> dict:
     data = dict(DEFAULTS)
+    data.update({k: v for k, v in _read(INSTALL).items() if k in ("library_dir", "listen_lan", "port")})
     shared = _read(PATH)
     d, overlay = _scope()
     if d is None:

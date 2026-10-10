@@ -1,0 +1,14 @@
+{
+  "id": "virtual-32x32",
+  "label": "Virtual 32x32 (preview)",
+  "driver": "virtual",
+  "width": 32,
+  "height": 32,
+  "rotation": 0,
+  "protocol": {},
+  "limits": {
+    "max_fps": 30
+  },
+  "status": "stable",
+  "notes": "Auto-fit from the 64x64 set."
+}

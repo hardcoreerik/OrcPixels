@@ -1,0 +1,22 @@
+{
+  "id": "serial-tpm2-32x8",
+  "label": "USB matrix 32x8 (TPM2)",
+  "driver": "serial",
+  "width": 32,
+  "height": 8,
+  "rotation": 0,
+  "protocol": {
+    "framing": "tpm2",
+    "baud": 500000
+  },
+  "limits": {
+    "max_fps": 30,
+    "max_brightness": 40,
+    "power_limit": 0.4
+  },
+  "status": "experimental",
+  "notes": "TPM2 receiver (e.g. Glediator/Jinx-style sketches).",
+  "layout": {
+    "serpentine": true
+  }
+}

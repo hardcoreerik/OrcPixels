@@ -1,0 +1,14 @@
+{
+  "id": "ipixel-64x16",
+  "label": "iPixel Color 64x16 (BLE)",
+  "driver": "ipixel",
+  "width": 64,
+  "height": 16,
+  "rotation": 0,
+  "protocol": {},
+  "limits": {
+    "max_fps": 4
+  },
+  "status": "stable",
+  "notes": "Flexible 64x16 strip; the original OrcPixels sign. Add with Scan / add."
+}

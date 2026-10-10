@@ -42,8 +42,9 @@ from . import protocol as P
 log = logging.getLogger("orcpixels.playlist")
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAYLISTS = ROOT / "config" / "playlists.json"
-SLOTS = ROOT / "config" / "device_slots.json"
+from .paths import CONFIG as _CFG  # noqa: E402
+PLAYLISTS = _CFG / "playlists.json"
+SLOTS = _CFG / "device_slots.json"
 DEFAULT_BASE = 1           # the app's own Program List uses slots 1..N as well
 DEFAULT_RATE = 1100.0      # bytes/s over BLE (measured ~1.1 KB/s on this sign)
 ACK_OVERHEAD_S = 0.6       # per transfer: acks + GATT round trips

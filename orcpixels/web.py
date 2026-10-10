@@ -130,7 +130,10 @@ def create_app(address: str | None = None, display: dict | None = None,
     display=None is the classic single-sign app (tests, CLI); create_multi_app() builds
     one of these per registered display and routes requests between them."""
     from . import displays as D
-    if display is not None:
+    if display is not None and not D.is_ipixel(display):
+        from .drivers.sign import DriverSign
+        sign = DriverSign(display)
+    elif display is not None:
         sign = SignClient(address or display["address"], display=display)
     else:
         sign = SignClient(address) if address is not None else SignClient()
@@ -608,6 +611,19 @@ def create_app(address: str | None = None, display: dict | None = None,
             raise HTTPException(404, "last frame was not animated")
         return Response(sign.last_gif, media_type="image/gif", headers={"Cache-Control": "no-store"})
 
+    @app.get("/api/device/frame.png")
+    async def device_frame(scale: int = 8):
+        """What the panel itself shows (driver output after auto-fit / rotation); iPixel and
+        anything not sent yet fall back to the last frame."""
+        raw = sign.device_png() if hasattr(sign, "device_png") else None
+        img = Image.open(io.BytesIO(raw)) if raw else (sign.last_frame or Image.new("RGB", (sign.state.width,
+                                                                                            sign.state.height)))
+        s = max(1, min(int(scale), 16))
+        img = img.convert("RGB").resize((img.width * s, img.height * s), Image.Resampling.NEAREST)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return Response(buf.getvalue(), media_type="image/png", headers={"Cache-Control": "no-store"})
+
     @app.get("/api/frame.png")
     async def frame(scale: int = 8):
         img = sign.last_frame or Image.new("RGB", (sign.state.width, sign.state.height))
@@ -628,7 +644,13 @@ class SelectReq(BaseModel):
 
 
 class AddReq(BaseModel):
-    address: str
+    address: str = ""
+    driver: Optional[str] = None
+    profile: Optional[str] = None
+    host: Optional[str] = None
+    port: Optional[int] = None
+    serial: Optional[str] = None
+    options: Optional[dict] = None
     name: Optional[str] = None
     label: Optional[str] = None
     width: int = 64
@@ -643,6 +665,10 @@ class EditReq(BaseModel):
     follow_rotate: Optional[bool] = None     # True -> rotate_180 = null (global setting)
     width: Optional[int] = None
     height: Optional[int] = None
+    host: Optional[str] = None
+    port: Optional[int] = None
+    serial: Optional[str] = None
+    options: Optional[dict] = None
 
 
 
@@ -734,7 +760,10 @@ class MultiDisplayApp:
         sign = sub.state.sign
         sh = getattr(sign, "showing", None) or {}
         return {**{k: d.get(k) for k in ("id", "label", "name", "address", "width", "height",
-                                          "rotate_180", "autoconnect")},
+                                          "rotate_180", "autoconnect", "driver", "profile", "host", "port",
+                                          "serial")},
+                "driver_status": getattr(getattr(sign, "driver", None), "status", "stable"),
+                "render_size": [sign.state.width, sign.state.height],
                 "primary": did == self.primary, "selected": did == selected,
                 "connected": sign.connected, "link_state": getattr(sign, "link_state", None),
                 "want_connected": getattr(sign, "want_connected", None),
@@ -775,6 +804,12 @@ class MultiDisplayApp:
                                  "displays": [self.info(did, r.id) for did in self.apps]})
             resp.set_cookie(COOKIE, r.id, max_age=3600 * 24 * 365, samesite="lax")
             return resp
+
+        @root.get("/api/displays/profiles")
+        async def profiles_list():
+            from . import drivers as DR
+            from . import profiles as PF
+            return {"profiles": PF.brief(), "drivers": DR.STATUS}
 
         @root.post("/api/displays/scan")
         async def displays_scan(timeout: float = 6.0):
@@ -823,6 +858,13 @@ class MultiDisplayApp:
                 raise HTTPException(400, str(e))
             self.displays[did].update(nd)             # same dict the stack's SignClient reads
             sign = self.apps[did].state.sign
+            if hasattr(sign, "driver"):                 # host / port / options changed: new driver
+                from . import drivers as DR
+                from . import profiles as PF
+                await sign._safe_disconnect()
+                sign.driver = DR.make(PF.config_for(nd))
+                sign.state.width, sign.state.height = D.render_size(nd)
+                return self.info(did)
             if not sign.state.device_info:
                 sign.state.width, sign.state.height = nd["width"], nd["height"]
             return self.info(did)
@@ -856,6 +898,36 @@ def create_multi_app(address: str | None = None) -> MultiDisplayApp:
     return MultiDisplayApp(address)
 
 
+class LanGuard:
+    """ASGI wrapper: when settings.lan_token is set, requests from non-loopback clients must
+    carry it (X-OrcPixels-Token header, ?token=, or the opt cookie set by ?token=)."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] in ("http", "websocket"):
+            client = (scope.get("client") or ("127.0.0.1", 0))[0]
+            if client not in ("127.0.0.1", "::1", "localhost", "testclient"):
+                from . import settings as S
+                tok = str(S.load().get("lan_token") or "")
+                if tok:
+                    import hmac
+                    import urllib.parse
+                    hdr = {k.decode().lower(): v.decode() for k, v in scope.get("headers") or []}
+                    q = urllib.parse.parse_qs(scope.get("query_string", b"").decode())
+                    cookie = hdr.get("cookie", "")
+                    got = hdr.get("x-orcpixels-token") or (q.get("token") or [""])[0] or \
+                        next((c.split("=", 1)[1] for c in cookie.split("; ") if c.startswith("optoken=")), "")
+                    if not hmac.compare_digest(got, tok):
+                        if scope["type"] == "http":
+                            await send({"type": "http.response.start", "status": 401,
+                                        "headers": [(b"content-type", b"text/plain")]})
+                            await send({"type": "http.response.body", "body": b"OrcPixels: LAN token required"})
+                        return
+        await self.app(scope, receive, send)
+
+
 def serve(host: str = "127.0.0.1", port: int = 8765, address: str | None = None):
     import copy
 
@@ -864,4 +936,4 @@ def serve(host: str = "127.0.0.1", port: int = 8765, address: str | None = None)
     cfg = copy.deepcopy(LOGGING_CONFIG)          # timestamps in server.log (access log)
     cfg["formatters"]["access"]["fmt"] = '%(asctime)s %(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'
     cfg["formatters"]["default"]["fmt"] = "%(asctime)s %(levelprefix)s %(message)s"
-    uvicorn.run(create_multi_app(address), host=host, port=port, log_level="info", log_config=cfg)
+    uvicorn.run(LanGuard(create_multi_app(address)), host=host, port=port, log_level="info", log_config=cfg)

@@ -1,0 +1,17 @@
+{
+  "id": "hub75-64x64-ddp",
+  "label": "ESP32 HUB75 64x64 (DDP)",
+  "driver": "udp",
+  "width": 64,
+  "height": 64,
+  "rotation": 0,
+  "protocol": {
+    "transport": "ddp"
+  },
+  "limits": {
+    "max_fps": 30,
+    "max_brightness": 70
+  },
+  "status": "experimental",
+  "notes": ""
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ipixel-64x64",
+  "label": "iPixel Color 64x64 (BLE)",
+  "driver": "ipixel",
+  "width": 64,
+  "height": 64,
+  "rotation": 0,
+  "protocol": {},
+  "limits": {
+    "max_fps": 2
+  },
+  "status": "stable",
+  "notes": "64x64 matrix (LED_BLE_*)."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "tronbyt-64x32",
+  "label": "Tronbyt (self-hosted push)",
+  "driver": "tidbyt",
+  "width": 64,
+  "height": 32,
+  "rotation": 0,
+  "protocol": {
+    "base_url": "http://tronbyt.local:8000",
+    "token_env": "TRONBYT_API_KEY",
+    "max_anim_frames": 60
+  },
+  "limits": {
+    "max_fps": 0.2
+  },
+  "status": "experimental",
+  "notes": "Tidbyt with Tronbyt firmware + server; same push API."
+}

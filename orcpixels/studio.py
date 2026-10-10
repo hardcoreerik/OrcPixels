@@ -460,7 +460,7 @@ def save_preset(job: Job, name: str, family: str = "user", title: str = "", desc
         raise ValueError("names starting with p_ or ending in _v<N> are reserved")
     if family not in FAMILIES:
         raise ValueError(f"family must be one of {FAMILIES}")
-    meta_p = PR.dir_for() / f"{name}.json"
+    meta_p = PR.save_dir_for() / f"{name}.json"
     if meta_p.exists() and not overwrite:
         raise FileExistsError(f"preset {name!r} exists (tick overwrite)")
     m = loop_metric_frames(job.frames) if job.animated else None
@@ -469,9 +469,9 @@ def save_preset(job: Job, name: str, family: str = "user", title: str = "", desc
                            "fix the loop or save anyway with force")
     enc = job.encoded()
     ext = "gif" if job.animated else "png"
-    (PR.dir_for() / f"{name}.{ext}").write_bytes(enc)
+    (PR.save_dir_for() / f"{name}.{ext}").write_bytes(enc)
     prev = f"{name}_preview_10x.png"
-    (PR.dir_for() / prev).write_bytes(png_bytes(job.frames[0], 10))
+    (PR.save_dir_for() / prev).write_bytes(png_bytes(job.frames[0], 10))
     meta = {"name": name, "kind": "gif" if job.animated else "image", "file": f"{name}.{ext}",
             "preview": prev, "family": family, "title": title or name,
             "description": description or f"made in the web {job.source}",

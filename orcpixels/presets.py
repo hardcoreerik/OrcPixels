@@ -25,20 +25,46 @@ def dir_for(size: tuple[int, int] | None = None) -> Path:
     return globals()[attr] if attr else DIR
 
 
-def list_presets(size: tuple[int, int] | None = None) -> list[dict]:
-    out = []
+def save_dir_for(size: tuple[int, int] | None = None) -> Path:
+    """Where new presets are written: the preset folder itself in a checkout, the user's
+    data folder (paths.DATA/presets[64]) in the installed build."""
+    from . import paths
     d = dir_for(size)
-    for p in sorted(d.glob("*.json")):
-        meta = json.loads(p.read_text(encoding="utf-8"))
-        meta.setdefault("name", p.stem)
-        out.append(meta)
-    return out
+    u = paths.user_presets(d.name)
+    if u is None:
+        return d
+    u.mkdir(parents=True, exist_ok=True)
+    return u
+
+
+def _dirs(size) -> list[Path]:
+    from . import paths
+    d = dir_for(size)
+    u = paths.user_presets(d.name)
+    return [d] + ([u] if u is not None and u.exists() else [])
+
+
+def list_presets(size: tuple[int, int] | None = None) -> list[dict]:
+    out, seen = [], set()
+    for d in reversed(_dirs(size)):                 # user presets win over shipped ones
+        for p in sorted(d.glob("*.json")):
+            if p.stem in seen:
+                continue
+            seen.add(p.stem)
+            meta = json.loads(p.read_text(encoding="utf-8"))
+            meta.setdefault("name", p.stem)
+            out.append(meta)
+    return sorted(out, key=lambda m: m["name"])
 
 
 def get(name: str, size: tuple[int, int] | None = None) -> dict:
     """Size-specific preset; a name missing from the 64x64 set falls back to the 64x16
     file (the sign letterboxes it)."""
     d = dir_for(size)
+    for cand in reversed(_dirs(size)):
+        if (cand / f"{name}.json").exists():
+            d = cand
+            break
     p = d / f"{name}.json"
     if not p.exists() and d != DIR and (DIR / f"{name}.json").exists():
         d, p = DIR, DIR / f"{name}.json"

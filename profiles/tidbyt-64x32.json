@@ -1,0 +1,19 @@
+{
+  "id": "tidbyt-64x32",
+  "label": "Tidbyt (cloud push)",
+  "driver": "tidbyt",
+  "width": 64,
+  "height": 32,
+  "rotation": 0,
+  "protocol": {
+    "base_url": "https://api.tidbyt.com",
+    "token_env": "TIDBYT_API_KEY",
+    "max_anim_frames": 60
+  },
+  "limits": {
+    "max_fps": 0.1,
+    "max_frame_bytes": 200000
+  },
+  "status": "experimental",
+  "notes": "Needs device_id + API key from the Tidbyt app. Pushes at most every 10 s."
+}

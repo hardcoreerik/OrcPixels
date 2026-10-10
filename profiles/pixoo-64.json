@@ -1,0 +1,18 @@
+{
+  "id": "pixoo-64",
+  "label": "Divoom Pixoo 64 (Wi-Fi HTTP)",
+  "driver": "pixoo",
+  "width": 64,
+  "height": 64,
+  "rotation": 0,
+  "protocol": {
+    "reset_every": 32,
+    "max_anim_frames": 40
+  },
+  "limits": {
+    "max_fps": 1,
+    "max_brightness": 100
+  },
+  "status": "experimental",
+  "notes": "Local HTTP API on port 80. Keep it slow: Divoom firmware stalls under fast pushes."
+}

@@ -151,3 +151,29 @@ Write `0000fa02` (with response, <=244-byte chunks, 12 KiB windows), ACKs on
 MIT, copyright (c) 2026 Oregon Radio Company LLC. See `LICENSE`, and `NOTICE` for the bundled
 font and data (GNU Unifont, AD1C cty.dat, GeoNames, Natural Earth) and the terms of the online
 APIs the Live Data screens use. Not affiliated with the makers of iPixel Color.
+
+## Windows installer
+
+Download `OrcPixels-Setup-x.y.z.exe` from the [Releases](https://github.com/hardcoreerik/OrcPixels/releases) page. It bundles Python (PyInstaller build), so nothing else is needed.
+
+- Installs to Program Files with a Start Menu entry, an optional desktop shortcut and an uninstaller.
+- Wizard asks for a **Library folder** (default `Documents\OrcPixels Library`) and offers **Start OrcPixels when Windows starts** (off by default; a per-user Run key the uninstaller removes).
+- Settings, displays, playlists and your own presets live in `%APPDATA%\OrcPixels`, never in Program Files.
+- Running OrcPixels starts the server in the background with a tray icon: **Open OrcPixels**, **Settings**, **Server address** (click to copy), **Start with Windows**, **Quit** (clean shutdown).
+- The server listens on 127.0.0.1 only. Set `listen_lan: true` (and ideally `lan_token`) in settings to reach it from other devices; LAN clients then need the token (`X-OrcPixels-Token` header or `?token=`).
+
+Build it yourself: `powershell -ExecutionPolicy Bypass -File tools\build_installer.ps1` (needs Python 3.11+ and Inno Setup 6). Pushing a `v*` tag builds it in GitHub Actions and attaches it to a release.
+
+## Supported displays
+
+| Display | Driver | Transport | Status |
+|---|---|---|---|
+| iPixel Color 64x16 / 64x64 (BLE) | `ipixel` | Bluetooth LE | stable (tested) |
+| Virtual panel (any size, browser preview + PNG/GIF) | `virtual` | none | stable |
+| WLED matrices | `wled` | JSON API + DDP or UDP realtime | experimental, untested on hardware |
+| ESP32 HUB75 panels (WLED-HUB75, FPP, ...) | `udp` | DDP / E1.31 (sACN) / Art-Net | experimental, untested on hardware |
+| Divoom Pixoo 64 | `pixoo` | local HTTP | experimental, untested on hardware |
+| USB/serial matrices (Arduino, Teensy, ESP32) | `serial` | Adalight / TPM2 | experimental, untested on hardware |
+| Tidbyt / Tronbyt | `tidbyt` | HTTPS push API | experimental, untested on hardware |
+
+Profiles live in `profiles/` (see `profiles/README.md`); add a panel with **Settings > Add display**. Other panel sizes render the closest curated set and are auto-fitted.
