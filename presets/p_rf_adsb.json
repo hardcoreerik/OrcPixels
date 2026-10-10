@@ -1,0 +1,16 @@
+{
+  "name": "p_rf_adsb",
+  "kind": "gif",
+  "file": "p_rf_adsb.gif",
+  "still": "p_rf_adsb.png",
+  "preview": "p_rf_adsb_preview_10x.png",
+  "family": "rf",
+  "title": "ADS-B radar",
+  "description": "Radar sweep with aircraft blips that flare as the beam passes + 'ADS-B 1090'",
+  "frames": 16,
+  "frame_ms": 120,
+  "bytes": 7267,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_rf_adsb"
+}

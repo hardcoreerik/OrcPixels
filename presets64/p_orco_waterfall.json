@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_waterfall",
+  "still": "p_orco_waterfall.png",
+  "family": "orc_co",
+  "title": "Oregon waterfall",
+  "description": "The Oregon shape filled with a scrolling SDR waterfall, its live-style spectrum trace beside it + 'ORC SDR'",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "kind": "gif",
+  "file": "p_orco_waterfall.gif",
+  "preview": "p_orco_waterfall_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 120,
+  "bytes": 29467,
+  "loop": "seamless",
+  "layout64": "Oregon shape filled with a scrolling SDR waterfall, spectrum trace + ORC SDR",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:50"
+}

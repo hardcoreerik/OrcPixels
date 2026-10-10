@@ -1,0 +1,19 @@
+{
+  "name": "p_proj_orclink",
+  "still": "p_proj_orclink.png",
+  "family": "proj",
+  "title": "OrcLink",
+  "description": "Chain links with a data pulse running through + 'ORCLINK / RUST EDGE'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_proj_orclink.gif",
+  "preview": "p_proj_orclink_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 10426,
+  "loop": "seamless",
+  "layout64": "chain links with a data pulse running through, 'ORCLINK / RUST EDGE'",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:50"
+}

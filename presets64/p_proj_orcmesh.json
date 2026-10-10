@@ -1,0 +1,19 @@
+{
+  "name": "p_proj_orcmesh",
+  "still": "p_proj_orcmesh.png",
+  "family": "proj",
+  "title": "OrcMesh",
+  "description": "Five mesh nodes with packets hopping along the links + 'ORCMESH'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_proj_orcmesh.gif",
+  "preview": "p_proj_orcmesh_preview_6x.png",
+  "size": "64x64",
+  "frames": 15,
+  "frame_ms": 100,
+  "bytes": 6332,
+  "loop": "seamless",
+  "layout64": "five mesh nodes, packets hopping link to link, 'ORCMESH'",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:50"
+}

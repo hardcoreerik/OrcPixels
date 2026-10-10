@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_fmrds",
+  "still": "p_rf_fmrds.png",
+  "family": "rf",
+  "title": "FM RDS ticker",
+  "description": "FM stereo pilot bars + an RDS-style radiotext ticker scrolling 'ORC FM' (art, not live RDS)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_fmrds.gif",
+  "preview": "p_rf_fmrds_preview_6x.png",
+  "size": "64x64",
+  "frames": 44,
+  "frame_ms": 70,
+  "bytes": 37733,
+  "loop": "seamless",
+  "layout64": "FM stereo pilot bars + an RDS radiotext marquee",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

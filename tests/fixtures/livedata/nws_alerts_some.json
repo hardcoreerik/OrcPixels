@@ -1,0 +1,25 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "properties": {
+    "event": "Wind Advisory",
+    "severity": "Moderate",
+    "headline": "Wind Advisory issued October 2 at 3:10PM PDT until October 3 at 5:00AM PDT by NWS Portland OR",
+    "areaDesc": "Central Coast Range of Western Oregon; South Washington Cascades",
+    "ends": "2026-10-03T05:00:00-07:00",
+    "expires": "2026-10-03T05:00:00-07:00"
+   }
+  },
+  {
+   "properties": {
+    "event": "Red Flag Warning",
+    "severity": "Severe",
+    "headline": "Red Flag Warning issued October 2 by NWS Medford OR",
+    "areaDesc": "Siskiyou Mountains",
+    "ends": null,
+    "expires": "2026-10-03T20:00:00-07:00"
+   }
+  }
+ ]
+}

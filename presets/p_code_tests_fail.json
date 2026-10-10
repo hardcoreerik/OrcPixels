@@ -1,0 +1,16 @@
+{
+  "name": "p_code_tests_fail",
+  "kind": "gif",
+  "file": "p_code_tests_fail.gif",
+  "still": "p_code_tests_fail.png",
+  "preview": "p_code_tests_fail_preview_10x.png",
+  "family": "code",
+  "title": "Tests fail",
+  "description": "Red X blinking beside '1 FAILED' with a red scanline (variety, still on-brand black)",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 3632,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_tests_fail"
+}

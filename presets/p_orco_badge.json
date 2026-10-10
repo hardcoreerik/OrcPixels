@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_badge",
+  "kind": "gif",
+  "file": "p_orco_badge.gif",
+  "still": "p_orco_badge.png",
+  "preview": "p_orco_badge_preview_10x.png",
+  "family": "orc_co",
+  "title": "Est. badge",
+  "description": "Bordered 'EST. 2026' badge: big amber 'ORC', Oregon outline seal, a glint sweeping across once per loop",
+  "frames": 32,
+  "frame_ms": 80,
+  "bytes": 8983,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "generator": "tools/make_orco_presets.py::p_orco_badge"
+}

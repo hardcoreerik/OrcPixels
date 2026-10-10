@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_torches",
+  "kind": "gif",
+  "file": "p_orc_torches.gif",
+  "still": "p_orc_torches.png",
+  "preview": "p_orc_torches_preview_10x.png",
+  "family": "orc",
+  "title": "Torch-lit hall",
+  "description": "Two flickering torches framing 'WARCHIEF' in the hall",
+  "frames": 12,
+  "frame_ms": 100,
+  "bytes": 7485,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_torches"
+}

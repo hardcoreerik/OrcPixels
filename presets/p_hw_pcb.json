@@ -1,0 +1,16 @@
+{
+  "name": "p_hw_pcb",
+  "kind": "gif",
+  "file": "p_hw_pcb.gif",
+  "still": "p_hw_pcb.png",
+  "preview": "p_hw_pcb_preview_10x.png",
+  "family": "hw",
+  "title": "PCB traces",
+  "description": "Circuit traces (from the OrcPixels logo border) with light pulses running along them",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 2686,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_hw_pcb"
+}

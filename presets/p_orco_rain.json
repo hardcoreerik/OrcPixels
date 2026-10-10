@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_rain",
+  "kind": "gif",
+  "file": "p_orco_rain.gif",
+  "still": "p_orco_rain.png",
+  "preview": "p_orco_rain_preview_10x.png",
+  "family": "orc_co",
+  "title": "Rain or shine",
+  "description": "Rain falling over Oregon while amber signal rings from Portland punch through it + 'RAIN OR / SHINE'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5531,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "uses_theorc_dev": false,
+  "generator": "tools/make_orco_presets.py::p_orco_rain"
+}

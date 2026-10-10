@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_terminal",
+  "kind": "gif",
+  "file": "p_orco_terminal.gif",
+  "still": "p_orco_terminal.png",
+  "preview": "p_orco_terminal_preview_10x.png",
+  "family": "orc_co",
+  "title": "TheOrc.dev terminal",
+  "description": "Shell prompt typing 'TheOrc.dev', the server answering 'HELLO FROM ORC', blinking cursor",
+  "frames": 37,
+  "frame_ms": 100,
+  "bytes": 5886,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": true,
+  "generator": "tools/make_orco_presets.py::p_orco_terminal"
+}

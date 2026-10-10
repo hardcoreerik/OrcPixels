@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_eq",
+  "kind": "gif",
+  "file": "p_orco_eq.gif",
+  "still": "p_orco_eq.png",
+  "preview": "p_orco_eq_preview_10x.png",
+  "family": "orc_co",
+  "title": "Equalizer wordmark",
+  "description": "'OREGON RADIO CO' wordmark over 16 bouncing equalizer bars (green to amber, cream peaks); letters brighten with the bar below",
+  "frames": 32,
+  "frame_ms": 80,
+  "bytes": 10999,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "generator": "tools/make_orco_presets.py::p_orco_eq"
+}

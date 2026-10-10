@@ -1,0 +1,19 @@
+{
+  "name": "p_amb_plasma",
+  "still": "p_amb_plasma.png",
+  "family": "amb",
+  "title": "Brand plasma",
+  "description": "Classic demoscene plasma in black/green/lime/cyan (ambient)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_amb_plasma.gif",
+  "preview": "p_amb_plasma_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 19318,
+  "loop": "seamless",
+  "layout64": "demoscene plasma, full field, brand colours",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_code_tests_fail",
+  "still": "p_code_tests_fail.png",
+  "family": "code",
+  "title": "Tests fail",
+  "description": "Red X blinking beside '1 FAILED' with a red scanline (variety, still on-brand black)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_tests_fail.gif",
+  "preview": "p_code_tests_fail_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5554,
+  "loop": "seamless",
+  "layout64": "big red X blinking, '1 FAILED', red scanline",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "p_code_terminal",
+  "kind": "gif",
+  "file": "p_code_terminal.gif",
+  "still": "p_code_terminal.png",
+  "preview": "p_code_terminal_preview_10x.png",
+  "family": "code",
+  "title": "Orc terminal",
+  "description": "A tiny terminal: build log lines scrolling up under a blinking '>' prompt",
+  "frames": 42,
+  "frame_ms": 100,
+  "bytes": 9690,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_terminal"
+}

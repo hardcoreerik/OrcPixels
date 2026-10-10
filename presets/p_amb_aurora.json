@@ -1,0 +1,16 @@
+{
+  "name": "p_amb_aurora",
+  "kind": "gif",
+  "file": "p_amb_aurora.gif",
+  "still": "p_amb_aurora.png",
+  "preview": "p_amb_aurora_preview_10x.png",
+  "family": "amb",
+  "title": "Lime aurora",
+  "description": "Slow lime/cyan aurora curtains drifting (ambient, text-free)",
+  "frames": 24,
+  "frame_ms": 110,
+  "bytes": 5448,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_amb_aurora"
+}

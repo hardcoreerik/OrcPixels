@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_crater",
+  "still": "p_orco_crater.png",
+  "family": "orc_co",
+  "title": "Crater Lake ripple",
+  "description": "Crater Lake: caldera rim, deep blue water, Wizard Island, ripples spreading from a drop + 'CRATER / LAKE / 1949 FT'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_crater.gif",
+  "preview": "p_orco_crater_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 110,
+  "bytes": 18246,
+  "loop": "seamless",
+  "layout64": "caldera rim, deep blue lake, Wizard Island, ripples + CRATER LAKE 1949 FT",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

@@ -1,0 +1,3 @@
+{
+  "_comment": "Optional: copy to config/apps.local.json to override fields of config/apps.json per app key (e.g. extra exe names or title patterns on your machine), or add new apps."
+}

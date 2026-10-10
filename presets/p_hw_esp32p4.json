@@ -1,0 +1,16 @@
+{
+  "name": "p_hw_esp32p4",
+  "kind": "gif",
+  "file": "p_hw_esp32p4.gif",
+  "still": "p_hw_esp32p4.png",
+  "preview": "p_hw_esp32p4_preview_10x.png",
+  "family": "hw",
+  "title": "ESP32-P4 chip",
+  "description": "QFN chip labelled 'ESP32-P4' with LEDs chasing around its pins",
+  "frames": 24,
+  "frame_ms": 60,
+  "bytes": 11470,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_hw_esp32p4"
+}

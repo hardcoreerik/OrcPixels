@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_mascot",
+  "kind": "gif",
+  "file": "p_orco_mascot.gif",
+  "still": "p_orco_mascot.png",
+  "preview": "p_orco_mascot_preview_10x.png",
+  "family": "orc_co",
+  "title": "Orc mascot",
+  "description": "Pixel orc mascot holding a whip antenna that sends rings, blinking once per loop, beside 'ORC' and an ON AIR light",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 10076,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "generator": "tools/make_orco_presets.py::p_orco_mascot"
+}

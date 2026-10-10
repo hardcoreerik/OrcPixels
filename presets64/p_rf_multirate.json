@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_multirate",
+  "still": "p_rf_multirate.png",
+  "family": "rf",
+  "title": "DSP multirate",
+  "description": "Three sample streams at 1x, 1/2 and 1/4 rate flowing with 'DEC' decimation labels",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_multirate.gif",
+  "preview": "p_rf_multirate_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 16392,
+  "loop": "seamless",
+  "layout64": "three sample streams at 1x, 1/2, 1/4 rate with DEC stages",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

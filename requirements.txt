@@ -1,0 +1,7 @@
+bleak>=1.0
+pillow>=10.1
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+pyserial>=3.5  # FT8 Live Data screens: OrcSDR USB serial (HTTP needs no extra)
+pytest>=8  # tests

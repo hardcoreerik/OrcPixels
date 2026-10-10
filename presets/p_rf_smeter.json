@@ -1,0 +1,16 @@
+{
+  "name": "p_rf_smeter",
+  "kind": "gif",
+  "file": "p_rf_smeter.gif",
+  "still": "p_rf_smeter.png",
+  "preview": "p_rf_smeter_preview_10x.png",
+  "family": "rf",
+  "title": "Analog S-meter",
+  "description": "Analog S-meter arc with a needle swinging S3..S9+20 and scale marks",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 3659,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_rf_smeter"
+}

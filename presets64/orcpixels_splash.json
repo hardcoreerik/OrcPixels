@@ -1,0 +1,15 @@
+{
+  "name": "orcpixels_splash",
+  "description": "orc_16 icon fixed left + 'OrcPixels' scrolling in x17-63 (60 frames, 2px/80ms). Same as `python -m orcpixels splash`.",
+  "kind": "gif",
+  "file": "orcpixels_splash.gif",
+  "preview": "orcpixels_splash_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 19592,
+  "loop": "seamless",
+  "layout64": "orc 2x centred + 'OrcPixels' marquee, octagon frame",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:43"
+}

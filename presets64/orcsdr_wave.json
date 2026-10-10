@@ -1,0 +1,44 @@
+{
+  "name": "orcsdr_wave",
+  "project": "OrcSDR",
+  "description": "OrcSDR orc icon + mini spectrum sampled from orcsdr_banner.png. Frozen byte-for-byte copy of assets/projects/orcsdr_wave_64x16.png as re-sent 2026-09-29 22:09 PT.",
+  "md5": "25ad8a903da0b6a5fca0527a7b2dac14",
+  "params": {
+    "icon": "orcsdr_16 at x0",
+    "spectrum": {
+      "x": 17,
+      "width": 47,
+      "height": 16,
+      "levels": "spectrum_from_banner(47), normalized 0.08 + 0.87*v/peak",
+      "gradient_stops": [
+        [
+          210,
+          250,
+          255
+        ],
+        [
+          120,
+          250,
+          150
+        ],
+        [
+          210,
+          252,
+          56
+        ]
+      ],
+      "body": "45% of tip color"
+    }
+  },
+  "kind": "image",
+  "file": "orcsdr_wave.png",
+  "preview": "orcsdr_wave_preview_6x.png",
+  "size": "64x64",
+  "frames": 1,
+  "frame_ms": null,
+  "bytes": 1285,
+  "loop": null,
+  "layout64": "orc 2x in the octagon + wordmark + full-width banner spectrum",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

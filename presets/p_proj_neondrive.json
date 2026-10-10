@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_neondrive",
+  "kind": "gif",
+  "file": "p_proj_neondrive.gif",
+  "still": "p_proj_neondrive.png",
+  "preview": "p_proj_neondrive_preview_10x.png",
+  "family": "proj",
+  "title": "NEONDRIVE",
+  "description": "Synthwave grid road rushing toward a magenta horizon + 'NEONDRIVE'",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 7893,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_neondrive"
+}

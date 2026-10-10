@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_visualizer",
+  "kind": "gif",
+  "file": "p_proj_visualizer.gif",
+  "still": "p_proj_visualizer.png",
+  "preview": "p_proj_visualizer_preview_10x.png",
+  "family": "proj",
+  "title": "TheVisualizer",
+  "description": "Retro audio bars bouncing in sync + 'VISUALIZER'",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 12231,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_visualizer"
+}

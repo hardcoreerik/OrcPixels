@@ -1,0 +1,19 @@
+{
+  "name": "p_code_compiling",
+  "still": "p_code_compiling.png",
+  "family": "code",
+  "title": "Compiling",
+  "description": "'COMPILING' with cycling dots and an indeterminate progress block sliding (wrap)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_compiling.gif",
+  "preview": "p_code_compiling_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 8478,
+  "loop": "seamless",
+  "layout64": "rotating gear, 'COMPILING' + dots, sliding progress block",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

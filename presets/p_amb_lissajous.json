@@ -1,0 +1,16 @@
+{
+  "name": "p_amb_lissajous",
+  "kind": "gif",
+  "file": "p_amb_lissajous.gif",
+  "still": "p_amb_lissajous.png",
+  "preview": "p_amb_lissajous_preview_10x.png",
+  "family": "amb",
+  "title": "Lissajous",
+  "description": "A 1:2 Lissajous figure-eight with a glowing trail and slowly turning phase",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 6794,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_amb_lissajous"
+}

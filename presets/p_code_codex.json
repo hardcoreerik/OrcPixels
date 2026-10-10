@@ -1,0 +1,16 @@
+{
+  "name": "p_code_codex",
+  "kind": "gif",
+  "file": "p_code_codex.gif",
+  "still": "p_code_codex.png",
+  "preview": "p_code_codex_preview_10x.png",
+  "family": "code",
+  "title": "Codex thinking",
+  "description": "'CODEX' with three thinking dots bouncing in a wave",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 2464,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_codex"
+}

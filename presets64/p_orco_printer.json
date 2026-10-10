@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_printer",
+  "still": "p_orco_printer.png",
+  "family": "orc_co",
+  "title": "3D print ORC",
+  "description": "A 3D-printer nozzle laying down 'ORC' layer by layer (hot amber layer cooling to green), percent readout, DONE",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_printer.gif",
+  "preview": "p_orco_printer_preview_6x.png",
+  "size": "64x64",
+  "frames": 40,
+  "frame_ms": 90,
+  "bytes": 10857,
+  "loop": "seamless",
+  "layout64": "3D-printer nozzle lays ORC layer by layer (hot amber cools to green), % + DONE",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

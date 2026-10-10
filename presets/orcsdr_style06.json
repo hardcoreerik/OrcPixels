@@ -1,0 +1,19 @@
+{
+  "name": "orcsdr_style06",
+  "kind": "gif",
+  "file": "orcsdr_style06.gif",
+  "still": "orcsdr_style06.png",
+  "preview": "orcsdr_style06_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "Matrix rain reveal",
+  "description": "Matrix rain reveal: Matrix-style green rain with 'OrcSDR' (4x6, cyan-white) resolving in the middle.",
+  "frames": 22,
+  "frame_ms": 90,
+  "bytes": 10419,
+  "generator": "tools/make_styles.py::s06_matrix",
+  "params": {
+    "rain_tail": 6,
+    "rain_period_rows": 22,
+    "reveal": "1.8*(0.5-0.5cos) clamped, 1 cycle/loop"
+  }
+}

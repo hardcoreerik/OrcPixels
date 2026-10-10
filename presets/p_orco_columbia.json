@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_columbia",
+  "kind": "gif",
+  "file": "p_orco_columbia.gif",
+  "still": "p_orco_columbia.png",
+  "preview": "p_orco_columbia_preview_10x.png",
+  "family": "orc_co",
+  "title": "Columbia data river",
+  "description": "The Columbia River flowing west under the gorge title, amber data packets riding the current between green banks",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5440,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "generator": "tools/make_orco_presets.py::p_orco_columbia"
+}

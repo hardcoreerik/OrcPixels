@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_sunset",
+  "still": "p_orco_sunset.png",
+  "family": "orc_co",
+  "title": "Pacific sunset AM",
+  "description": "Sun resting on the Pacific with a shimmering glint path, an amplitude-modulated AM wave rolling across the sky + 'ORC AM'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_sunset.gif",
+  "preview": "p_orco_sunset_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 120,
+  "bytes": 21465,
+  "loop": "seamless",
+  "layout64": "sun on the Pacific, shimmering glint path, AM wave rolling across the sky + ORC AM",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

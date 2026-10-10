@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_horn",
+  "kind": "gif",
+  "file": "p_orc_horn.gif",
+  "still": "p_orc_horn.png",
+  "preview": "p_orc_horn_preview_10x.png",
+  "family": "orc",
+  "title": "War horn",
+  "description": "A war horn blasting sound waves toward 'AROOO'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 6123,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_horn"
+}

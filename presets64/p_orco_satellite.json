@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_satellite",
+  "still": "p_orco_satellite.png",
+  "family": "orc_co",
+  "title": "Satellite pass",
+  "description": "A satellite arcs across the sky over Oregon, downlinking to a Bend ground station; status LOS/TRK/ACQ + 'ORC SAT'",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_satellite.gif",
+  "preview": "p_orco_satellite_preview_6x.png",
+  "size": "64x64",
+  "frames": 40,
+  "frame_ms": 90,
+  "bytes": 15895,
+  "loop": "seamless",
+  "layout64": "satellite arcs over Oregon, downlink to Bend; LOS/ACQ/TRK + ORC SAT",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

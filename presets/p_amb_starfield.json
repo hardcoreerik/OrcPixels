@@ -1,0 +1,16 @@
+{
+  "name": "p_amb_starfield",
+  "kind": "gif",
+  "file": "p_amb_starfield.gif",
+  "still": "p_amb_starfield.png",
+  "preview": "p_amb_starfield_preview_10x.png",
+  "family": "amb",
+  "title": "Starfield",
+  "description": "Parallax starfield drifting left at 3 speeds (ambient, seamless wrap)",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 4166,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_amb_starfield"
+}

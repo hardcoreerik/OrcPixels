@@ -1,0 +1,16 @@
+{
+  "name": "p_code_deploy",
+  "kind": "gif",
+  "file": "p_code_deploy.gif",
+  "still": "p_code_deploy.png",
+  "preview": "p_code_deploy_preview_10x.png",
+  "family": "code",
+  "title": "Deploy to edge",
+  "description": "Packets flying from a PC to an ESP32 node: 'DEPLOY TO EDGE' (no cloud)",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 3584,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_deploy"
+}

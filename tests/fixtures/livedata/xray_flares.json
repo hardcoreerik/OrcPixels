@@ -1,0 +1,18 @@
+[
+ {
+  "time_tag": "2026-10-03T04:09:00Z",
+  "satellite": 18,
+  "current_class": "B1.9",
+  "current_ratio": 0.008075212328315661,
+  "current_int_xrlong": 0.00016278523253276944,
+  "begin_time": "2026-10-02T22:31:00Z",
+  "begin_class": "B2.0",
+  "max_time": "2026-10-02T22:37:00Z",
+  "max_class": "B2.9",
+  "max_xrlong": 2.977372446366644e-07,
+  "end_time": "2026-10-02T22:40:00Z",
+  "max_ratio_time": "Unk",
+  "max_ratio": null,
+  "end_class": "B2.4"
+ }
+]

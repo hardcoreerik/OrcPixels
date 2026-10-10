@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_radar",
+  "still": "p_orco_radar.png",
+  "family": "orc_co",
+  "title": "Radar sweep",
+  "description": "Radar beam sweeping inside the Oregon outline, Portland/Eugene/Bend/Pendleton blips flare as it passes + bearing readout",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "kind": "gif",
+  "file": "p_orco_radar.gif",
+  "preview": "p_orco_radar_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 34189,
+  "loop": "seamless",
+  "layout64": "radar sweep inside the Oregon outline, city blips flare as it passes + bearing",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "p_code_tests_pass",
+  "kind": "gif",
+  "file": "p_code_tests_pass.gif",
+  "still": "p_code_tests_pass.png",
+  "preview": "p_code_tests_pass_preview_10x.png",
+  "family": "code",
+  "title": "Tests pass",
+  "description": "'TESTS PASS' with a marquee of green check marks gliding underneath",
+  "frames": 32,
+  "frame_ms": 80,
+  "bytes": 6929,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_tests_pass"
+}

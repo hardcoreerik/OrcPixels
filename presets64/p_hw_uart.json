@@ -1,0 +1,19 @@
+{
+  "name": "p_hw_uart",
+  "still": "p_hw_uart.png",
+  "family": "hw",
+  "title": "UART bits",
+  "description": "TX line: the bits of 'Orc' (8N1) as a square wave scrolling past, 'TX 115200'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_hw_uart.gif",
+  "preview": "p_hw_uart_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 60,
+  "bytes": 15215,
+  "loop": "seamless",
+  "layout64": "TX line square wave of 'Orc' 8N1 scrolling, bit labels below",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

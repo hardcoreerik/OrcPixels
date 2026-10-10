@@ -1,0 +1,19 @@
+{
+  "name": "p_hw_esp32p4",
+  "still": "p_hw_esp32p4.png",
+  "family": "hw",
+  "title": "ESP32-P4 chip",
+  "description": "QFN chip labelled 'ESP32-P4' with LEDs chasing around its pins",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_hw_esp32p4.gif",
+  "preview": "p_hw_esp32p4_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 60,
+  "bytes": 10214,
+  "loop": "seamless",
+  "layout64": "big QFN chip 'ESP32 / P4' with LEDs chasing round its pins",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

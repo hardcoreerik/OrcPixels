@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_firs",
+  "still": "p_orco_firs.png",
+  "family": "orc_co",
+  "title": "Douglas fir antennas",
+  "description": "Two parallax layers of Douglas firs drifting by, a few treetops are antenna masts with blinking lights + 'TREETOP FM'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_firs.gif",
+  "preview": "p_orco_firs_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 27360,
+  "loop": "seamless",
+  "layout64": "two parallax layers of firs drift by, antenna treetops blink + TREETOP FM",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:48"
+}

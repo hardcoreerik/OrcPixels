@@ -1,0 +1,77 @@
+{
+  "name": "orcsdr_wave_small_anim",
+  "project": "OrcSDR",
+  "version": 2,
+  "previous": "orcsdr_wave_small_anim_v1",
+  "description": "OrcSDR v2 layout (4x6 gradient wordmark at x=18, rows 0-5; 9-row spectrum) with subtle spectrum jitter, 8 frames x 150 ms. Default OrcSDR project frame.",
+  "params": {
+    "wordmark": {
+      "font": "4x6",
+      "x": 18,
+      "rows": "0-5",
+      "stops": [
+        [
+          225,
+          255,
+          255
+        ],
+        [
+          120,
+          240,
+          255
+        ],
+        [
+          110,
+          250,
+          140
+        ],
+        [
+          190,
+          252,
+          50
+        ]
+      ]
+    },
+    "spectrum": {
+      "x": 17,
+      "rows": "7-15",
+      "bar_every": 2,
+      "stops": [
+        [
+          40,
+          200,
+          90
+        ],
+        [
+          60,
+          240,
+          130
+        ],
+        [
+          70,
+          230,
+          210
+        ],
+        [
+          90,
+          220,
+          255
+        ]
+      ],
+      "jitter": 0.07
+    },
+    "frames": 8,
+    "frame_ms": 150
+  },
+  "kind": "gif",
+  "file": "orcsdr_wave_small_anim.gif",
+  "preview": "orcsdr_wave_small_anim_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 110,
+  "bytes": 21419,
+  "loop": "seamless",
+  "layout64": "v2 layout with a breathing spectrum",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

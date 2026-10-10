@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_runes",
+  "still": "p_orc_runes.png",
+  "family": "orc",
+  "title": "Orcish Tongue",
+  "description": "A ribbon of glowing orcish runes scrolling beneath 'ORCISH' (seamless wrap)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_runes.gif",
+  "preview": "p_orc_runes_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 22880,
+  "loop": "seamless",
+  "layout64": "'ORCISH' with two glowing rune ribbons scrolling opposite ways",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

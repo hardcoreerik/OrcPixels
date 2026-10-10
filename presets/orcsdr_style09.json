@@ -1,0 +1,19 @@
+{
+  "name": "orcsdr_style09",
+  "kind": "gif",
+  "file": "orcsdr_style09.gif",
+  "still": "orcsdr_style09.png",
+  "preview": "orcsdr_style09_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "S-meter bounce",
+  "description": "S-meter bounce: Orc icon + wordmark + segmented S-meter bar that bounces (lime / cyan / white top segments).",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 4934,
+  "generator": "tools/make_styles.py::s09_smeter",
+  "params": {
+    "segments": 11,
+    "colors": "lime S1-7, cyan S8-9, white +dB",
+    "level": "sum of sines with 1/2/4 cycles per loop"
+  }
+}

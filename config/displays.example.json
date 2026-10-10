@@ -1,0 +1,9 @@
+{
+  "_comment": "Copy to config/displays.json, or just use Scan / add display in the web UI (it writes this file). Addresses below are placeholders.",
+  "displays": [
+    {"id": "sign", "label": "64x16 sign", "name": "LED_BLE_XXXXXXXX", "address": "AA:BB:CC:DD:EE:01",
+     "width": 64, "height": 16, "rotate_180": null, "autoconnect": true},
+    {"id": "matrix64", "label": "64x64 matrix", "name": "LED_BLE_YYYYYYYY", "address": "AA:BB:CC:DD:EE:02",
+     "width": 64, "height": 64, "rotate_180": null, "autoconnect": false}
+  ]
+}

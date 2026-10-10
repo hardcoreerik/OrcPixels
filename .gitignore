@@ -1,0 +1,31 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+out/
+
+# personal / per-machine state (written at runtime; defaults live in the code)
+config/settings.json
+config/device_slots.json
+config/playlists.json
+# logs (also *.log above)
+server.log
+server.err.log
+logs/
+# virtual environments
+.venv/
+venv/
+.ledsign-venv/
+env/
+.env
+
+# multi-display registry + per-display settings/playlists (per machine)
+config/displays.json
+config/displays/
+
+# local overrides (see the *.example.json files)
+config/apps.local.json
+.env.*
+!.env.example
+tools/launch.local.ps1
+*.bak

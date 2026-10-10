@@ -1,0 +1,16 @@
+{
+  "name": "p_amb_heartbeat",
+  "kind": "gif",
+  "file": "p_amb_heartbeat.gif",
+  "still": "p_amb_heartbeat.png",
+  "preview": "p_amb_heartbeat_preview_10x.png",
+  "family": "amb",
+  "title": "RF heartbeat",
+  "description": "ECG-style lime pulse trace scrolling (the node is alive)",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 4493,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_amb_heartbeat"
+}

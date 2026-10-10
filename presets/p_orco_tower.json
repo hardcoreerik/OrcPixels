@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_tower",
+  "kind": "gif",
+  "file": "p_orco_tower.gif",
+  "still": "p_orco_tower.png",
+  "preview": "p_orco_tower_preview_10x.png",
+  "family": "orc_co",
+  "title": "Broadcast tower",
+  "description": "Oregon outline with a central-Oregon tower pulsing amber radio rings across the state + 'OREGON / RADIO CO'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5801,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "generator": "tools/make_orco_presets.py::p_orco_tower"
+}

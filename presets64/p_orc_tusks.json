@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_tusks",
+  "still": "p_orc_tusks.png",
+  "family": "orc",
+  "title": "Stay Orc",
+  "description": "Orc icon with a tusk gleam and 'STAY ORC' pulsing",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_tusks.gif",
+  "preview": "p_orc_tusks_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 10048,
+  "loop": "seamless",
+  "layout64": "orc 3x with a gleam sweeping its tusks, 'STAY ORC' pulsing",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

@@ -1,0 +1,74 @@
+[
+ {
+  "time_tag": "2026-10-01T15:00:00",
+  "Kp": 1.33,
+  "a_running": 5,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-01T18:00:00",
+  "Kp": 1.33,
+  "a_running": 5,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-01T21:00:00",
+  "Kp": 2.0,
+  "a_running": 7,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-02T00:00:00",
+  "Kp": 1.0,
+  "a_running": 4,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-02T03:00:00",
+  "Kp": 1.0,
+  "a_running": 4,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-02T06:00:00",
+  "Kp": 0.33,
+  "a_running": 2,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-02T09:00:00",
+  "Kp": 0.67,
+  "a_running": 3,
+  "station_count": 7
+ },
+ {
+  "time_tag": "2026-10-02T12:00:00",
+  "Kp": 0.67,
+  "a_running": 3,
+  "station_count": 8
+ },
+ {
+  "time_tag": "2026-10-02T15:00:00",
+  "Kp": 0.33,
+  "a_running": 2,
+  "station_count": 8
+ },
+ {
+  "time_tag": "2026-10-02T18:00:00",
+  "Kp": 0.67,
+  "a_running": 3,
+  "station_count": 8
+ },
+ {
+  "time_tag": "2026-10-02T21:00:00",
+  "Kp": 1.33,
+  "a_running": 5,
+  "station_count": 8
+ },
+ {
+  "time_tag": "2026-10-03T00:00:00",
+  "Kp": 2.33,
+  "a_running": 9,
+  "station_count": 8
+ }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_scope",
+  "still": "p_orco_scope.png",
+  "family": "orc_co",
+  "title": "Oscilloscope Lissajous",
+  "description": "Phosphor 3:2 Lissajous turning on a scope graticule, bright head tracing the curve + 'ORC LAB / X:Y 3:2'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": false,
+  "kind": "gif",
+  "file": "p_orco_scope.gif",
+  "preview": "p_orco_scope_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 21920,
+  "loop": "seamless",
+  "layout64": "phosphor 3:2 Lissajous turning on a graticule, bright head + ORC LAB / X:Y 3:2",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_code_grok",
+  "still": "p_code_grok.png",
+  "family": "code",
+  "title": "Grok orbit",
+  "description": "'GROK' with a particle orbiting a ring once per loop",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_grok.gif",
+  "preview": "p_code_grok_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 17899,
+  "loop": "seamless",
+  "layout64": "2x 'GROK' inside a tilted ring with an orbiting particle",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

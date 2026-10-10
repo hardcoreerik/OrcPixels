@@ -1,0 +1,19 @@
+{
+  "name": "orcsdr_style03",
+  "kind": "gif",
+  "file": "orcsdr_style03.gif",
+  "still": "orcsdr_style03.png",
+  "preview": "orcsdr_style03_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "Spectrum with peak-hold",
+  "description": "Spectrum with peak-hold: Orc icon + full-height animated spectrum with white peak-hold dots that decay.",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 13270,
+  "generator": "tools/make_styles.py::s03_spectrum_peakhold",
+  "params": {
+    "peak_decay_per_frame": 0.05,
+    "jitter": "periodic sines, 1-3 cycles/loop",
+    "loop": "2nd pass after warm-up (peak lookback 20 < 24 frames)"
+  }
+}

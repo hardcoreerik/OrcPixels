@@ -1,0 +1,16 @@
+{
+  "name": "p_rf_bandscan",
+  "kind": "gif",
+  "file": "p_rf_bandscan.gif",
+  "still": "p_rf_bandscan.png",
+  "preview": "p_rf_bandscan_preview_10x.png",
+  "family": "rf",
+  "title": "Band scanner",
+  "description": "Channel comb with a scan marker stepping across and pausing on 3 active channels",
+  "frames": 25,
+  "frame_ms": 70,
+  "bytes": 3904,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_rf_bandscan"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_code_llm",
+  "still": "p_code_llm.png",
+  "family": "code",
+  "title": "Local LLM tokens",
+  "description": "'LOCAL AI' with a token stream of varied-width blocks flowing through",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_llm.gif",
+  "preview": "p_code_llm_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 60,
+  "bytes": 21879,
+  "loop": "seamless",
+  "layout64": "'LOCAL AI' + six lanes of variable-width tokens streaming",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

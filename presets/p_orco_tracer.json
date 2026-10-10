@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_tracer",
+  "kind": "gif",
+  "file": "p_orco_tracer.gif",
+  "still": "p_orco_tracer.png",
+  "preview": "p_orco_tracer_preview_10x.png",
+  "family": "orc_co",
+  "title": "Border tracer",
+  "description": "A glowing comet tracing the real Oregon border (coast, Columbia, Snake, 42N) + 'OREGON / RADIO CO / LLC'",
+  "frames": 34,
+  "frame_ms": 80,
+  "bytes": 9466,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "uses_theorc_dev": false,
+  "generator": "tools/make_orco_presets.py::p_orco_tracer"
+}

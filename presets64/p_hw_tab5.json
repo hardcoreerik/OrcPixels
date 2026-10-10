@@ -1,0 +1,19 @@
+{
+  "name": "p_hw_tab5",
+  "still": "p_hw_tab5.png",
+  "family": "hw",
+  "title": "Tab5 SDR",
+  "description": "A tiny M5Stack Tab5 outline whose screen runs a looping waterfall",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_hw_tab5.gif",
+  "preview": "p_hw_tab5_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 100,
+  "bytes": 11449,
+  "loop": "seamless",
+  "layout64": "M5Stack Tab5 outline whose screen runs a looping waterfall",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

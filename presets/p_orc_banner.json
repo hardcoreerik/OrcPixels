@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_banner",
+  "kind": "gif",
+  "file": "p_orc_banner.gif",
+  "still": "p_orc_banner.png",
+  "preview": "p_orc_banner_preview_10x.png",
+  "family": "orc",
+  "title": "Warband banner",
+  "description": "A waving war banner with the orc emblem rippling in the wind",
+  "frames": 12,
+  "frame_ms": 110,
+  "bytes": 13299,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_banner"
+}

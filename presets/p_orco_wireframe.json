@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_wireframe",
+  "kind": "gif",
+  "file": "p_orco_wireframe.gif",
+  "still": "p_orco_wireframe.png",
+  "preview": "p_orco_wireframe_preview_10x.png",
+  "family": "orc_co",
+  "title": "Oregon wireframe",
+  "description": "The real Oregon outline as an extruded 3D wireframe spinning about its vertical axis + 'OREGON' / 'TheOrc.dev'",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 8045,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "uses_theorc_dev": true,
+  "generator": "tools/make_orco_presets.py::p_orco_wireframe"
+}

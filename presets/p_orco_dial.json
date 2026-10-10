@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_dial",
+  "kind": "gif",
+  "file": "p_orco_dial.gif",
+  "still": "p_orco_dial.png",
+  "preview": "p_orco_dial_preview_10x.png",
+  "family": "orc_co",
+  "title": "Frequency dial",
+  "description": "FM dial 88-108 with an amber needle sweeping; 'ORC FM' lights and the signal bars rise when it crosses 97.1",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 9984,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "generator": "tools/make_orco_presets.py::p_orco_dial"
+}

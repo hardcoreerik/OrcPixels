@@ -1,0 +1,22 @@
+{
+  "name": "orcsdr_style08",
+  "still": "orcsdr_style08.png",
+  "project": "OrcSDR",
+  "title": "Retro scope trace",
+  "description": "Retro scope trace: Retro oscilloscope: dotted grid + lime AM-modulated trace, wordmark top-left.",
+  "params": {
+    "trace": "AM sine, carrier period 7px",
+    "grid": "8px dotted"
+  },
+  "kind": "gif",
+  "file": "orcsdr_style08.gif",
+  "preview": "orcsdr_style08_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 12335,
+  "loop": "seamless",
+  "layout64": "retro scope: dotted graticule, AM-modulated lime trace",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

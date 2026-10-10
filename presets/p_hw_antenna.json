@@ -1,0 +1,16 @@
+{
+  "name": "p_hw_antenna",
+  "kind": "gif",
+  "file": "p_hw_antenna.gif",
+  "still": "p_hw_antenna.png",
+  "preview": "p_hw_antenna_preview_10x.png",
+  "family": "hw",
+  "title": "Antenna",
+  "description": "Mast antenna radiating wavefronts to both sides + 'RTL-SDR V4'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 10542,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_hw_antenna"
+}

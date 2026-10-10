@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_tube",
+  "kind": "gif",
+  "file": "p_orco_tube.gif",
+  "still": "p_orco_tube.png",
+  "preview": "p_orco_tube_preview_10x.png",
+  "family": "orc_co",
+  "title": "Tube radio glow",
+  "description": "Vintage vacuum tube with a breathing filament, warm 'ORC' and a magic-eye tuning indicator opening and closing",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 9797,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "generator": "tools/make_orco_presets.py::p_orco_tube"
+}

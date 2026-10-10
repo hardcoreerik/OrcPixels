@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_advisor",
+  "still": "p_orc_advisor.png",
+  "family": "orc",
+  "title": "Warchief's Advisor",
+  "description": "Orc icon fixed left, 'THE WARCHIEF'S ADVISOR' scrolling beside it (seamless)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_advisor.gif",
+  "preview": "p_orc_advisor_preview_6x.png",
+  "size": "64x64",
+  "frames": 48,
+  "frame_ms": 90,
+  "bytes": 28369,
+  "loop": "seamless",
+  "layout64": "orc 3x seated, 'THE WARCHIEF'S ADVISOR' marquee below",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:36:12"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "orcpixels_splash",
+  "kind": "gif",
+  "file": "orcpixels_splash.gif",
+  "preview": "orcpixels_splash_frame0_preview_10x.png",
+  "description": "orc_16 icon fixed left + 'OrcPixels' scrolling in x17-63 (60 frames, 2px/80ms). Same as `python -m orcpixels splash`.",
+  "generator": "orcpixels.branding.splash_gif()"
+}

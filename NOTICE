@@ -1,0 +1,35 @@
+OrcPixels
+Copyright (c) 2026 Oregon Radio Company LLC. Licensed under the MIT License (see LICENSE).
+
+"iPixel Color" is a product name of its maker; OrcPixels is not affiliated with or endorsed
+by them. Oregon Radio Company, OrcSDR and the orc artwork are names/marks of Oregon Radio
+Company LLC; the MIT licence covers the code and bundled art, not the right to use the
+names as your own brand.
+
+Third-party material bundled in this repository
+------------------------------------------------
+* GNU Unifont (orcpixels/fonts/unifont.otf) - copyright Roman Czyborra, David Corbett and
+  GNU Unifont contributors; SIL Open Font License 1.1 (orcpixels/fonts/UNIFONT_LICENSE.txt).
+* AD1C country file cty.dat (orcpixels/data/ham/cty.dat.gz) - Jim Reisert AD1C,
+  https://www.country-files.com/ , redistributed unmodified (gzipped) with credit, as
+  amateur logging software commonly does.
+* GeoNames cities15000 / admin1 / countryInfo derived tables (orcpixels/data/ham/
+  grid_places.tsv.gz, countries.tsv) - GeoNames, https://www.geonames.org/ , CC BY 4.0.
+* Natural Earth land / admin outlines (assets/geo/*, assets/*land*.png, map masks) -
+  https://www.naturalearthdata.com/ , public domain.
+
+Protocol reference (no code copied verbatim)
+--------------------------------------------
+* The iPixel Color BLE opcodes and framing follow lucagoc/pypixelcolor
+  (https://github.com/lucagoc/pypixelcolor), MIT License.
+
+Online data sources (fetched at run time, not bundled)
+------------------------------------------------------
+Live Data screens call public APIs. Each has its own terms; you are responsible for using
+them within those terms (polling intervals in the code are deliberately modest):
+NOAA/NWS api.weather.gov, NOAA SWPC, NOAA CO-OPS tides, USGS earthquakes and Water Data,
+Open-Meteo (air quality; free tier is non-commercial), OpenSky Network (non-commercial
+research terms), wheretheiss.at, CelesTrak, HamQSL (N0NBH), GitHub REST API, Yahoo Finance
+chart endpoints (unofficial; may break or be restricted), Coinbase / CoinGecko, Frankfurter
+(ECB rates), RSS feeds you configure (NPR, BBC, OPB, Ars Technica, ARRL, Reddit and others:
+headlines belong to their publishers), Hacker News API, and the X API (needs your own token).

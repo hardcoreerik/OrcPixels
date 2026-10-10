@@ -1,0 +1,18 @@
+{
+  "name": "orcsdr_style05",
+  "kind": "gif",
+  "file": "orcsdr_style05.gif",
+  "still": "orcsdr_style05.png",
+  "preview": "orcsdr_style05_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "Big wordmark pulse",
+  "description": "Big wordmark pulse: Big 16px Unifont 'OrcSDR' (cyan->lime gradient) with a slow brightness pulse.",
+  "frames": 12,
+  "frame_ms": 110,
+  "bytes": 12157,
+  "generator": "tools/make_styles.py::s05_big_pulse",
+  "params": {
+    "font": "Unifont 16px",
+    "pulse": "cos, 45-100%, 12 frames"
+  }
+}

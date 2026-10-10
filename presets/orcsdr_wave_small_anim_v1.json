@@ -1,0 +1,8 @@
+{
+  "name": "orcsdr_wave_small_anim_v1",
+  "kind": "gif",
+  "file": "orcsdr_wave_small_anim_v1.gif",
+  "project": "OrcSDR",
+  "description": "v1 backup (3x5 centered wordmark): orcsdr_wave_small with subtle spectrum jitter, 8 frames x 150 ms",
+  "generator": "tools/make_wave_small.py"
+}

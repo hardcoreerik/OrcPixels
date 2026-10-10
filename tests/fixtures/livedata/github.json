@@ -1,0 +1,130 @@
+[
+ {
+  "name": "example-repo-1",
+  "stargazers_count": 180,
+  "forks_count": 16,
+  "pushed_at": "2026-10-03T02:32:13Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-2",
+  "stargazers_count": 21,
+  "forks_count": 5,
+  "pushed_at": "2026-10-02T07:27:27Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-3",
+  "stargazers_count": 3,
+  "forks_count": 0,
+  "pushed_at": "2026-09-28T07:36:53Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-4",
+  "stargazers_count": 1,
+  "forks_count": 0,
+  "pushed_at": "2026-09-28T03:07:38Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-5",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-09-20T03:38:44Z",
+  "fork": true,
+  "archived": false
+ },
+ {
+  "name": "example-repo-6",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-09-14T21:00:22Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-7",
+  "stargazers_count": 3,
+  "forks_count": 1,
+  "pushed_at": "2026-09-07T02:58:04Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-8",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-08-21T04:12:57Z",
+  "fork": true,
+  "archived": false
+ },
+ {
+  "name": "example-repo-9",
+  "stargazers_count": 1,
+  "forks_count": 0,
+  "pushed_at": "2026-08-15T06:51:27Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-10",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-08-14T02:58:53Z",
+  "fork": true,
+  "archived": false
+ },
+ {
+  "name": "example-repo-11",
+  "stargazers_count": 1,
+  "forks_count": 0,
+  "pushed_at": "2026-07-31T19:05:16Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-12",
+  "stargazers_count": 2,
+  "forks_count": 0,
+  "pushed_at": "2026-07-22T05:37:24Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-13",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-07-20T04:08:13Z",
+  "fork": false,
+  "archived": true
+ },
+ {
+  "name": "example-repo-14",
+  "stargazers_count": 0,
+  "forks_count": 0,
+  "pushed_at": "2026-07-20T04:06:00Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-15",
+  "stargazers_count": 1,
+  "forks_count": 0,
+  "pushed_at": "2026-07-17T05:10:14Z",
+  "fork": false,
+  "archived": false
+ },
+ {
+  "name": "example-repo-16",
+  "stargazers_count": 6,
+  "forks_count": 0,
+  "pushed_at": "2026-05-27T01:03:46Z",
+  "fork": false,
+  "archived": false
+ }
+]

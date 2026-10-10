@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_esprtlsdr",
+  "kind": "gif",
+  "file": "p_proj_esprtlsdr.gif",
+  "still": "p_proj_esprtlsdr.png",
+  "preview": "p_proj_esprtlsdr_preview_10x.png",
+  "family": "proj",
+  "title": "esp-rtl-sdr",
+  "description": "USB packets flowing from an RTL dongle into an ESP32 + 'ESP-RTL-SDR'",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 7619,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_esprtlsdr"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "p_rf_m5dial",
+  "kind": "gif",
+  "file": "p_rf_m5dial.gif",
+  "still": "p_rf_m5dial.png",
+  "preview": "p_rf_m5dial_preview_10x.png",
+  "family": "rf",
+  "title": "M5Dial VFO",
+  "description": "VFO knob rocking back and forth with a tuning readout that follows it",
+  "frames": 32,
+  "frame_ms": 80,
+  "bytes": 10915,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_rf_m5dial"
+}

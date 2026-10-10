@@ -1,0 +1,20 @@
+{
+  "name": "orcsdr_style02",
+  "kind": "gif",
+  "file": "orcsdr_style02.gif",
+  "still": "orcsdr_style02.png",
+  "preview": "orcsdr_style02_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "Icon + wordmark + waterfall",
+  "description": "Icon + wordmark + waterfall: Orc icon + small 4x6 wordmark + 9-row waterfall with drifting carriers.",
+  "frames": 20,
+  "frame_ms": 110,
+  "bytes": 12578,
+  "generator": "tools/make_styles.py::s02_icon_waterfall",
+  "params": {
+    "icon": true,
+    "wordmark_x": 18,
+    "waterfall": "47x9 rows 7-15",
+    "loop": "20-row wrapping history"
+  }
+}

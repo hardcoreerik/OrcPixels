@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_eyes",
+  "kind": "gif",
+  "file": "p_orc_eyes.gif",
+  "still": "p_orc_eyes.png",
+  "preview": "p_orc_eyes_preview_10x.png",
+  "family": "orc",
+  "title": "Warchief's gaze",
+  "description": "Orc face whose eyes glow brighter and blink once per loop, 'WARCHIEF' beside it",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 10349,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_eyes"
+}

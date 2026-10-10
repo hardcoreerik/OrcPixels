@@ -1,0 +1,16 @@
+{
+  "name": "orcsdr_wave_small_anim_v1",
+  "project": "OrcSDR",
+  "description": "v1 backup (3x5 centered wordmark): orcsdr_wave_small with subtle spectrum jitter, 8 frames x 150 ms",
+  "kind": "gif",
+  "file": "orcsdr_wave_small_anim_v1.gif",
+  "preview": "orcsdr_wave_small_anim_v1_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 110,
+  "bytes": 19644,
+  "loop": "seamless",
+  "layout64": "v1 backup, animated",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

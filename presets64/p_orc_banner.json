@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_banner",
+  "still": "p_orc_banner.png",
+  "family": "orc",
+  "title": "Warband banner",
+  "description": "A waving war banner with the orc emblem rippling in the wind",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_banner.gif",
+  "preview": "p_orc_banner_preview_6x.png",
+  "size": "64x64",
+  "frames": 12,
+  "frame_ms": 110,
+  "bytes": 19883,
+  "loop": "seamless",
+  "layout64": "war banner on a pole rippling in the wind with the orc emblem",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

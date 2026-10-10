@@ -1,0 +1,17 @@
+{
+  "name": "orcsdr_style04",
+  "kind": "gif",
+  "file": "orcsdr_style04.gif",
+  "still": "orcsdr_style04.png",
+  "preview": "orcsdr_style04_preview_10x.png",
+  "project": "OrcSDR",
+  "title": "Scan cursor sweep",
+  "description": "Scan cursor sweep: 4x6 wordmark + spectrum with a lime scan cursor sweeping; bars light up as it passes.",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 11051,
+  "generator": "tools/make_styles.py::s04_scan_sweep",
+  "params": {
+    "cursor_step_px": 4
+  }
+}

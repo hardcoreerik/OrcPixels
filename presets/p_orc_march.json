@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_march",
+  "kind": "gif",
+  "file": "p_orc_march.gif",
+  "still": "p_orc_march.png",
+  "preview": "p_orc_march_preview_10x.png",
+  "family": "orc",
+  "title": "Warband march",
+  "description": "A column of tiny orcs with spears marching across and wrapping",
+  "frames": 16,
+  "frame_ms": 100,
+  "bytes": 3777,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_march"
+}

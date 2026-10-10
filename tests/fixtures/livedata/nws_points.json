@@ -1,0 +1,9 @@
+{
+ "properties": {
+  "forecast": "https://api.weather.gov/gridpoints/PQR/113,104/forecast",
+  "forecastHourly": "https://api.weather.gov/gridpoints/PQR/113,104/forecast/hourly",
+  "gridId": "PQR",
+  "gridX": 113,
+  "gridY": 104
+ }
+}

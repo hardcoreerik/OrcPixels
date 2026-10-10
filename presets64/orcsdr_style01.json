@@ -1,0 +1,25 @@
+{
+  "name": "orcsdr_style01",
+  "still": "orcsdr_style01.png",
+  "project": "OrcSDR",
+  "title": "Waterfall word (down)",
+  "description": "Waterfall word (down): 'OrcSDR' painted as signal energy into a scrolling-down waterfall (spectrogram painting).",
+  "params": {
+    "font": "4x6 scaled 2x2",
+    "scroll": "down",
+    "map": "WF_MAP",
+    "hold_ms": 1500,
+    "loop": "34-row wrapping history"
+  },
+  "kind": "gif",
+  "file": "orcsdr_style01.gif",
+  "preview": "orcsdr_style01_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 34346,
+  "loop": "seamless",
+  "layout64": "full-height waterfall; 'OrcSDR' painted as signal energy scrolls down",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:43"
+}

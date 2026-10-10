@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic fixture for tests (not real news content). -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Example forum: top today</title><id>https://news.example.com/</id><updated>2026-10-02T20:00:00+00:00</updated>
+  <entry>
+    <title>Researchers test quieter electric ferries</title>
+    <link rel="alternate" href="https://news.example.com/post/1"/>
+    <id>https://news.example.com/post/1</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T20:00:00+00:00</updated>
+    <published>2026-10-02T20:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Volunteers plant 500 trees along the river</title>
+    <link rel="alternate" href="https://news.example.com/post/2"/>
+    <id>https://news.example.com/post/2</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T17:00:00+00:00</updated>
+    <published>2026-10-02T17:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Community radio club hosts field day</title>
+    <link rel="alternate" href="https://news.example.com/post/3"/>
+    <id>https://news.example.com/post/3</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T14:00:00+00:00</updated>
+    <published>2026-10-02T14:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>School robotics team heads to nationals</title>
+    <link rel="alternate" href="https://news.example.com/post/4"/>
+    <id>https://news.example.com/post/4</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T11:00:00+00:00</updated>
+    <published>2026-10-02T11:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Farmers market extends hours for harvest</title>
+    <link rel="alternate" href="https://news.example.com/post/5"/>
+    <id>https://news.example.com/post/5</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T08:00:00+00:00</updated>
+    <published>2026-10-02T08:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Example city council approves new bike lanes</title>
+    <link rel="alternate" href="https://news.example.com/post/6"/>
+    <id>https://news.example.com/post/6</id>
+    <author><name>example</name></author>
+    <updated>2026-10-02T05:00:00+00:00</updated>
+    <published>2026-10-02T05:00:00+00:00</published>
+  </entry>
+</feed>

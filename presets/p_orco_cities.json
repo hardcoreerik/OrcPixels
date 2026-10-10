@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_cities",
+  "kind": "gif",
+  "file": "p_orco_cities.gif",
+  "still": "p_orco_cities.png",
+  "preview": "p_orco_cities_preview_10x.png",
+  "family": "orc_co",
+  "title": "ORC network map",
+  "description": "Oregon outline with Portland, Eugene and Bend stations taking turns on air: ring pulse, packet to the next city, name + frequency",
+  "frames": 30,
+  "frame_ms": 100,
+  "bytes": 10240,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "generator": "tools/make_orco_presets.py::p_orco_cities"
+}

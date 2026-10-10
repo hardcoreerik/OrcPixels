@@ -1,0 +1,19 @@
+{
+  "name": "p_hw_pcb",
+  "still": "p_hw_pcb.png",
+  "family": "hw",
+  "title": "PCB traces",
+  "description": "Circuit traces (from the OrcPixels logo border) with light pulses running along them",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_hw_pcb.gif",
+  "preview": "p_hw_pcb_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 6143,
+  "loop": "seamless",
+  "layout64": "PCB traces with vias and light pulses running along them",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

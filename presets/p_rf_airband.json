@@ -1,0 +1,16 @@
+{
+  "name": "p_rf_airband",
+  "kind": "gif",
+  "file": "p_rf_airband.gif",
+  "still": "p_rf_airband.png",
+  "preview": "p_rf_airband_preview_10x.png",
+  "family": "rf",
+  "title": "Airband AM",
+  "description": "Plane crossing over an AM carrier whose sidebands swell with voice bursts",
+  "frames": 16,
+  "frame_ms": 100,
+  "bytes": 6906,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_rf_airband"
+}

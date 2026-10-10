@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_orcmesh",
+  "kind": "gif",
+  "file": "p_proj_orcmesh.gif",
+  "still": "p_proj_orcmesh.png",
+  "preview": "p_proj_orcmesh_preview_10x.png",
+  "family": "proj",
+  "title": "OrcMesh",
+  "description": "Five mesh nodes with packets hopping along the links + 'ORCMESH'",
+  "frames": 20,
+  "frame_ms": 100,
+  "bytes": 4217,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_orcmesh"
+}

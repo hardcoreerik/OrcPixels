@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>OrcPixels</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0d0f12;--panel:#15181d;--panel2:#1b1f26;--line:#262b33;--text:#d8dde5;--mute:#7d8794;--acc:#35d07f;--acc2:#2aa3ff;--warn:#f0b429;--bad:#ef5350}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,"Segoe UI",sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:#0a0c0f;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+header img{border-radius:8px}
+header h1{font-size:18px;margin:0}
+nav{display:flex;gap:2px;flex-wrap:wrap;margin-left:12px}
+nav button{background:transparent;color:var(--mute);border:0;border-bottom:2px solid transparent;border-radius:0;padding:8px 12px;font-weight:600}
+nav button.on{color:var(--text);border-bottom-color:var(--acc)}
+nav button:hover{color:var(--text)}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;padding:16px 18px;align-items:start}
+@media(max-width:1100px){.wrap{grid-template-columns:1fr}}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px}
+.card h2{font-size:12px;margin:0 0 10px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.col{display:flex;flex-direction:column;gap:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+.muted{color:var(--mute);font-size:12px}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+input[type=text],input[type=number],select,textarea{background:#0a0c0f;color:var(--text);border:1px solid #333a44;border-radius:6px;padding:6px 8px;font:inherit}
+input[type=number]{width:74px}
+input[type=range]{accent-color:var(--acc)}
+input[type=color]{width:38px;height:30px;border:1px solid #333a44;border-radius:6px;background:#0a0c0f;padding:2px}
+button{background:var(--acc);color:#04130a;border:0;padding:7px 13px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px}
+button.alt{background:#2a3039;color:var(--text)} button.alt:hover{background:#343b46}
+button.warn{background:var(--bad);color:#fff} button.blue{background:var(--acc2);color:#021120}
+button.sm{padding:3px 8px;font-size:12px}
+button:disabled{opacity:.45;cursor:default}
+button.tool{background:#20252d;color:var(--text);min-width:38px} button.tool.on{background:var(--acc);color:#04130a}
+.panel{image-rendering:pixelated;background:#000;border:5px solid #1f242b;border-radius:6px;display:block}
+.p512{width:512px;height:128px;max-width:100%}.p256{width:256px;height:64px}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700;background:#2a3039;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
+.b-ok{background:#16452c;color:#6ef0a6}.b-warn{background:#4a3b0c;color:#ffd166}.b-bad{background:#4d1717;color:#ff8a80}.b-blue{background:#0f3552;color:#8fd0ff}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--bad);flex:none}
+.side{position:sticky;top:66px;max-height:calc(100vh - 80px);overflow:auto}
+.log{max-height:300px;overflow:auto}
+.logrow{display:grid;grid-template-columns:62px 1fr auto;gap:6px;padding:3px 0;border-bottom:1px solid #1d2128;font-size:12px}
+.logrow .w{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-acked,.st-sent{color:#6ef0a6}.st-queued,.st-skipped{color:var(--mute)}.st-failed,.st-no{color:#ff8a80}.st-sending{color:#ffd166}
+.slots{display:grid;grid-template-columns:repeat(20,1fr);gap:2px;margin-top:6px}
+.slots div{aspect-ratio:1;background:#1a1e24;border-radius:2px;cursor:pointer;font-size:0}
+.slots div.w{background:#2f4a3a}.slots div.a{background:var(--acc)}.slots div.sel{outline:2px solid var(--acc2)}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;z-index:50}
+.toast{background:#1d232b;border:1px solid #333a44;border-left:4px solid var(--acc);border-radius:8px;padding:8px 12px;min-width:240px;max-width:380px;box-shadow:0 6px 20px #0008;font-size:13px;animation:tin .2s}
+.toast.bad{border-left-color:var(--bad)}.toast.info{border-left-color:var(--acc2)}
+@keyframes tin{from{transform:translateY(8px);opacity:0}}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:10px}
+.pcard{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+.pcard img{width:256px;height:64px;image-rendering:pixelated;background:#000;display:block;margin:0 auto 4px;cursor:pointer;border-radius:4px}
+img.th{image-rendering:pixelated;background:#000;border-radius:4px;flex:none;vertical-align:middle}
+.pcard .n{font-size:12px;word-break:break-all}
+.ldgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:10px;margin-top:8px}
+.ldtile{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px;cursor:pointer}
+.ldtile.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.ldtile img{width:256px;height:64px;image-rendering:pixelated;background:#000;display:block;margin:0 auto 4px;border-radius:4px}
+.ldtile .t{font-size:12px;color:var(--text);display:flex;justify-content:space-between;gap:6px;align-items:center}
+.ldtile .s{font-size:11px;color:var(--mute);margin-top:2px}
+.plitem{display:flex;gap:8px;align-items:center;margin:2px 0;background:#11151a;padding:3px 6px;border-radius:6px;cursor:grab}
+.bar{flex:1;height:12px;background:#0a0c0f;border:1px solid #2a3039;border-radius:6px;overflow:hidden}.bar div{height:100%;width:0;background:var(--acc)}
+.drop{border:2px dashed #333a44;border-radius:10px;padding:16px;text-align:center;color:var(--mute);cursor:pointer}
+.drop.hover{border-color:var(--acc);color:var(--text)}
+canvas.led{background:#000;border-radius:6px;display:block;max-width:100%}
+html.sq .p512{width:320px;height:320px}html.sq .p256{width:160px;height:160px}
+html.sq .pcard img,html.sq .ldtile img{width:192px;height:192px}html.sq .pcard img.th{width:128px;height:128px}
+html.sq .pgrid,html.sq .ldgrid{grid-template-columns:repeat(auto-fill,minmax(208px,1fr))}
+html.sq #nowimg{aspect-ratio:1/1!important}
+.disp{display:flex;gap:6px;align-items:center;padding:4px 6px;border-radius:6px;background:#11151a;margin:3px 0;cursor:pointer;font-size:12px}
+.disp.sel{outline:2px solid var(--acc2)}.disp .a{color:var(--mute);font-size:11px}
+.dot.on{background:var(--acc)}.dot.mid{background:var(--warn)}
+#ed{cursor:crosshair;image-rendering:pixelated;touch-action:none}
+.frames{display:flex;gap:6px;overflow-x:auto;padding:4px 0}
+.frames canvas{width:128px;height:32px;image-rendering:pixelated;background:#000;border:2px solid #2a3039;border-radius:4px;cursor:pointer;flex:none}
+.frames canvas.on{border-color:var(--acc)}
+.sw{width:22px;height:22px;border-radius:4px;border:1px solid #333a44;cursor:pointer;display:inline-block}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12px}
+.kv b{color:var(--mute);font-weight:500}
+label.chk{display:inline-flex;gap:5px;align-items:center}
+.ctl{display:grid;grid-template-columns:110px 1fr 46px;gap:6px;align-items:center;font-size:12px}
+.ctl span:last-child{text-align:right;color:var(--mute)}
+</style></head><body>
+<header>
+ <img src="/logo.png" width="40" height="40" alt="OrcPixels">
+ <div><h1>OrcPixels</h1><div class="muted" id="hdrsub">iPixel Color 64x16 &middot; local control</div></div>
+ <nav id="nav">
+  <button data-tab="live">Live</button><button data-tab="presets">Presets</button><button data-tab="playlists">Playlists</button>
+  <button data-tab="convert">Image Converter</button><button data-tab="create">Image Creator</button><button data-tab="settings">Settings</button>
+ </nav>
+ <div style="flex:1"></div>
+ <button class="alt" onclick="api('/api/splash')">Splash</button>
+</header>
+<div class="wrap">
+<main>
+<!-- ================= LIVE ================= -->
+<section class="tab" id="tab-live">
+ <div class="card"><h2>OrcSDR Live</h2>
+  <div class="row"><button id="sdrbtn" onclick="sdrToggle()">Start Live</button>
+   <b id="sdrstate" title="While armed, Live falls back to the on-device playlist when OrcSDR drops and resumes by itself when it is back">Live: off</b>
+   <label class="chk"><input type="checkbox" id="sdrwf" onchange="api('/api/orcsdr/config',{waterfall:this.checked}).then(sdrPoll)"> waterfall</label>
+   <label class="chk">every <input type="number" id="sdrint" min="0" max="60" step="0.1" value="0" title="0 = as fast as the sign acks" onchange="api('/api/orcsdr/config',{interval:+this.value}).then(sdrPoll)"> s</label></div>
+  <div class="row" style="align-items:flex-start"><img id="sdrprev" class="panel p512" alt="OrcSDR preview"></div>
+  <div class="muted mono" id="sdrinfo">.</div>
+  <div class="row">Device <input type="text" id="sdrurl" placeholder="http://orcsdr.local" style="width:240px">
+   <button class="alt" onclick="api('/api/orcsdr/config',{url:$('sdrurl').value}).then(sdrPoll)">Save URL</button>
+   <span class="muted">read-only: GET /api/status + /api/spectrum only</span></div>
+ </div>
+ <div class="card"><h2>Live Data <span class="muted" style="text-transform:none;letter-spacing:0">30 screens from free sources (NWS, NOAA SWPC, USGS, NOAA tides, OpenSky, Open-Meteo, GitHub, Yahoo Finance, CoinGecko, ECB, NPR, BBC, OPB, Ars, ARRL, HN, Reddit) + optional X.com</span></h2>
+  <div class="row"><button id="ldbtn" onclick="ldToggle()">Start</button>
+   <b id="ldstate" title="Same rules as OrcSDR Live: one live source at a time; a preset/text/image send turns it off; falls back to the on-device playlist if the data source fails and resumes by itself">Live Data: off</b>
+   <label class="chk" title="cycle the ticked screens"><input type="checkbox" id="ldrot" onchange="ldCfg()"> rotate ticked screens every</label>
+   <input type="number" id="ldrots" min="5" max="3600" step="1" value="20" style="width:64px" onchange="ldCfg()"> s
+   <label class="chk">frame every <input type="number" id="ldint" min="0.5" max="60" step="0.5" value="1" style="width:56px" onchange="ldCfg()"> s</label>
+   <select id="ldtr" title="how frames go to the sign" onchange="api('/api/livedata/config',{transport:this.value}).then(r=>r&&ldRender(r))"><option value="legacy">legacy (PNG + acks, ~1 fps, works on this sign)</option><option value="fast">fast: experimental, FREEZES this sign</option><option value="fast-rgb">fast-rgb: experimental, FREEZES this sign</option><option value="fast-acked">fast-acked: experimental, FREEZES this sign</option><option value="fast-v2">fast-v2: experimental, legacy bytes, untested</option></select>
+   <button class="alt" id="ldtest" onclick="ldTestFrame()" title="send ONE frame of the picked screen (Live Data stays off) and check it on the sign">Send test frame</button></div>
+  <div class="row" id="ldask" style="display:none"><b id="ldaskq"></b>
+   <button class="alt sm" onclick="ldAnswer(true)">Yes, I see it</button><button class="warn sm" onclick="ldAnswer(false)">No (frozen / Bluetooth screen)</button></div>
+  <div class="row" style="align-items:flex-start;gap:16px"><div><div class="muted" id="ldprevt">preview</div><img id="ldprev" class="panel p512" alt="Live Data preview"></div>
+   <div class="muted mono" id="ldinfo" style="white-space:pre-wrap;max-width:420px">.</div></div>
+  <div class="muted">Click a tile to pick it (Start shows the picked screen); tick boxes choose the rotation. A red dot top-right on the sign = source down, last good value shown.</div>
+  <div class="ldgrid" id="ldgrid"></div>
+  <details id="ldfc" ontoggle="if(this.open) ldFcLoad()"><summary class="muted">Markets &amp; news sources (symbols, currencies, RSS, optional X token) + FT8 decoder (OrcSDR port / URL, my call, home grid)</summary>
+   <div class="muted">Comma-separated Yahoo symbols (e.g. AAPL, ^GSPC, GC=F, BTC-USD). Empty = default. Feeds refetch once after a change.</div>
+   <div id="ldfcf" style="display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;max-width:820px;margin:6px 0"></div>
+   <div class="row"><label>X bearer token <input type="password" id="ldxtok" placeholder="not set" autocomplete="off" style="width:240px"></label>
+    <span class="muted" id="ldxst"></span><span class="muted">stored in config/settings.json (gitignored), or set env X_BEARER_TOKEN</span></div>
+   <div class="row"><button class="alt" onclick="ldFcSave()">Save sources</button><button class="alt sm" onclick="ldFcSave(true)">Clear X token</button><span class="muted" id="ldfcmsg"></span></div>
+  </details>
+ </div>
+ <div class="card"><h2>Auto status &amp; buddy</h2>
+  <div class="row"><label class="chk"><input type="checkbox" id="auto" onchange="setAuto(this.checked)"> Follow active coding app (Codex / Claude / Grok)</label>
+   <label class="chk"><input type="checkbox" id="aien" onchange="api('/api/ai/config',{enabled:this.checked}).then(aiPoll)"> AI status feature (reads which AI app is in front)</label>
+   <label class="chk"><input type="checkbox" id="buddy" onchange="api('/api/ai/config',{buddy:this.checked}).then(aiPoll)"> Buddy (what the agent is doing)</label>
+   <span class="muted" id="autoinfo"></span></div>
+  <div class="row"><div><div class="muted">status frame</div><img id="aistat" class="panel p256" alt="status preview"></div>
+   <div><div class="muted">buddy frame</div><img id="aibud" class="panel p256" alt="buddy preview"></div></div>
+  <div class="muted mono" id="aiinfo" style="white-space:pre-wrap">.</div>
+ </div>
+</section>
+
+<!-- ================= PRESETS ================= -->
+<section class="tab" id="tab-presets">
+ <div class="card"><h2>Preview</h2>
+  <div class="row" style="gap:18px;align-items:flex-start">
+   <div><div class="muted">on the sign (last frame sent)</div><img id="live" class="panel p512" src="/api/frame.png" alt="last frame"></div>
+   <div><div class="muted">draft (hover a preset, type text)</div><img id="draft" class="panel p512" alt="draft"></div></div>
+ </div>
+ <div class="card"><h2>Presets <span class="muted" id="pcount"></span></h2>
+  <div class="row">Family <select id="pfam" onchange="renderPresets()"><option value="">all</option></select>
+   <input type="text" id="pq" placeholder="search" oninput="renderPresets()" style="width:200px"></div>
+  <div class="pgrid" id="presets"></div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h2>Text</h2>
+   <div class="row"><input type="text" id="text" value="HELLO" maxlength="255" oninput="draft()" style="flex:1">
+    <input type="color" id="color" value="#ffffff" oninput="draft()"></div>
+   <div class="row"><label>Mode <select id="mode" onchange="draft()"><option value="native">native device text</option><option value="image">render as image</option></select></label>
+    <label>Animation <select id="anim"><option value="0">static</option><option value="1">scroll left</option><option value="2">scroll right</option><option value="5">blink</option><option value="6">fade</option><option value="7">snowflake</option></select></label></div>
+   <div class="row"><label>Speed <input type="range" id="speed" min="0" max="100" value="80"></label></div>
+   <div class="row"><input type="text" id="sub" placeholder="subtitle (image mode, 2nd line)" oninput="draft()" style="flex:1">
+    <button onclick="sendText()">Send text</button></div>
+  </div>
+  <div class="card"><h2>Quick image &amp; projects</h2>
+   <div class="row"><input type="file" id="file" accept="image/*" onchange="draftFile()">
+    <button onclick="sendImage()">Send image</button><button class="alt" onclick="api('/api/test-image')">Test pattern</button></div>
+   <div class="muted">For fit/crop/dither/GIF control use the Image Converter tab.</div>
+   <div class="row" style="margin-top:12px"><select id="proj" onchange="projPreview()"></select>
+    <select id="pkind" onchange="projPreview()"><option value="default">default</option><option value="banner">banner</option><option value="wave">wave</option><option value="icon">icon + name</option></select>
+    <button onclick="api('/api/projects/'+$('proj').value+'/show?kind='+$('pkind').value)">Show project</button></div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= PLAYLISTS ================= -->
+<section class="tab" id="tab-playlists">
+ <div class="card"><h2>Playlist editor (on-device memory)</h2>
+  <div class="muted">Presets are stored in the sign's program slots (1..100) and the sign cycles them by itself, no PC needed. Any live send (preset/text/image, Auto status, OrcSDR Live) pauses it; press <b>Play on sign</b> to resume. Durations are saved but the protocol has no duration field (the device decides).</div>
+  <div class="row">Playlist <select id="plsel" onchange="plLoad(this.value)"><option value="">(new)</option></select>
+   <input type="text" id="plname" placeholder="playlist name" style="width:180px">
+   <button class="alt" onclick="plNew()">New</button><button onclick="plSave()">Save</button><button class="alt" onclick="plRename()">Rename</button>
+   <button class="blue" onclick="plUpload()">Upload to sign</button>
+   <button class="alt" onclick="plPlay()">Play on sign</button>
+   <button class="alt" onclick="plDelete()">Delete playlist</button>
+   <button class="alt" onclick="if(confirm('Remove all items from the editor?')){PL.items=[];plRender();}">Clear items</button></div>
+  <div class="muted">Playlists belong to the selected display: <b id="pldisp"></b>.</div>
+  <div class="row" style="align-items:flex-start">
+   <div style="flex:1;min-width:240px"><input type="text" id="plq" placeholder="search presets" oninput="plPick()" style="width:100%">
+    <div id="plpick" style="max-height:560px;overflow:auto;margin-top:4px"></div></div>
+   <div style="flex:1.3;min-width:300px"><div class="muted">Order (drag, or use the arrows) &middot; <span id="plest"></span></div><div id="plitems"></div></div></div>
+  <div class="row"><div class="bar"><div id="plbar"></div></div><span class="muted" id="plprog">idle</span></div>
+  <div class="muted mono" id="pllog" style="white-space:pre-wrap;max-height:110px;overflow:auto"></div>
+ </div>
+ <div class="card"><h2>On device (slots written by OrcPixels)</h2>
+  <div class="muted" id="plact"></div><div class="pgrid" id="plslots" style="margin-top:8px"></div>
+ </div>
+</section>
+
+<!-- ================= CONVERTER ================= -->
+<section class="tab" id="tab-convert">
+ <div class="grid2">
+  <div class="card"><h2>Source</h2>
+   <div class="drop" id="cvdrop" onclick="$('cvfile').click()">Drop a PNG / JPG / GIF here or click to choose<br><span class="muted" id="cvname"></span></div>
+   <input type="file" id="cvfile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="cvPick(this.files[0])">
+   <h2 style="margin-top:14px">Framing</h2>
+   <div class="row"><select id="cv_mode" onchange="cvRun()"><option value="fit">fit (letterbox)</option><option value="fill">fill (cover + crop)</option><option value="crop">crop (1:1 pixels)</option><option value="stretch">stretch</option></select>
+    background <input type="color" id="cv_bg" value="#000000" onchange="cvRun()"></div>
+   <div class="ctl"><span>position x</span><input type="range" id="cv_pos_x" min="0" max="1" step="0.01" value="0.5"><span></span></div>
+   <div class="ctl"><span>position y</span><input type="range" id="cv_pos_y" min="0" max="1" step="0.01" value="0.5"><span></span></div>
+   <div class="ctl"><span>zoom</span><input type="range" id="cv_zoom" min="0.25" max="6" step="0.05" value="1"><span></span></div>
+   <h2 style="margin-top:14px">Color</h2>
+   <div class="ctl"><span>brightness</span><input type="range" id="cv_brightness" min="0.2" max="2.5" step="0.05" value="1"><span></span></div>
+   <div class="ctl"><span>contrast</span><input type="range" id="cv_contrast" min="0.2" max="3" step="0.05" value="1"><span></span></div>
+   <div class="ctl"><span>saturation</span><input type="range" id="cv_saturation" min="0" max="3" step="0.05" value="1"><span></span></div>
+   <div class="ctl"><span>colors (0 = all)</span><input type="range" id="cv_colors" min="0" max="64" step="1" value="0"><span></span></div>
+   <div class="row">dither <select id="cv_dither" onchange="cvRun()"><option value="none">none</option><option value="fs">Floyd-Steinberg</option></select></div>
+   <h2 style="margin-top:14px">Animation (GIF sources)</h2>
+   <div class="ctl"><span>fps</span><input type="range" id="cv_fps" min="1" max="30" step="1" value="10"><span></span></div>
+   <div class="ctl"><span>max frames</span><input type="range" id="cv_max_frames" min="1" max="64" step="1" value="32"><span></span></div>
+   <div class="row">seamless loop <select id="cv_loop" onchange="cvRun()"><option value="none">as is</option><option value="pingpong">ping-pong</option><option value="crossfade">crossfade tail</option></select>
+    <label class="chk">fade frames <input type="number" id="cv_xfade" min="1" max="16" value="4" onchange="cvRun()"></label></div>
+   <button class="alt sm" onclick="cvReset()">reset controls</button>
+  </div>
+  <div class="card"><h2>LED preview <span id="cvbadge"></span></h2>
+   <canvas id="cvled" class="led" width="640" height="160"></canvas>
+   <div class="muted mono" id="cvinfo" style="margin-top:6px">no image yet</div>
+   <div class="muted" id="cvwarn" style="color:var(--warn)"></div>
+   <div class="frames" id="cvframes"></div>
+   <div id="cvact"></div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= CREATOR ================= -->
+<section class="tab" id="tab-create">
+ <div class="card"><h2>Image Creator <span class="muted" id="edpos"></span></h2>
+  <div class="row" id="tools">
+   <button class="tool on" data-t="pencil" title="pencil (P)">Pencil</button><button class="tool" data-t="eraser" title="eraser (E)">Eraser</button>
+   <button class="tool" data-t="fill" title="fill (F)">Fill</button><button class="tool" data-t="line" title="line (L)">Line</button>
+   <button class="tool" data-t="rect" title="rectangle (R)">Rect</button><button class="tool" data-t="rectf" title="filled rectangle">Rect fill</button>
+   <button class="tool" data-t="pick" title="eyedropper (I)">Pick</button>
+   <span style="width:10px"></span>
+   <input type="color" id="edcolor" value="#35d07f" title="current color">
+   <span id="palette"></span>
+   <button class="alt sm" onclick="addCustom()" title="add current color to custom colors">+ custom</button><span id="custom"></span>
+  </div>
+  <div class="row">
+   <button class="alt sm" onclick="undo()" title="Ctrl+Z">Undo</button><button class="alt sm" onclick="redo()" title="Ctrl+Y">Redo</button>
+   <label class="chk"><input type="checkbox" id="edgrid" checked onchange="edDraw()"> grid</label>
+   <label class="chk"><input type="checkbox" id="edonion" onchange="edDraw()"> onion skin</label>
+   <button class="alt sm" onclick="edClear()">Clear frame</button>
+   <button class="alt sm" onclick="edShift(-1,0)" title="shift left">&larr;</button><button class="alt sm" onclick="edShift(1,0)">&rarr;</button>
+   <button class="alt sm" onclick="edShift(0,-1)">&uarr;</button><button class="alt sm" onclick="edShift(0,1)">&darr;</button>
+  </div>
+  <canvas id="ed" width="768" height="192"></canvas>
+  <div class="row" style="margin-top:8px"><b class="muted">Frames</b>
+   <button class="alt sm" onclick="frAdd()">+ blank</button><button class="alt sm" onclick="frDup()">duplicate</button>
+   <button class="alt sm" onclick="frMove(-1)">&larr; move</button><button class="alt sm" onclick="frMove(1)">move &rarr;</button>
+   <button class="warn sm" onclick="frDel()">delete</button>
+   <label class="chk">fps <input type="number" id="edfps" min="1" max="30" value="8"></label>
+   <span class="muted" id="frinfo"></span></div>
+  <div class="frames" id="edframes"></div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h2>Text &amp; import</h2>
+   <div class="row"><input type="text" id="edtext" placeholder="text" value="ORC" style="flex:1">
+    <select id="edfont"></select></div>
+   <div class="row">x <input type="number" id="edtx" value="1"> y <input type="number" id="edty" value="1">
+    <button onclick="edText()">Place text</button><span class="muted">uses the current color; undo removes it</span></div>
+   <div class="row" style="margin-top:10px"><select id="edimp" style="max-width:260px"></select>
+    <select id="edimpmode"><option value="replace">replace all frames</option><option value="layer">paste on current frame</option></select>
+    <button class="alt" onclick="edImport()">Import</button></div>
+  </div>
+  <div class="card"><h2>Preview &amp; output <span id="edbadge"></span></h2>
+   <canvas id="edled" class="led" width="512" height="128"></canvas>
+   <div class="row">loop fix <select id="edloop"><option value="none">as drawn</option><option value="pingpong">ping-pong</option><option value="crossfade">crossfade tail</option></select>
+    <button class="alt" onclick="edJob(true)">Check loop</button></div>
+   <div class="muted mono" id="edinfo"></div>
+   <div id="edact"></div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section class="tab" id="tab-settings">
+ <div class="grid2">
+  <div class="card"><h2>Connection</h2>
+   <div class="muted">Each display has its own link, settings, rotation, playlists and Live. Pick which one this page controls; signs are only ever connected by their saved address. New panels are found with an explicit scan.</div>
+   <div id="displist2" style="margin:6px 0"></div>
+   <div class="row"><button class="alt" onclick="dispScan()">Scan for new displays</button><span class="muted" id="scanst"></span></div>
+   <div id="scanres"></div>
+   <div class="row"><span class="dot" id="dot2"></span><span id="conn">.</span></div>
+   <div class="row"><button class="alt" onclick="api('/api/connect')">Connect</button><button class="alt" onclick="api('/api/disconnect')">Disconnect</button></div>
+   <div class="muted" id="err"></div>
+   <h2 style="margin-top:14px">30 s rule</h2>
+   <div class="row">timeout <input type="number" id="stuck" min="5" max="600" step="1"> s
+    <select id="idleact"><option value="play">play saved playlist</option><option value="disconnect">disconnect</option></select>
+    <button class="alt" onclick="saveRule()">Save</button></div>
+   <div class="muted">If the sign is connected but gets no content within this time (or the connection setup hangs), OrcPixels puts the saved on-device playlist back, or lets go of the sign so it runs on its own.</div>
+  </div>
+  <div class="card"><h2>Display</h2>
+   <div class="row">Brightness <input type="range" id="bri" min="0" max="100" value="60" onchange="api('/api/brightness',{level:+this.value})"> <span id="briv">60</span></div>
+   <div class="row"><button class="alt" onclick="api('/api/power',{on:true})">Power on</button><button class="alt" onclick="api('/api/power',{on:false})">Power off</button>
+    <button class="warn" onclick="api('/api/clear')">Blank</button></div>
+   <div class="row"><label class="chk"><input type="checkbox" id="rot" onchange="api('/api/settings',{rotate_180:this.checked})"> Rotate 180&deg; for this display (panel mounted upside-down; previews stay upright)</label></div>
+   <h2 style="margin-top:14px">Live transport</h2>
+   <div class="row"><select id="transport" onchange="api('/api/orcsdr/config',{transport:this.value}).then(sdrPoll)"><option value="legacy">legacy (PNG + acks, ~1 fps, works on this sign)</option><option value="fast">fast: experimental, FREEZES this sign</option><option value="fast-rgb">fast-rgb: experimental, FREEZES this sign</option><option value="fast-acked">fast-acked: experimental, FREEZES this sign</option><option value="fast-v2">fast-v2: experimental, legacy bytes, untested</option></select></div>
+  </div>
+ </div>
+ <div class="card"><h2>Device notifications</h2><div id="log" class="mono" style="white-space:pre-wrap;max-height:180px;overflow:auto;color:#8fcf9f"></div></div>
+ <div class="card"><h2>Device info</h2><div id="devinfo" class="kv"></div></div>
+</section>
+</main>
+
+<!-- ================= STATUS PANEL ================= -->
+<aside class="side">
+ <div class="card"><h2>Displays <button class="alt sm" style="margin-left:auto" onclick="dispScan()">Scan / add</button></h2>
+  <div id="displist" class="muted">loading.</div>
+ </div>
+ <div class="card"><h2>Sign <span class="muted" id="signlabel" style="text-transform:none;letter-spacing:0"></span></h2>
+  <div class="row" style="margin:0"><span class="dot" id="dot"></span><b id="linktxt">.</b></div>
+  <div class="muted" id="linksub"></div>
+  <div class="row" style="margin:6px 0 0"><span class="badge" id="livebadge">Live: off</span><span class="muted" id="livewhy"></span></div>
+  <div class="muted" id="busy" style="color:var(--warn)"></div>
+ </div>
+ <div class="card"><h2>On the device now</h2>
+  <img id="nowimg" class="panel" style="width:100%;aspect-ratio:4/1" src="/api/frame.png" alt="now">
+  <div class="row"><span class="badge" id="nowkind">?</span><b id="nowname"></b></div>
+  <div class="muted" id="nowsub"></div>
+ </div>
+ <div class="card"><h2>Send log <label class="chk muted" style="margin-left:auto;text-transform:none;letter-spacing:0"><input type="checkbox" id="logall"> control cmds</label></h2>
+  <div class="log" id="sendlog"><span class="muted">no sends yet</span></div>
+ </div>
+ <div class="card"><h2>Device slots <span class="muted" id="slotcount"></span></h2>
+  <div class="muted" id="slotact"></div>
+  <div class="slots" id="slotgrid"></div>
+  <div class="muted" id="slotdet" style="margin-top:6px">click a slot for details</div>
+  <h2 style="margin-top:12px">Saved playlists</h2>
+  <div id="savedpl" class="muted"></div>
+ </div>
+</aside>
+</div>
+<div id="toasts"></div>
+<!--DISPLAY-->
+<script>
+const DISP=window.OP_DISPLAY||{id:null,label:'Sign',width:64,height:16};
+const DW=DISP.width||64, DH=DISP.height||16, SQ=DW===DH;
+document.documentElement.classList.toggle('sq',SQ);
+document.getElementById("hdrsub").innerHTML=`${(DISP.label||"iPixel Color").replace(/[<>&]/g,"")} &middot; ${DW}x${DH} &middot; local control`;
+const $=id=>document.getElementById(id);
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TZ=Intl.DateTimeFormat().resolvedOptions().timeZone;   // the browser's zone
+const TZL=(()=>{ const n=(new Intl.DateTimeFormat('en-US',{timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName')||{}).value||''; return /^[A-Z][DS]T$/.test(n)?n[0]+'T':n; })();
+function ptTime(ts){ return new Date(ts*1000).toLocaleTimeString('en-GB',{timeZone:TZ,hour12:false}); }
+function ptIso(s){ if(!s) return '?'; const m=String(s).match(/^(\d{4})-(\d\d)-(\d\d)T(\d\d:\d\d(:\d\d)?)/); return m?`${m[2]}-${m[3]} ${m[4]} ${TZL}`:s; }
+function kb(n){ return n==null?'':(n>=1024?(n/1024).toFixed(1)+' KB':n+' B'); }
+function toast(msg,kind='ok',ms=4500){ const d=document.createElement('div'); d.className='toast '+(kind==='ok'?'':kind); d.innerHTML=msg;
+  const box=$('toasts'); box.appendChild(d); setTimeout(()=>d.remove(),ms); while(box.children.length>5) box.firstChild.remove(); }
+
+// ------------------------------------------------------------------ tabs
+function showTab(t){ if(!$('tab-'+t)) t='live';
+  document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+t));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  if(location.hash!=='#'+t) history.replaceState(null,'','#'+t); localStorage.opTab=t; if(t==='create') edDraw(); }
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+window.addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
+
+async function api(url, body, method='POST'){
+  $('err').textContent='';
+  try{ const r=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):null});
+    if(!r.ok){ const j=await r.json().catch(()=>({detail:r.statusText})); throw new Error(typeof j.detail==='string'?j.detail:JSON.stringify(j.detail)); }
+    return await r.json();
+  }catch(e){ $('err').textContent='Error: '+e.message; toast('<b>Error</b> '+esc(e.message),'bad',8000); return null; }
+  finally{ setTimeout(dash,150); }
+}
+
+// ------------------------------------------------------------------ status panel (/api/dash, 1 s)
+let PID=null, REV=0, ACT=new Map(), TOASTED=new Map(), FILES_REV=null, FIRST=true, ANIMATED=null, CONTENT_ID=0, NOWKIND='';
+async function dash(){
+  let d; try{ d=await (await fetch('/api/dash?since='+REV)).json(); }catch(e){ $('linktxt').textContent='server unreachable'; $('dot').style.background='var(--bad)'; return; }
+  if(PID!==null && d.pid!==PID){ PID=d.pid; REV=0; ACT.clear(); FIRST=true; return dash(); }
+  PID=d.pid;
+  for(const e of d.activity){ ACT.set(e.id,e); if(FIRST) TOASTED.set(e.id,e.status); else maybeToast(e);
+    if(e.kind!=='control' && e.status!=='failed' && e.status!=='sending') CONTENT_ID=Math.max(CONTENT_ID, e.kind==='live'?0:e.id); }
+  FIRST=false; REV=Math.max(REV,d.rev);
+  const ids=[...ACT.keys()]; if(ids.length>80) ids.slice(0,ids.length-80).forEach(k=>ACT.delete(k));
+  renderLink(d); renderNow(d); renderLog(); renderLive(d.live); renderBusy(d.queue);
+  if(d.files_rev!==FILES_REV){ FILES_REV=d.files_rev; plRefresh(); }
+  $('auto').checked=d.auto.enabled; $('rot').checked=d.rotate_180;
+  $('autoinfo').textContent=d.auto.available?('provider: '+d.auto.provider+(d.auto.last_error?' | error: '+d.auto.last_error:'')):'(no provider installed)';
+  $('log').textContent=(d.notifications||[]).map(n=>`${n.t} ${n.hex} ${n.kind||''}`).join('\n');
+}
+let LIVE_PREV=null;
+function renderLive(l){ if(!l) return;
+  const on=l.enabled; $('livebadge').textContent='Live: '+(on?l.label:'off'); $('livebadge').className='badge '+(on?(l.state==='streaming'?'b-ok':'b-warn'):'');
+  $('livewhy').textContent=on?(l.state==='streaming'&&!l.frames_sent?'starting: waiting for the BLE link':''):(l.stopped_reason?`turned off ${l.stopped_at?ptTime(l.stopped_at)+' '+TZL:''}: ${l.stopped_reason}`:'');
+  if(LIVE_PREV!==null && LIVE_PREV.enabled && !on) toast(`<b>${esc(l.name||'Live')} turned off</b>: ${esc(l.stopped_reason||'stopped')}`+(/sent$/.test(l.stopped_reason||'')?'<div class="muted">sending a preset/image/text replaces Live; press Start Live to get it back</div>':''),'bad',9000);
+  if(LIVE_PREV!==null && !LIVE_PREV.enabled && on) toast(`<b>${esc(l.name||'Live')} armed</b> &middot; first frame as soon as the sign is free`,'info',3000);
+  if(LIVE_PREV!==null && on && !LIVE_PREV.frames_sent && l.frames_sent) toast(`<b>${esc(l.name||'Live')}</b> is on the sign`,'ok',3000);
+  LIVE_PREV=l; sdrOn=on&&l.source!=='livedata'; ldOn=on&&l.source==='livedata';
+  if(!$('sdrbtn').disabled){ $('sdrbtn').textContent=sdrOn?'Stop Live':'Start Live'; $('sdrbtn').className=sdrOn?'warn':''; }
+  if(!$('ldbtn').disabled){ $('ldbtn').textContent=ldOn?'Stop':'Start'; $('ldbtn').className=ldOn?'warn':''; } }
+let QUEUE={queued:0};
+function renderBusy(q){ QUEUE=q||{queued:0};
+  $('busy').textContent=q&&(q.sending||q.queued)?`BLE busy: ${q.sending?'sending '+q.sending:''}${q.queued?` + ${q.queued} queued`:''} (~${q.est_s} s)`:''; }
+function showPreset(n){ const busy=QUEUE.sending||QUEUE.queued;
+  if(busy) toast(`queued <b>${esc(n)}</b> behind ${esc(QUEUE.sending||'')}${QUEUE.queued?` + ${QUEUE.queued} more`:''} (~${QUEUE.est_s} s)`,'info',3500);
+  else if(sdrOn||ldOn) toast(`sending <b>${esc(n)}</b>: this turns ${sdrOn?'OrcSDR Live':'Live Data'} off`,'info',3000);
+  api('/api/presets/'+encodeURIComponent(n)+'/show'); }
+function maybeToast(e){
+  if(e.status==='sending' || e.status==='queued' || TOASTED.get(e.id)===e.status) return;
+  const seen=TOASTED.has(e.id); TOASTED.set(e.id,e.status);
+  if(e.kind==='control' && e.status!=='failed') return;
+  if(e.kind==='live'){ if(e.status==='failed') toast(`<b>Live frame failed</b> ${esc(e.error||'')}`,'bad'); else if(!seen) toast(`<b>${esc((LIVE_PREV&&LIVE_PREV.name)||'Live')}</b> frames flowing`,'info',2500); return; }
+  if(e.status==='skipped'){ toast(`<b>${esc(e.what)}</b> skipped: ${esc((e.error||'').replace(/^skipped: /,''))}`,'info',5000); return; }
+  const ok=e.status!=='failed';
+  toast(`${ok?'&#10003;':'&#10007;'} <b>${esc(e.what)}</b> <span class="muted">${kb(e.bytes)} &middot; ${esc(e.status)}${e.ms!=null?' in '+(e.ms/1000).toFixed(1)+' s':''}</span>`+(e.error?`<div class="muted">${esc(e.error)}</div>`:''), ok?'ok':'bad', ok?4000:9000);
+}
+function linkText(d){
+  const lk=d.link||{}; const sub=[]; let txt, col;
+  if(d.connected){ txt='Connected'+(d.name?' \u00b7 '+d.name:''); col='var(--acc)';
+    if(lk.idle_in_s!=null) sub.push(`nothing sent yet: 30 s rule in ${Math.round(lk.idle_in_s)} s (${lk.idle_action})`); }
+  else if(lk.gave_up){ txt='Gave up \u00b7 sign runs its own playlist'; col='var(--warn)'; if(lk.gave_up_reason) sub.push(lk.gave_up_reason);
+    if(lk.next_retry_s!=null) sub.push(`next try in ${Math.round(lk.next_retry_s)} s`); }
+  else if(lk.state==='reconnecting'||lk.state==='connecting'){ txt=`Reconnecting\u2026 attempt ${lk.attempts||1}`; col='var(--warn)';
+    if(lk.next_retry_s!=null) sub.push(`next try in ${Math.round(lk.next_retry_s)} s`); if(lk.down_s!=null) sub.push(`down ${Math.round(lk.down_s)} s`); if(lk.error) sub.push(lk.error); }
+  else if(lk.want_connected===false){ txt='Disconnected (Settings \u2192 Connect)'; col='var(--bad)'; }
+  else { txt='Disconnected'; col='var(--bad)'; if(lk.next_retry_s!=null) sub.push(`next try in ${Math.round(lk.next_retry_s)} s`); }
+  const tail=[]; if(lk.reconnects) tail.push(`${lk.reconnects} reconnect(s)`); if(lk.idle_resumes) tail.push(`30 s rule used ${lk.idle_resumes}x`); if(lk.gave_up_count) tail.push(`gave up ${lk.gave_up_count}x`);
+  if(tail.length) sub.push(tail.join(', '));
+  return {txt,col,sub};
+}
+function renderLink(d){ const {txt,col,sub}=linkText(d);
+  $('linktxt').textContent=txt; $('dot').style.background=col; $('linksub').textContent=sub.join(' \u00b7 ');
+  $('conn').textContent=txt+(sub.length?' \u2014 '+sub.join(' \u00b7 '):''); $('dot2').style.background=col;
+  if(d.last_error && !$('err').textContent) $('err').textContent='last error: '+d.last_error; }
+const KINDCLS={live:'b-ok','live-fallback':'b-warn',playlist:'b-blue',slot:'b-blue',auto:'b-blue',preset:'',blank:'b-bad'};
+let thumbKey='';
+function renderNow(d){ const n=d.now||{};
+  $('nowkind').textContent=n.kind||'?'; $('nowkind').className='badge '+(KINDCLS[n.kind]||'');
+  $('nowname').textContent=n.name||'';
+  const s=[]; if(n.since) s.push('since '+ptTime(n.since)+' '+TZL); if(n.detail) s.push(n.detail);
+  if(n.slots&&n.slots.length) s.push('slots '+n.slots.join(', ')); if(n.presets) s.push(n.presets.join(' \u2192 '));
+  if(n.offline) s.push(n.offline);
+  $('nowsub').textContent=s.join(' \u00b7 ');
+  const preset=n.thumb&&n.thumb.startsWith('/api/presets/');
+  const key=preset?n.thumb:(d.animated?'gif':'png')+':'+CONTENT_ID;
+  if(key!==thumbKey || (!preset && !d.animated && n.kind==='live')){ thumbKey=key;
+    const src=preset?n.thumb:(d.animated?'/api/frame.gif':'/api/frame.png?scale=8')+(d.animated?'?':'&')+'t='+Date.now();
+    $('nowimg').src=src; $('live').src=src; }
+}
+function renderLog(){ const all=$('logall').checked;
+  const es=[...ACT.values()].filter(e=>all||e.kind!=='control').slice(-20).reverse();
+  $('sendlog').innerHTML=es.map(e=>{ const st=(e.status||'').split(' ')[0];
+    const tip=`${e.cmd}${e.reply?' reply '+e.reply:''}${e.error?' | '+e.error:''}${e.ms!=null?' | '+e.ms+' ms':''}${e.last_pt&&e.count>1?' | last '+e.last_pt:''}`;
+    return `<div class="logrow" title="${esc(tip)}"><span class="mono muted">${esc(e.pt)}</span><span class="w">${esc(e.what)}</span><span class="st-${st}">${kb(e.bytes)} ${e.status==='acked'||e.status==='sent'?'&#10003;':(e.status==='sending'?'&hellip;':(e.status==='queued'?'queued':(e.status==='skipped'?'skipped':'&#10007;')))}</span></div>`; }).join('')||'<span class="muted">no sends yet</span>'; }
+$('logall').onchange=renderLog;
+
+// ------------------------------------------------------------------ presets
+let PRESETS=[];
+const FAMNAMES={core:'core (OrcSDR / splash)',proj:'projects',rf:'RF / SDR',orc:'orc / warchief',code:'coding & AI',hw:'hardware',amb:'ambient',orc_co:'Oregon Radio Co',user:'made in the studio'};
+const FAMILIES=['user','proj','rf','orc','code','hw','amb','orc_co'];
+// Thumbnails are served at exactly their CSS size (64x64: 192 px = scale 3, list 128 px = scale 2;
+// 64x16: 256x64 = scale 4) so the LED dots are never resampled (a 256->192 nearest-neighbour
+// downscale dropped every 4th dot row/column: dim, moire, "empty" tiles). Only thumbnails near
+// the viewport carry a src, so a 3440 px wide page animates ~50 GIFs, not 99 (+99 in the
+// playlist picker): Chrome left partly black/stale tiles when every one of them was animating.
+const THUMB_IO=('IntersectionObserver' in window)?new IntersectionObserver(es=>es.forEach(e=>{ const im=e.target;
+  if(e.isIntersecting){ if(im.getAttribute('src')!==im.dataset.src) im.src=im.dataset.src; }
+  else if(im.getAttribute('src')) im.removeAttribute('src'); }),{rootMargin:'300px'}):null;
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{ if(n.nodeType!==1) return;
+  if(n.matches('img[data-src]')) lazyThumbs(n.parentNode||n); else lazyThumbs(n); }))).observe(document.body,{childList:true,subtree:true});
+function lazyThumbs(root){ root.querySelectorAll('img[data-src]').forEach(im=>{ if(THUMB_IO) THUMB_IO.observe(im); else im.src=im.dataset.src; }); }
+function psrc(p,scale=(SQ?3:4)){ return '/api/presets/'+encodeURIComponent(p?p.name:'')+'/led?scale='+scale; }   // LED-dot look, animated for GIFs
+async function loadPresets(){
+  PRESETS=await (await fetch('/api/presets')).json();
+  const fams=[...new Set(PRESETS.map(p=>p.family||'core'))];
+  const sel=$('pfam'), cur=sel.value;
+  sel.innerHTML='<option value="">all</option>'+fams.map(f=>`<option value="${f}">${FAMNAMES[f]||f}</option>`).join('');
+  sel.value=cur; renderPresets(); plPick(); plRender(); fillImport(); }
+function renderPresets(){
+  const fam=$('pfam').value, q=$('pq').value.toLowerCase();
+  const ps=PRESETS.filter(p=>(!fam||(p.family||'core')===fam)&&(!q||(p.name+' '+(p.title||'')+' '+(p.description||'')).toLowerCase().includes(q)));
+  $('pcount').textContent=ps.length+' preset(s)';
+  $('presets').innerHTML=ps.map(p=>`<div class="pcard"><img data-src="${psrc(p)}" width="${SQ?192:256}" height="${SQ?192:64}" decoding="async" alt="${esc(p.name)}" title="${esc(p.description||'')}" onmouseenter="$('draft').src=this.dataset.src" onclick="showPreset('${p.name}')">
+    <div class="n">${esc(p.title&&p.title!==p.name?p.title:p.name)}</div><div class="muted">${esc(p.name)} &middot; ${p.kind==='gif'?(p.frames?p.frames+' fr':'anim'):'still'}${p.bytes?' &middot; '+kb(p.bytes):''}</div>
+    <div class="row" style="justify-content:center"><button class="sm" onclick="showPreset('${p.name}')">Show</button><button class="alt sm" onclick="plAdd('${p.name}');toast('added ${esc(p.name)} to the playlist editor','info',2000)">+ playlist</button></div></div>`).join(''); lazyThumbs($('presets')); }
+function thumb(n,w=(SQ?128:256)){ const p=PRESETS.find(x=>x.name===n);
+  return p?`<img class="th" data-src="${psrc(p,SQ?2:4)}" width="${w}" height="${Math.round(w*DH/DW)}" decoding="async" alt="${esc(n)}">`:`<span class="muted" style="display:inline-block;width:${w}px">${esc(n)}</span>`; }
+
+// text / image / projects
+function textBody(){ return {text:$('text').value||' ', color:$('color').value, mode:$('mode').value, animation:+$('anim').value, speed:+$('speed').value, subtitle:$('sub').value}; }
+let dt; function draft(){ clearTimeout(dt); dt=setTimeout(async()=>{
+  const r=await fetch('/api/preview/text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(textBody())});
+  if(r.ok) $('draft').src=URL.createObjectURL(await r.blob()); },150); }
+function sendText(){ api('/api/text', textBody()); }
+function draftFile(){ const f=$('file').files[0]; if(!f) return; const img=new Image();
+  img.onload=()=>{ const c=document.createElement('canvas'); c.width=DW;c.height=DH; const g=c.getContext('2d');
+    g.fillStyle='#000'; g.fillRect(0,0,DW,DH); const s=Math.min(DW/img.width,DH/img.height);
+    const w=img.width*s,h=img.height*s; g.drawImage(img,(DW-w)/2,(DH-h)/2,w,h); $('draft').src=c.toDataURL(); };
+  img.src=URL.createObjectURL(f); }
+async function sendImage(){ const f=$('file').files[0]; if(!f){ toast('pick a file first','bad'); return; }
+  const fd=new FormData(); fd.append('file',f);
+  const r=await fetch('/api/image',{method:'POST',body:fd});
+  if(!r.ok){ const j=await r.json().catch(()=>({})); toast('<b>Error</b> '+esc(j.detail||r.statusText),'bad'); } dash(); }
+async function loadProjects(){ const ps=await (await fetch('/api/projects')).json();
+  $('proj').innerHTML=ps.map(p=>`<option value="${p.key}">${esc(p.display)}</option>`).join(''); projPreview(); }
+function projPreview(){ if(!$('proj').value) return; const k=$('pkind').value;
+  $('draft').src=k==='default'?'/api/projects/'+$('proj').value+'/default':'/api/projects/'+$('proj').value+'/frame.png?scale=8&kind='+k; }
+
+// ------------------------------------------------------------------ playlists
+let PL={items:[]}, PLDATA=null, plTimer=null, plDrag=null;
+function plPick(){ const q=$('plq').value.toLowerCase();
+  const ps=PRESETS.filter(p=>!q||(p.name+' '+(p.description||'')+' '+(p.family||'')).toLowerCase().includes(q));
+  $('plpick').innerHTML=ps.map(p=>`<div class="plitem" style="cursor:default">${thumb(p.name)}<span style="flex:1;font-size:12px;word-break:break-all">${esc(p.title&&p.title!==p.name?p.title:p.name)}<br><span class="muted">${esc(p.name)}</span></span><button class="alt sm" onclick="plAdd('${p.name}')">+ add</button></div>`).join('')||'<span class="muted">no match</span>'; }
+function plAdd(n){ PL.items.push({preset:n,duration:null}); plRender(); }
+function plMove(i,d){ const j=i+d; if(j<0||j>=PL.items.length) return; [PL.items[i],PL.items[j]]=[PL.items[j],PL.items[i]]; plRender(); }
+function plDel(i){ PL.items.splice(i,1); plRender(); }
+function plDrop(i){ if(plDrag===null||plDrag===i) return; const it=PL.items.splice(plDrag,1)[0]; PL.items.splice(i,0,it); plDrag=null; plRender(); }
+function plRender(){
+  const base=(PLDATA&&PL.name&&PLDATA.playlists[PL.name]&&PLDATA.playlists[PL.name].base_slot)||1;
+  $('plitems').innerHTML=PL.items.map((it,i)=>`<div class="plitem" draggable="true" ondragstart="plDrag=${i}" ondragover="event.preventDefault()" ondrop="plDrop(${i})">
+    <span class="muted" style="width:48px">slot ${base+i}</span>${thumb(it.preset)}<span style="flex:1;font-size:12px;word-break:break-all">${esc(it.preset)}</span>
+    <input type="number" min="0" step="0.5" placeholder="dur s" value="${it.duration??''}" style="width:64px" onchange="PL.items[${i}].duration=this.value?+this.value:null">
+    <button class="alt sm" onclick="plMove(${i},-1)">&uarr;</button><button class="alt sm" onclick="plMove(${i},1)">&darr;</button><button class="warn sm" onclick="plDel(${i})">&times;</button></div>`).join('')||'<span class="muted">add presets from the left</span>';
+  const bytes=PL.items.reduce((a,it)=>a+((PRESETS.find(p=>p.name===it.preset)||{}).bytes||0),0);
+  const rate=(PLDATA&&PLDATA.device.rate_bps)||1100;
+  const known=PL.items.every(it=>(PRESETS.find(p=>p.name===it.preset)||{}).bytes);
+  $('plest').textContent=PL.items.length+' item(s)'+(PL.name&&PLDATA&&PLDATA.playlists[PL.name]?` \u00b7 ~${kb(PLDATA.playlists[PL.name].approx_bytes)} \u00b7 upload ~${PLDATA.playlists[PL.name].approx_upload_s} s (saved)`:(known&&bytes?` \u00b7 ~${Math.round(bytes/rate)} s upload`:'')); }
+async function plRefresh(){
+  try{ PLDATA=await (await fetch('/api/playlists')).json(); }catch(e){ return; }
+  const sel=$('plsel'), cur=sel.value;
+  sel.innerHTML='<option value="">(new)</option>'+Object.keys(PLDATA.playlists).map(n=>`<option>${esc(n)}</option>`).join('');
+  sel.value=cur; plDevice(); plShowProgress(PLDATA.upload); renderSlots(); }
+function plLoad(n){ if(!n){ PL={items:[]}; $('plname').value=''; plRender(); return; }
+  const p=PLDATA.playlists[n]; PL={name:n,items:p.items.map(i=>({...i}))}; $('plname').value=n; plRender(); }
+async function plSave(){ const n=$('plname').value.trim(); if(!n){ toast('name the playlist first','bad'); return null; }
+  const r=await api('/api/playlists/'+encodeURIComponent(n),{items:PL.items}); if(r){ PL.name=n; await plRefresh(); $('plsel').value=n; plRender(); toast('playlist '+esc(n)+' saved','info',2000); } return r; }
+async function plUpload(){ const n=$('plname').value.trim()||$('plsel').value; if(!n){ toast('save the playlist first','bad'); return; }
+  if(!await plSave()) return; const r=await api('/api/playlists/'+encodeURIComponent(n)+'/upload'); if(r){ plShowProgress(r); plWatch(); } }
+async function plUploadNamed(n){ const r=await api('/api/playlists/'+encodeURIComponent(n)+'/upload'); if(r){ plShowProgress(r); plWatch(); } }
+async function plPlay(){ const r=await api('/api/playlists/play'); if(r) plRefresh(); }
+async function plDelete(){ const n=$('plsel').value; if(!n){ toast('pick a saved playlist','bad'); return; }
+  if(!confirm(`Delete playlist "${n}"? (slots on the sign are not erased)`)) return;
+  const r=await api('/api/playlists/'+encodeURIComponent(n),null,'DELETE'); if(r!==null){ $('plsel').value=''; plLoad(''); plRefresh(); } }
+function plWatch(){ clearInterval(plTimer); plTimer=setInterval(async()=>{ const p=await (await fetch('/api/playlists/upload')).json(); plShowProgress(p);
+  if(!p.running){ clearInterval(plTimer); plTimer=null; plRefresh(); } },1000); }
+function plShowProgress(p){ if(!p) return; $('plbar').style.width=(p.pct||0)+'%'; $('plbar').style.background=p.error?'var(--bad)':'var(--acc)';
+  $('plprog').textContent=p.phase==='idle'?'idle':`${p.playlist||''}: ${p.phase} ${p.items?`item ${p.item}/${p.items} ${p.current||''}`:''} ${p.bytes_sent}/${p.bytes_total} B (${p.pct}%)`+
+    (p.running?` \u00b7 elapsed ${p.elapsed_s}s \u00b7 eta ${p.eta_s??'?'}s`:(p.elapsed_s?` \u00b7 took ${p.elapsed_s}s`:''))+(p.error?' \u00b7 '+p.error:'');
+  $('pllog').textContent=(p.log||[]).join('\n'); if(p.running&&!plTimer) plWatch(); }
+function slotLabel(e){ return e.preset&&e.preset.startsWith('studio:')?'studio image':e.preset; }
+function plDevice(){ const d=PLDATA.device, a=d.active;
+  $('plact').textContent=a?`play order: ${a.playlist} \u00b7 slots ${a.slots.join(', ')} (set ${ptIso(a.played_at||a.set_at)}, ack ${a.ack})`:'no play order set by OrcPixels yet';
+  const di=PLDATA.device_info; if(di&&di.stored_slots_hint!=null) $('plact').textContent+=` \u00b7 device-info byte 8 (probably stored slot count): ${di.stored_slots_hint}`;
+  const ks=Object.keys(d.slots).sort((x,y)=>x-y);
+  $('plslots').innerHTML=ks.map(k=>{ const e=d.slots[k]; const on=a&&a.slots.includes(+k);
+    return `<div class="pcard" style="border-color:${on?'var(--acc)':'var(--line)'}"><div class="muted">slot ${k}${on?' &middot; in play order':''}</div>${thumb(e.preset)}
+      <div class="n">${esc(slotLabel(e))}</div><div class="muted" title="ack ${esc(e.ack)}">${e.kind} ${kb(e.bytes)} &middot; ${ptIso(e.written)}</div>
+      <button class="alt sm" onclick="api('/api/slots/${k}/show')">show</button></div>`; }).join('')||'<span class="muted">(none)</span>'; }
+let SLOTSEL=null;
+function renderSlots(){ if(!PLDATA) return; const d=PLDATA.device, a=d.active, max=PLDATA.max_slots||100;
+  const n=Object.keys(d.slots).length; $('slotcount').textContent=`${n}/${max} written`;
+  $('slotact').innerHTML=a?`playing <b>${esc(a.playlist)}</b> &middot; slots ${a.slots.join(', ')}<br>set ${ptIso(a.played_at||a.set_at)}`:'no play order set yet';
+  let h=''; for(let i=1;i<=max;i++){ const e=d.slots[i]; const on=a&&a.slots.includes(i);
+    h+=`<div class="${e?'w':''} ${on?'a':''} ${SLOTSEL===i?'sel':''}" title="slot ${i}${e?': '+esc(slotLabel(e))+' ('+e.kind+', '+kb(e.bytes)+', '+ptIso(e.written)+')':' (empty / unknown)'}" onclick="slotPick(${i})"></div>`; }
+  $('slotgrid').innerHTML=h;
+  if(SLOTSEL) slotPick(SLOTSEL,true);
+  const pls=PLDATA.playlists;
+  $('savedpl').innerHTML=Object.keys(pls).map(k=>{ const p=pls[k]; const act=a&&a.playlist===k;
+    return `<div class="row" style="margin:3px 0"><span style="flex:1"><b style="color:var(--text)">${esc(k)}</b>${act?' <span class="badge b-ok">on device</span>':''}<br>${p.items.length} item(s), slots ${p.slots[0]}..${p.slots[p.slots.length-1]}, ~${p.approx_upload_s} s upload</span>
+      ${act?`<button class="alt sm" onclick="plPlay()">play</button>`:`<button class="alt sm" onclick="plUploadNamed('${esc(k)}')">upload</button>`}</div>`; }).join('')||'none saved'; }
+function slotPick(i,quiet){ SLOTSEL=i; const e=PLDATA&&PLDATA.device.slots[i];
+  if(!quiet) document.querySelectorAll('#slotgrid div').forEach((el,j)=>el.classList.toggle('sel',j+1===i));
+  $('slotdet').innerHTML=e?`<b style="color:var(--text)">slot ${i}</b>: ${esc(slotLabel(e))}<br>${e.kind}, ${kb(e.bytes)}, written ${ptIso(e.written)}${e.playlist?' by playlist '+esc(e.playlist):(e.source?' by the '+esc(e.source):'')}, ack ${esc(e.ack)} <button class="alt sm" onclick="api('/api/slots/${i}/show')">show</button>`:`slot ${i}: nothing written by OrcPixels`; }
+
+// ------------------------------------------------------------------ OrcSDR Live + Auto
+let sdrOn=false;
+async function sdrToggle(){ const b=$('sdrbtn'); b.disabled=true;
+  try{ // decide from fresh state: the button label can be up to a poll old (18:05 report)
+    let on=sdrOn; try{ on=(await (await fetch('/api/orcsdr/status')).json()).live.enabled; }catch(e){}
+    const r=await api('/api/orcsdr/live',{action:on?'stop':'start',waterfall:$('sdrwf').checked,interval:+$('sdrint').value});
+    if(r&&!on&&(QUEUE.sending||QUEUE.queued)) toast(`Live armed; ${QUEUE.queued?QUEUE.queued+' queued send(s) dropped, ':''}waiting for ${esc(QUEUE.sending||'the current send')} to finish`,'info',5000);
+  } finally { b.disabled=false; sdrPoll(); aiPoll(); } }
+async function sdrPoll(){
+  try{ const s=await (await fetch('/api/orcsdr/status')).json(); const l=s.live, d=s.device;
+    sdrOn=l.enabled; if(!$('sdrbtn').disabled){ $('sdrbtn').textContent=sdrOn?'Stop Live':'Start Live'; $('sdrbtn').className=sdrOn?'warn':''; }
+    $('sdrstate').textContent='Live: '+(l.label||(sdrOn?'streaming':'off'));
+    $('sdrstate').style.color=l.state==='streaming'?'#8cfc28':(l.state==='waiting'?'var(--warn)':'var(--mute)');
+    if(document.activeElement!==$('sdrurl')) $('sdrurl').value=s.url;
+    $('sdrwf').checked=l.waterfall; if(document.activeElement!==$('sdrint')) $('sdrint').value=l.interval_s;
+    if(s.transport||l.transport) $('transport').value=s.transport||l.transport;
+    const dev=d?`${d.mode} ${(d.frequency_hz/1e6).toFixed(3)} MHz  ${d.signal_dbfs!=null?d.signal_dbfs.toFixed(1)+' dBFS':''} ${d.program_service||''}`:('OrcSDR offline: '+(s.device_error||'?'));
+    const st=!sdrOn?('idle'+(l.stopped_reason?' ('+l.stopped_reason+')':'')):
+      (l.state==='waiting'?`waiting for OrcSDR, outage #${l.outages}, probing every 3-5 s`+(l.fallback_error?' | fallback error: '+l.fallback_error:''):
+      `LIVE, ${l.frames_sent} frames, ~${l.avg_send_ms||'?'} ms/frame${l.frames_per_s?', '+l.frames_per_s+' fps':''}${l.resumes?', auto-resumed '+l.resumes+'x':''}`)+(l.test_outage?' | TEST OUTAGE ON':'');
+    $('sdrinfo').textContent=dev+' | '+st+(l.send_error?' | send error: '+l.send_error:'');
+    if($('tab-live').classList.contains('on')) $('sdrprev').src='/api/orcsdr/preview.png?scale=8&t='+Date.now();
+  }catch(e){ $('sdrinfo').textContent='status unavailable'; }
+}
+// ------------------------------------------------------------------ Live Data
+let ldOn=false, LDPICK=localStorage.ldPick||null, LDSRC={}, LDDATA=null, LDCHK=null;
+function ldChecked(){ return [...document.querySelectorAll('#ldgrid input[type=checkbox]:checked')].map(c=>c.dataset.k); }
+function ldBody(){ const rot=$('ldrot').checked; let scr;
+  if(rot){ scr=ldChecked(); if(LDPICK&&scr.includes(LDPICK)) scr=[LDPICK,...scr.filter(k=>k!==LDPICK)]; if(!scr.length&&LDPICK) scr=[LDPICK]; }
+  else scr=[LDPICK||(LDDATA&&LDDATA.live.current)||'wx_now'];
+  return {screens:scr, rotate:rot, rotate_s:+$('ldrots').value, interval:+$('ldint').value}; }
+async function ldToggle(){ const b=$('ldbtn'); b.disabled=true;
+  try{ let on=ldOn; try{ on=(await (await fetch('/api/livedata/status')).json()).live.enabled; }catch(e){}
+    const r=await api('/api/livedata/live', on?{action:'stop'}:{action:'start',...ldBody()});
+    if(r&&!on&&(QUEUE.sending||QUEUE.queued)) toast(`Live Data armed; waiting for ${esc(QUEUE.sending||'the current send')} to finish`,'info',5000);
+    if(r) ldRender(r);
+  } finally { b.disabled=false; sdrPoll(); } }
+async function ldTestFrame(){ const k=LDPICK||(LDDATA&&LDDATA.live.current)||'xray'; $('ldtest').disabled=true;
+  try{ const r=await api('/api/livedata/test-frame',{screen:k}); if(!r) return; ldRender(r);
+    const sc=r.screens.find(x=>x.key===k); $('ldaskq').textContent=`Is "${sc?sc.title:k}" (sent ${ptTime(r.at)} ${TZL} via ${r.transport}) showing on the sign?`; $('ldask').style.display='';
+  } finally { $('ldtest').disabled=false; } }
+async function ldAnswer(ok){ $('ldask').style.display='none';
+  if(ok){ toast(`<b>${esc($('ldtr').value)}</b> draws on this sign: Start is safe`,'ok',5000); return; }
+  toast(`<b>${esc($('ldtr').value)}</b> does not draw on this sign. Switching Live Data to <b>legacy</b> and putting the playlist back.`,'bad',9000);
+  await api('/api/livedata/config',{transport:'legacy'}); await api('/api/playlists/play',{}); ldPoll(); }
+async function ldCfg(){ const body=ldBody(); const r=await api(ldOn?'/api/livedata/live':'/api/livedata/config', ldOn?{action:'start',...body}:body); if(r) ldRender(r); }
+function ldPick(k){ LDPICK=k; localStorage.ldPick=k; document.querySelectorAll('.ldtile').forEach(t=>t.classList.toggle('sel',t.dataset.k===k));
+  ldPrev(true); if(ldOn&&!$('ldrot').checked) ldCfg(); }
+function ldPrev(force){ if(!LDDATA) return; const k=LDPICK||LDDATA.live.current; const sc=LDDATA.screens.find(x=>x.key===k); if(!sc) return;
+  const src=`/api/livedata/screens/${k}/led.gif?scale=8&v=${sc.ok_at||0}${sc.stale?'s':''}${Math.floor(Date.now()/60000)}`;
+  if(force||$('ldprev').dataset.src!==src){ $('ldprev').dataset.src=src; $('ldprev').src=src; }
+  $('ldprevt').textContent=`preview: ${sc.title}`; }
+function ldStatus(sc){ if(sc.needs_key) return ['b-warn','needs token']; if(sc.error&&sc.usable) return ['b-warn','stale']; if(sc.error) return ['b-bad','error'];
+  if(!sc.ok_at) return ['','not fetched']; return [sc.stale?'b-warn':'b-ok', sc.stale?'stale':'fresh']; }
+function ldAge(s){ return s==null?'':(s<90?s+' s':(s<5400?Math.round(s/60)+' min':Math.round(s/3600)+' h'))+' ago'; }
+function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
+  if(!$('ldbtn').disabled){ $('ldbtn').textContent=ldOn?'Stop':'Start'; $('ldbtn').className=ldOn?'warn':''; }
+  $('ldstate').textContent='Live Data: '+(l.label||'off'); $('ldstate').style.color=l.state==='streaming'?'#8cfc28':(l.state==='waiting'?'var(--warn)':'var(--mute)');
+  if(document.activeElement!==$('ldrots')) $('ldrots').value=l.rotate_s; if(document.activeElement!==$('ldint')) $('ldint').value=l.interval_s;
+  $('ldrot').checked=l.rotate; if(document.activeElement!==$('ldtr')) $('ldtr').value=l.transport||'legacy'; $('ldtest').disabled=ldOn;
+  if(!LDPICK) LDPICK=l.current;
+  const st=!ldOn?('idle'+(l.stopped_reason?' ('+l.stopped_reason+(l.stopped_at?', '+ptTime(l.stopped_at)+' '+TZL:'')+')':'')):
+    (l.state==='waiting'?`waiting for data (outage #${l.outages}); sign on ${l.showing||'?'}`+(l.data_error?'\n'+l.data_error:''):
+    `LIVE: ${l.current_title}, ${l.frames_sent} frames${l.frames_per_s?', '+l.frames_per_s+' fps':''}${l.rotate?`, rotating ${l.screens.length} every ${l.rotate_s} s`:''}${l.resumes?', auto-resumed '+l.resumes+'x':''}`);
+  $('ldinfo').textContent=st+(l.send_error?'\nsend error: '+l.send_error:'');
+  const g=$('ldgrid'); const sig=d.screens.map(s=>s.key).join();
+  if(g.dataset.sig!==sig){ g.dataset.sig=sig; g.innerHTML=d.screens.map((s,i)=>(i===0||d.screens[i-1].group!==s.group?`<div class="ldgroup muted" style="grid-column:1/-1;margin-top:6px;font-weight:600">${esc(s.group||'')}</div>`:'')+`<div class="ldtile" data-k="${s.key}" onclick="ldPick('${s.key}')">
+     <img alt="${esc(s.title)}"><div class="t"><span><b>${esc(s.title)}</b></span><span class="badge"></span>
+     <label class="chk" onclick="event.stopPropagation()" title="include in rotation"><input type="checkbox" data-k="${s.key}" onchange="ldCfg()"></label></div>
+     <div class="s"></div></div>`).join(''); }
+  const chk=new Set(l.screens);
+  for(const s of d.screens){ const t=g.querySelector(`.ldtile[data-k="${s.key}"]`); if(!t) continue;
+    t.classList.toggle('sel',s.key===LDPICK);
+    const c=t.querySelector('input'); if(document.activeElement!==c) c.checked=l.rotate?chk.has(s.key):c.checked||false;
+    const [cls,txt]=ldStatus(s); const b=t.querySelector('.badge'); b.className='badge '+cls; b.textContent=txt;
+    t.querySelector('.s').textContent=`${s.source}${s.key_env?(s.needs_key?' (needs '+s.key_env+')':' (optional '+s.key_env+')'):''} · every ${s.poll_s>=60?Math.round(s.poll_s/60)+' min':s.poll_s+' s'} · ${ldAge(s.age_s)}`+(s.error?' · '+s.error.slice(0,80):'');
+    const im=t.querySelector('img'); const src=`/api/livedata/screens/${s.key}/led.gif?scale=4&v=${s.ok_at||0}${s.stale?'s':''}${Math.floor(Date.now()/60000)}`;
+    if(im.dataset.src!==src && $('tab-live').classList.contains('on')){ im.dataset.src=src; im.src=src; } }
+  ldPrev(false); }
+async function ldFcLoad(){ try{ const c=await (await fetch('/api/livedata/feed-config')).json();
+  $('ldfcf').innerHTML=c.fields.map(f=>`<label class="muted" for="ldfc_${f.key}">${esc(f.label)}</label><input type="text" id="ldfc_${f.key}" data-k="${f.key}" value="${esc(f.value)}" placeholder="${esc(f.default)}" style="width:100%">`).join('');
+  $('ldxst').textContent=c.secrets.livedata_x_bearer_token?'token: set':'token: not set (X screen stays off)'; }catch(e){ $('ldfcmsg').textContent='could not load'; } }
+async function ldFcSave(clearTok){ const values={}; document.querySelectorAll('#ldfcf input').forEach(i=>values[i.dataset.k]=i.value.trim());
+  if(clearTok) values.livedata_x_bearer_token=''; else if($('ldxtok').value.trim()) values.livedata_x_bearer_token=$('ldxtok').value.trim();
+  const r=await api('/api/livedata/feed-config',{values}); $('ldxtok').value='';
+  if(r){ $('ldfcmsg').textContent='saved '+ptTime(Date.now()/1000)+' '+TZL; ldRender(r); ldFcLoad(); } }
+async function ldPoll(){ try{ ldRender(await (await fetch('/api/livedata/screens')).json()); }catch(e){ $('ldinfo').textContent='status unavailable'; } }
+async function setAuto(on){ const s=await api('/api/auto',{enabled:on}); if(!s) $('auto').checked=false; aiPoll(); sdrPoll(); }
+let aiKey='';
+async function aiPoll(){
+  try{ const s=await (await fetch('/api/ai/state')).json(); const d=s.detection, b=s.last_buddy||s.activity, l=s.last_send;
+    $('buddy').checked=s.buddy; $('aien').checked=s.feature_enabled!==false;
+    const cap=s.capabilities||{}; const capl=cap.available?'':`not available here: ${cap.reason||'unsupported platform'}`;
+    const lines=[capl, s.feature_enabled===false?'AI status feature is off (Settings: ai_enabled)':'', d?`app: ${d.app_display} (${d.via})   project: ${d.project||'-'}   branch: ${d.branch||'-'}`:'app: (no AI app seen yet)',
+      d?`worktree: ${d.worktree||'(main checkout)'}   folder: ${d.folder||'-'}`:'', d?`from: ${d.source||'-'}`:'',
+      `buddy: ${b?'['+b.state+'] '+b.text:'-'}`,
+      (s.enabled?'ON':'off')+(l?`  last send: ${l.kind} ${l.bytes} B${l.send_ms?' in '+l.send_ms+' ms':''} at ${ptTime(l.at)} ${TZL}  (${s.sends} sends)`:'')
+        +(s.stopped_reason?'  stopped: '+s.stopped_reason:'')+(s.error?'  error: '+s.error:'')];
+    $('aiinfo').textContent=lines.filter(x=>x).join('\n');
+    const k=JSON.stringify([d&&[d.app,d.repo,d.branch,d.worktree],b&&[b.state,b.text]]);
+    if(k!==aiKey){ aiKey=k; $('aistat').src='/api/ai/preview.png?kind=status&scale=4&t='+Date.now(); $('aibud').src='/api/ai/preview.png?kind=buddy&scale=4&t='+Date.now(); }
+  }catch(e){ $('aiinfo').textContent='ai status unavailable'; }
+}
+
+// ------------------------------------------------------------------ settings
+async function loadSettings(){ try{ const s=await (await fetch('/api/settings')).json();
+  $('stuck').value=s.sign_stuck_timeout_s??30; $('idleact').value=s.sign_idle_action||'play'; }catch(e){} }
+async function saveRule(){ const r=await api('/api/settings',{sign_stuck_timeout_s:+$('stuck').value,sign_idle_action:$('idleact').value}); if(r) toast('30 s rule saved','info',2000); }
+async function statusPoll(){ try{ const s=await (await fetch('/api/status')).json(); const di=s.device_info||{};
+  const kv={address:s.address,name:s.name,size:`${s.width}x${s.height}`,pid:s.pid,brightness:s.brightness,power:s.power,...di};
+  $('devinfo').innerHTML=Object.entries(kv).filter(([k,v])=>v!=null&&typeof v!=='object').map(([k,v])=>`<b>${esc(k)}</b><span>${esc(v)}</span>`).join('');
+  if(s.brightness!=null && document.activeElement!==$('bri')){ $('bri').value=s.brightness; $('briv').textContent=s.brightness; } }catch(e){} }
+$('bri').oninput=()=>$('briv').textContent=$('bri').value;
+
+// ------------------------------------------------------------------ LED preview + jobs (converter / creator)
+function ledDraw(c, id){ const g=c.getContext('2d'), s=c.width/DW, d=id.data;
+  g.fillStyle='#000'; g.fillRect(0,0,c.width,c.height);
+  for(let y=0;y<DH;y++) for(let x=0;x<DW;x++){ const i=(y*DW+x)*4, a=d[i+3]/255, r=d[i]*a, gg=d[i+1]*a, b=d[i+2]*a;
+    g.fillStyle=(r+gg+b<8)?'#0d0d0d':`rgb(${r|0},${gg|0},${b|0})`; g.beginPath(); g.arc(x*s+s/2,y*s+s/2,s*0.42,0,6.2832); g.fill(); } }
+const ANIM={};
+function ledStart(key, c, frames, ms){ clearInterval(ANIM[key]); if(!frames.length) return; let i=0; const step=()=>{ ledDraw(c,frames[i%frames.length]); i++; }; step();
+  if(frames.length>1) ANIM[key]=setInterval(step, Math.max(20,ms)); }
+function urlToData(u){ return new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>{ const c=document.createElement('canvas'); c.width=DW;c.height=DH;
+  const g=c.getContext('2d'); g.drawImage(im,0,0,DW,DH); res(g.getImageData(0,0,DW,DH)); }; im.onerror=rej; im.src=u; }); }
+function dataToUrl(id){ const c=document.createElement('canvas'); c.width=DW;c.height=DH; c.getContext('2d').putImageData(id,0,0); return c.toDataURL('image/png'); }
+const JOB={cv:null, ed:null}, SAVED={cv:null, ed:null};
+function loopBadge(j){ if(!j) return ''; if(j.kind!=='gif') return '<span class="badge">still</span>';
+  return j.loop&&j.loop.ok?'<span class="badge b-ok">seamless loop</span>':'<span class="badge b-bad">loop jumps</span>'; }
+function jobInfoText(j){ const l=j.loop; return `${j.kind.toUpperCase()} \u00b7 ${j.frames} frame(s)${j.kind==='gif'?` @ ${j.frame_ms} ms (${j.fps} fps)`:''} \u00b7 ${kb(j.bytes)} \u00b7 BLE upload ~${j.upload_s} s`+
+  (l?`\nloopcheck: seam ${l.seam} vs p90 ${l.p90} (mc ${l.seam_mc} vs ${l.p90_mc}) \u2192 ${l.ok?'seamless':'JUMP'}`:''); }
+function actionsHtml(p){ return `<div class="row" style="margin-top:10px"><button onclick="jobSend('${p}')">Send to sign</button></div>
+  <div class="row"><input type="text" id="${p}_name" placeholder="preset name (a-z 0-9 _)" style="width:190px"><select id="${p}_family">${FAMILIES.map(f=>`<option value="${f}">${FAMNAMES[f]||f}</option>`).join('')}</select>
+   <input type="text" id="${p}_title" placeholder="title (optional)" style="width:150px"></div>
+  <div class="row"><label class="chk"><input type="checkbox" id="${p}_over"> overwrite</label><label class="chk"><input type="checkbox" id="${p}_force"> save even if the loop jumps</label>
+   <button class="alt" onclick="jobSave('${p}')">Save as preset</button></div>
+  <div class="row">slot <input type="number" id="${p}_slot" min="1" max="100" value="${p==='cv'?90:95}" oninput="slotHint('${p}')"><button class="blue" onclick="jobStore('${p}')">Store in slot</button><span class="muted" id="${p}_slotinfo"></span></div>`; }
+function slotHint(p){ const n=+$(p+'_slot').value, e=PLDATA&&PLDATA.device.slots[n], a=PLDATA&&PLDATA.device.active;
+  $(p+'_slotinfo').textContent=!e?'empty (not written by OrcPixels)':`holds ${slotLabel(e)} (${ptIso(e.written)})`+(a&&a.slots.includes(n)?' \u00b7 in the play order: playlist re-plays after the write':''); }
+async function jobId(p){ return p==='ed'? await edJob(false) : (JOB.cv&&JOB.cv.id); }
+async function jobSend(p){ const id=await jobId(p); if(!id){ toast('nothing to send yet','bad'); return; } await api('/api/studio/jobs/'+id+'/send'); }
+async function jobSave(p){ const id=await jobId(p); if(!id){ toast('nothing to save yet','bad'); return; }
+  const name=$(p+'_name').value.trim(); if(!name){ toast('give the preset a name','bad'); return; }
+  const r=await api('/api/studio/jobs/'+id+'/save',{name,family:$(p+'_family').value,title:$(p+'_title').value,overwrite:$(p+'_over').checked,force:$(p+'_force').checked});
+  if(r){ SAVED[p]=r.preset.name; toast(`saved preset <b>${esc(r.preset.name)}</b> (${kb(r.preset.bytes)})`,'info'); loadPresets(); } }
+async function jobStore(p){ const id=await jobId(p); if(!id){ toast('nothing to store yet','bad'); return; }
+  const slot=+$(p+'_slot').value; const e=PLDATA&&PLDATA.device.slots[slot];
+  if(e && !confirm(`Slot ${slot} holds "${slotLabel(e)}" (written ${ptIso(e.written)}). Overwrite it?`)) return;
+  toast(`storing in slot ${slot}\u2026 (~${(JOB[p]||{}).upload_s||'?'} s over BLE)`,'info',3000);
+  const r=await api('/api/studio/jobs/'+id+'/store',{slot,preset:SAVED[p]});
+  if(r){ toast(`stored in slot ${slot} (${kb(r.bytes)}, ${r.send_s} s)`+(r.replayed?` \u00b7 playlist ${esc(r.replayed)} re-played`:''),'ok',6000); plRefresh().then(()=>slotHint(p)); } }
+function showJob(p, j, frames){ JOB[p]=j; $(p+'badge').innerHTML=loopBadge(j); $(p+'info').textContent=jobInfoText(j);
+  if(p==='cv'){ $('cvwarn').textContent=(j.warnings||[]).join(' \u00b7 ');
+    $('cvframes').innerHTML=''; frames.slice(0,64).forEach(f=>{ const c=document.createElement('canvas'); c.width=DW;c.height=DH; const g=c.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,DW,DH);
+      const t=document.createElement('canvas'); t.width=DW;t.height=DH; t.getContext('2d').putImageData(f,0,0); g.drawImage(t,0,0); $('cvframes').appendChild(c); });
+    ledStart('cv',$('cvled'),frames,j.frame_ms); }
+  else if(j.warnings&&j.warnings.length) $('edinfo').textContent+='\n'+j.warnings.join(' \u00b7 '); }
+
+// converter
+const CVK=['mode','pos_x','pos_y','zoom','bg','brightness','contrast','saturation','colors','dither','fps','max_frames','loop','xfade'];
+const CVDEF={}; let CV={file:null,sid:null}, cvSeq=0, cvT=null;
+CVK.forEach(k=>{ const el=$('cv_'+k); CVDEF[k]=el.value; if(el.type==='range'){ const lab=el.nextElementSibling; const upd=()=>lab.textContent=el.value; upd(); el.oninput=()=>{ upd(); clearTimeout(cvT); cvT=setTimeout(cvRun,220); }; } });
+function cvReset(){ CVK.forEach(k=>{ const el=$('cv_'+k); el.value=CVDEF[k]; if(el.type==='range') el.nextElementSibling.textContent=el.value; }); cvRun(); }
+function cvParams(){ const p={}; CVK.forEach(k=>{ const el=$('cv_'+k); p[k]=(el.type==='range'||el.type==='number')?+el.value:el.value; }); return p; }
+function cvPick(f){ if(!f) return; CV={file:f,sid:null}; $('cvname').textContent=`${f.name} (${kb(f.size)})`; cvRun(); }
+async function cvRun(retry){ if(!CV.file) return; const seq=++cvSeq; const fd=new FormData(); fd.append('params',JSON.stringify(cvParams()));
+  if(CV.sid&&!retry) fd.append('source_id',CV.sid); else fd.append('file',CV.file);
+  $('cvinfo').textContent='converting\u2026';
+  const r=await fetch('/api/studio/convert',{method:'POST',body:fd});
+  if(!r.ok){ const j=await r.json().catch(()=>({detail:r.statusText})); if(!retry&&CV.sid){ CV.sid=null; return cvRun(true); } $('cvinfo').textContent='Error: '+j.detail; return; }
+  const j=await r.json(); if(seq!==cvSeq) return; CV.sid=j.source_id;
+  const frames=await Promise.all(j.frame_urls.map(urlToData)); if(seq!==cvSeq) return; showJob('cv',j,frames); }
+const drop=$('cvdrop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('hover'); }));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('hover'); }));
+drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) cvPick(f); });
+
+// ------------------------------------------------------------------ creator
+const EW=DW, EH=DH, ES=SQ?7:12;
+let FR=[new ImageData(EW,EH)], CUR=0, TOOL='pencil', UNDO=[], REDO=[], EDDIRTY=1, EDJOB={dirty:-1,loop:'',id:null};
+let drawing=false, dstart=null, dlast=null, dsnap=null, dbtn=0;
+const PALETTE=['#ffffff','#9aa3ad','#4a5058','#ff2d2d','#ff8a00','#ffd400','#8cfc28','#35d07f','#00e5ff','#2a7fff','#3b2bff','#b04dff','#ff3dd0','#ff9ab0','#8b4a1c','#000000'];
+function hexRgba(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),255]; }
+function rgbaHex(r,g,b){ return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join(''); }
+function renderPalette(){ $('palette').innerHTML=PALETTE.map(c=>`<span class="sw" style="background:${c}" title="${c}" onclick="setColor('${c}')"></span>`).join(' ');
+  const cu=JSON.parse(localStorage.opCustom||'[]'); $('custom').innerHTML=cu.map((c,i)=>`<span class="sw" style="background:${c}" title="${c} (right-click removes)" onclick="setColor('${c}')" oncontextmenu="event.preventDefault();delCustom(${i})"></span>`).join(' '); }
+function setColor(c){ $('edcolor').value=c; if(TOOL==='eraser'||TOOL==='pick') setTool('pencil'); }
+function addCustom(){ const cu=JSON.parse(localStorage.opCustom||'[]'); const c=$('edcolor').value; if(!cu.includes(c)){ cu.push(c); if(cu.length>16) cu.shift(); } localStorage.opCustom=JSON.stringify(cu); renderPalette(); }
+function delCustom(i){ const cu=JSON.parse(localStorage.opCustom||'[]'); cu.splice(i,1); localStorage.opCustom=JSON.stringify(cu); renderPalette(); }
+function setTool(t){ TOOL=t; document.querySelectorAll('#tools .tool').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); }
+document.querySelectorAll('#tools .tool').forEach(b=>b.onclick=()=>setTool(b.dataset.t));
+function cloneFr(f){ return new ImageData(new Uint8ClampedArray(f.data),EW,EH); }
+function snapshot(){ return {fr:FR.map(cloneFr),cur:CUR}; }
+function push(){ UNDO.push(snapshot()); if(UNDO.length>150) UNDO.shift(); REDO=[]; EDDIRTY++; }
+function undo(){ if(!UNDO.length) return; REDO.push(snapshot()); const s=UNDO.pop(); FR=s.fr; CUR=Math.min(s.cur,FR.length-1); EDDIRTY++; edDraw(true); }
+function redo(){ if(!REDO.length) return; UNDO.push(snapshot()); const s=REDO.pop(); FR=s.fr; CUR=Math.min(s.cur,FR.length-1); EDDIRTY++; edDraw(true); }
+function setPx(f,x,y,c){ if(x<0||y<0||x>=EW||y>=EH) return; const i=(y*EW+x)*4; f.data[i]=c[0]; f.data[i+1]=c[1]; f.data[i+2]=c[2]; f.data[i+3]=c[3]; }
+function getPx(f,x,y){ const i=(y*EW+x)*4; return [f.data[i],f.data[i+1],f.data[i+2],f.data[i+3]]; }
+function line(f,x0,y0,x1,y1,c){ const dx=Math.abs(x1-x0), dy=-Math.abs(y1-y0), sx=x0<x1?1:-1, sy=y0<y1?1:-1; let e=dx+dy;
+  for(;;){ setPx(f,x0,y0,c); if(x0===x1&&y0===y1) break; const e2=2*e; if(e2>=dy){ e+=dy; x0+=sx; } if(e2<=dx){ e+=dx; y0+=sy; } } }
+function rect(f,x0,y0,x1,y1,c,fill){ const [a,b]=[Math.min(x0,x1),Math.max(x0,x1)], [p,q]=[Math.min(y0,y1),Math.max(y0,y1)];
+  for(let y=p;y<=q;y++) for(let x=a;x<=b;x++) if(fill||x===a||x===b||y===p||y===q) setPx(f,x,y,c); }
+function flood(f,x,y,c){ const t=getPx(f,x,y); if(t.every((v,i)=>v===c[i])) return; const st=[[x,y]];
+  while(st.length){ const [px,py]=st.pop(); if(px<0||py<0||px>=EW||py>=EH) continue; const v=getPx(f,px,py); if(!v.every((u,i)=>u===t[i])) continue;
+    setPx(f,px,py,c); st.push([px+1,py],[px-1,py],[px,py+1],[px,py-1]); } }
+function curColor(){ return (TOOL==='eraser'||dbtn===2)?[0,0,0,0]:hexRgba($('edcolor').value); }
+function evPt(e){ const r=$('ed').getBoundingClientRect(); return [Math.floor((e.clientX-r.left)/r.width*EW), Math.floor((e.clientY-r.top)/r.height*EH)]; }
+const ed=$('ed');
+ed.addEventListener('contextmenu',e=>e.preventDefault());
+ed.addEventListener('pointerdown',e=>{ const [x,y]=evPt(e); dbtn=e.button; const f=FR[CUR];
+  if(TOOL==='pick'){ const v=getPx(f,x,y); if(v[3]) $('edcolor').value=rgbaHex(v[0],v[1],v[2]); setTool('pencil'); return; }
+  push(); ed.setPointerCapture(e.pointerId);
+  if(TOOL==='fill'){ flood(f,x,y,curColor()); edDraw(true); return; }
+  drawing=true; dstart=dlast=[x,y]; dsnap=cloneFr(f);
+  if(TOOL==='pencil'||TOOL==='eraser'){ setPx(f,x,y,curColor()); edDraw(); } });
+ed.addEventListener('pointermove',e=>{ const [x,y]=evPt(e); $('edpos').textContent=(x>=0&&x<EW&&y>=0&&y<EH)?`x ${x}, y ${y}`:''; if(!drawing) return; const f=FR[CUR];
+  if(TOOL==='pencil'||TOOL==='eraser'){ line(f,dlast[0],dlast[1],x,y,curColor()); dlast=[x,y]; }
+  else { f.data.set(dsnap.data); if(TOOL==='line') line(f,dstart[0],dstart[1],x,y,curColor()); else rect(f,dstart[0],dstart[1],x,y,curColor(),TOOL==='rectf'); }
+  edDraw(); });
+ed.addEventListener('pointerup',()=>{ if(drawing){ drawing=false; EDDIRTY++; edDraw(true); } });
+function edDraw(full){ const g=ed.getContext('2d'), grid=$('edgrid').checked, gap=grid?1:0, f=FR[CUR], prev=$('edonion').checked&&FR.length>1?FR[(CUR-1+FR.length)%FR.length]:null;
+  g.fillStyle='#050607'; g.fillRect(0,0,ed.width,ed.height);
+  for(let y=0;y<EH;y++) for(let x=0;x<EW;x++){ const i=(y*EW+x)*4; let col=null;
+    if(f.data[i+3]) col=`rgb(${f.data[i]},${f.data[i+1]},${f.data[i+2]})`;
+    else if(prev&&prev.data[i+3]) col=`rgba(${prev.data[i]},${prev.data[i+1]},${prev.data[i+2]},0.28)`;
+    g.fillStyle=col||(grid?'#15181c':'#050607'); g.fillRect(x*ES,y*ES,ES-gap,ES-gap); }
+  if(grid){ g.fillStyle='#2a303880'; for(let x=8;x<EW;x+=8) g.fillRect(x*ES-1,0,1,ed.height); g.fillRect(0,8*ES-1,ed.width,1); }
+  if(full!==false) edStrip(); }
+let edPrevT=null;
+function edStrip(){ const box=$('edframes'); box.innerHTML='';
+  FR.forEach((f,i)=>{ const c=document.createElement('canvas'); c.width=DW;c.height=DH; c.className=i===CUR?'on':''; c.title='frame '+(i+1);
+    const g=c.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,DW,DH); const t=document.createElement('canvas'); t.width=DW;t.height=DH; t.getContext('2d').putImageData(f,0,0); g.drawImage(t,0,0);
+    c.onclick=()=>{ CUR=i; edDraw(true); }; c.draggable=true; c.ondragstart=()=>{ window._frDrag=i; }; c.ondragover=e=>e.preventDefault();
+    c.ondrop=()=>{ const j=window._frDrag; if(j==null||j===i) return; push(); const it=FR.splice(j,1)[0]; FR.splice(i,0,it); CUR=i; edDraw(true); };
+    box.appendChild(c); });
+  $('frinfo').textContent=`frame ${CUR+1}/${FR.length}`;
+  clearTimeout(edPrevT); edPrevT=setTimeout(()=>ledStart('ed',$('edled'),FR,Math.round(1000/Math.max(1,+$('edfps').value||8))),120); }
+function frAdd(){ push(); FR.splice(CUR+1,0,new ImageData(EW,EH)); CUR++; edDraw(true); }
+function frDup(){ push(); FR.splice(CUR+1,0,cloneFr(FR[CUR])); CUR++; edDraw(true); }
+function frDel(){ if(FR.length<2){ edClear(); return; } push(); FR.splice(CUR,1); CUR=Math.min(CUR,FR.length-1); edDraw(true); }
+function frMove(d){ const j=CUR+d; if(j<0||j>=FR.length) return; push(); [FR[CUR],FR[j]]=[FR[j],FR[CUR]]; CUR=j; edDraw(true); }
+function edClear(){ push(); FR[CUR]=new ImageData(EW,EH); edDraw(true); }
+function edShift(dx,dy){ push(); const f=FR[CUR], o=cloneFr(f);
+  for(let y=0;y<EH;y++) for(let x=0;x<EW;x++) setPx(f,(x+dx+EW)%EW,(y+dy+EH)%EH,getPx(o,x,y)); edDraw(true); }
+$('edfps').onchange=()=>{ EDDIRTY++; edStrip(); };
+function compose(dst,src){ for(let i=0;i<dst.data.length;i+=4) if(src.data[i+3]>0){ dst.data[i]=src.data[i]; dst.data[i+1]=src.data[i+1]; dst.data[i+2]=src.data[i+2]; dst.data[i+3]=255; } }
+async function edText(){ const t=$('edtext').value; if(!t) return;
+  const r=await api('/api/studio/text',{text:t,font:$('edfont').value,color:$('edcolor').value,x:+$('edtx').value,y:+$('edty').value}); if(!r) return;
+  const layer=await urlToData(r.png); push(); compose(FR[CUR],layer); edDraw(true); toast(`text placed (${r.width} px wide)`,'info',2000); }
+async function fillImport(){ let as=[]; try{ as=await (await fetch('/api/studio/assets')).json(); }catch(e){}
+  $('edimp').innerHTML='<optgroup label="presets">'+PRESETS.map(p=>`<option value="preset:${esc(p.name)}">${esc(p.name)}${p.kind==='gif'?' (anim)':''}</option>`).join('')+'</optgroup>'+
+    '<optgroup label="assets">'+as.map(a=>`<option value="asset:${esc(a.path)}">${esc(a.path)} (${a.w}x${a.h})</option>`).join('')+'</optgroup>'; }
+async function edImport(){ const v=$('edimp').value; if(!v) return; const [k,...rest]=v.split(':'); const name=rest.join(':');
+  let r; try{ const resp=await fetch('/api/studio/import?'+k+'='+encodeURIComponent(name)); r=await resp.json(); if(!resp.ok) throw new Error(r.detail); }catch(e){ toast('import failed: '+esc(e.message),'bad'); return; }
+  const frames=await Promise.all(r.frames.map(urlToData)); push();
+  if($('edimpmode').value==='replace'){ FR=frames.map(f=>{ const o=new ImageData(EW,EH); compose(o,f); return o; }); CUR=0; $('edfps').value=Math.max(1,Math.min(30,Math.round(1000/(r.frame_ms||125)))); }
+  else compose(FR[CUR],frames[0]);
+  edDraw(true); toast(`imported ${esc(name)} (${frames.length} frame(s))`,'info',2500); }
+async function edJob(check){ const loop=$('edloop').value;
+  if(EDJOB.dirty===EDDIRTY && EDJOB.loop===loop && EDJOB.id){ if(check) toast('loop check: '+(JOB.ed&&JOB.ed.loop?(JOB.ed.loop.ok?'seamless':'JUMP'):'still image'),'info',2500); return EDJOB.id; }
+  const fps=Math.max(1,+$('edfps').value||8); const d=EDDIRTY;
+  const r=await api('/api/studio/frames',{frames:FR.map(dataToUrl),frame_ms:Math.round(1000/fps),loop,xfade:4}); if(!r) return null;
+  EDJOB={dirty:d,loop,id:r.id}; showJob('ed',r,[]);
+  if(check) toast('loop check: '+(r.loop?(r.loop.ok?'seamless':'JUMP (seam '+r.loop.seam+' vs p90 '+r.loop.p90+')'):'still image'),r.loop&&!r.loop.ok?'bad':'info',4000);
+  return r.id; }
+document.addEventListener('keydown',e=>{ if(!$('tab-create').classList.contains('on')) return; if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if(e.ctrlKey&&e.key==='z'){ undo(); e.preventDefault(); } else if(e.ctrlKey&&(e.key==='y'||e.key==='Z')){ redo(); e.preventDefault(); }
+  else if(!e.ctrlKey){ const m={p:'pencil',e:'eraser',f:'fill',l:'line',r:'rect',i:'pick'}[e.key]; if(m) setTool(m); } });
+async function loadFonts(){ try{ const f=await (await fetch('/api/studio/fonts')).json(); $('edfont').innerHTML=Object.entries(f).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join(''); }catch(e){} }
+
+// ------------------------------------------------------------------ displays (multi-sign)
+let DISPS=[];
+function dispDot(d){ return d.connected?'on':(d.want_connected||d.link_state==='connecting'||d.link_state==='reconnecting'?'mid':''); }
+function dispRow(d,full){
+  const st=d.connected?'connected':(d.link_state||'disconnected');
+  return `<div class="disp${d.selected?' sel':''}" onclick="dispSelect('${d.id}')" title="${esc(d.name||'')} ${esc(d.address||'')}">
+   <span class="dot ${dispDot(d)}"></span><span style="flex:1"><b>${esc(d.label||d.id)}</b> <span class="a">${d.width}x${d.height} &middot; ${esc(st)}${d.showing?' &middot; '+esc(d.showing):''}</span>
+   ${full?`<br><span class="a mono">${esc(d.name||'')} ${esc(d.address||'')} &middot; rotate ${d.rotate_180==null?'(global)':(d.rotate_180?'180':'off')} &middot; autoconnect ${d.autoconnect?'on':'off'}</span>`:''}</span>
+   <button class="alt sm" onclick="event.stopPropagation();dispConn('${d.id}',${!d.connected&&!d.want_connected})">${d.connected||d.want_connected?'Disconnect':'Connect'}</button>
+   ${full&&!d.primary?`<button class="warn sm" onclick="event.stopPropagation();dispRemove('${d.id}')">Remove</button>`:''}</div>`; }
+async function dispLoad(){ try{ const r=await (await fetch('/api/displays')).json(); DISPS=r.displays||[]; }catch(e){ return; }
+  $('displist').innerHTML=DISPS.map(d=>dispRow(d,false)).join('')||'<span class="muted">no displays</span>';
+  $('displist2').innerHTML=DISPS.map(d=>dispRow(d,true)).join('');
+  const me=DISPS.find(d=>d.id===DISP.id)||DISPS.find(d=>d.selected);
+  if(me){ $('signlabel').textContent='\u00b7 '+(me.label||me.id); $('pldisp').textContent=`${me.label||me.id} (${me.width}x${me.height})`; }
+  if(me&&!me.selected&&DISP.id) dispSelect(me.id,true); }
+async function dispSelect(id,quiet){ if(id===DISP.id&&!quiet) return; const r=await api('/api/displays/select',{id}); if(r&&id!==DISP.id) location.reload(); }
+async function dispConn(id,on){ const r=await fetch('/d/'+encodeURIComponent(id)+'/api/'+(on?'connect':'disconnect'),{method:'POST'});
+  if(!r.ok){ const j=await r.json().catch(()=>({})); toast('<b>'+(on?'Connect':'Disconnect')+' failed</b> '+esc(j.detail||r.statusText),'bad',8000); }
+  else toast((on?'connecting ':'disconnected ')+esc(id),'info',2500); setTimeout(dispLoad,400); }
+async function dispRemove(id){ if(!confirm(`Remove display "${id}" from OrcPixels? (nothing is sent to the sign)`)) return;
+  const r=await api('/api/displays/'+encodeURIComponent(id),null,'DELETE'); if(r) dispLoad(); }
+async function dispScan(){ showTab('settings'); $('scanst').textContent='scanning (6 s)...'; $('scanres').innerHTML='';
+  const r=await api('/api/displays/scan?timeout=6'); $('scanst').textContent=r?`${r.found.length} advertiser(s) (connected signs do not advertise)`:'scan failed';
+  if(!r) return;
+  $('scanres').innerHTML=r.found.map(f=>`<div class="disp" style="cursor:default"><span style="flex:1"><b>${esc(f.name||'?')}</b> <span class="a mono">${esc(f.address)} &middot; ${f.rssi??'?'} dBm</span></span>
+    ${f.known_as?`<span class="a">registered as ${esc(f.known_as)}</span>`:`<select id="sz_${esc(f.address).replace(/:/g,'')}"><option value="64x16">64x16</option><option value="64x64">64x64</option><option value="32x32">32x32</option></select>
+    <button class="sm" onclick="dispAdd('${esc(f.address)}','${esc(f.name||'')}')">Add display</button>`}</div>`).join(''); }
+async function dispAdd(addr,name){ const sz=$('sz_'+addr.replace(/:/g,'')).value.split('x').map(Number);
+  const label=prompt('Label for this display', name||addr); if(label===null) return;
+  const r=await api('/api/displays/add',{address:addr,name:name||null,label,width:sz[0],height:sz[1]});
+  if(r){ toast(`added <b>${esc(r.label||r.id)}</b> (not connected yet: press Connect)`,'ok',5000); dispScan(); dispLoad(); } }
+if(SQ){ $('cvled').width=$('cvled').height=384; $('edled').width=$('edled').height=384; $('ed').width=DW*7; $('ed').height=DH*7; }
+
+// playlist create / rename
+function plNew(){ PL={name:null,items:[]}; $('plsel').value=''; $('plname').value=''; $('plname').focus(); plRender(); }
+async function plRename(){ const old=$('plsel').value; if(!old){ toast('pick a saved playlist to rename','bad'); return; }
+  const n=prompt(`Rename playlist "${old}" to`, old); if(n===null||!n.trim()||n.trim()===old) return;
+  const r=await api('/api/playlists/'+encodeURIComponent(old)+'/rename',{name:n.trim()});
+  if(r){ await plRefresh(); $('plsel').value=r.name; plLoad(r.name); toast(`renamed to <b>${esc(r.name)}</b>`,'info',2500); } }
+
+// ------------------------------------------------------------------ init
+$('cvact').innerHTML=actionsHtml('cv'); $('edact').innerHTML=actionsHtml('ed');
+renderPalette(); showTab(location.hash.slice(1)||localStorage.opTab||'live');
+dash(); setInterval(dash,1000);
+sdrPoll(); setInterval(sdrPoll,3000); ldPoll(); setInterval(ldPoll,5000); aiPoll(); setInterval(aiPoll,3000); statusPoll(); setInterval(statusPoll,5000);
+loadSettings(); loadProjects(); loadPresets(); loadFonts(); draft(); edDraw(true);
+dispLoad(); setInterval(dispLoad,3000);
+</script></body></html>

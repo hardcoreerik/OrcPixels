@@ -1,0 +1,124 @@
+{
+  "name": "orcsdr_wave_small",
+  "project": "OrcSDR",
+  "version": 2,
+  "previous": "orcsdr_wave_small_v1",
+  "description": "Banner-faithful OrcSDR frame v2: orc icon + octagon hint, 4x6 gradient wordmark at x=18 (after the icon), 9-row thin-bar spectrum sampled from orcsdr_banner.png",
+  "params": {
+    "icon": "orcsdr_16 pixel map, face #8cfc28, octagon #196e19",
+    "wordmark": {
+      "font": "4x6 FONT4x6 (1px spacing, 29x6 px)",
+      "stops": [
+        [
+          225,
+          255,
+          255
+        ],
+        [
+          120,
+          240,
+          255
+        ],
+        [
+          110,
+          250,
+          140
+        ],
+        [
+          190,
+          252,
+          50
+        ]
+      ],
+      "x": 18,
+      "pos": "x18-46, rows 0-5"
+    },
+    "spectrum": {
+      "rows": "7-15",
+      "bar_every": 2,
+      "stops": [
+        [
+          40,
+          200,
+          90
+        ],
+        [
+          60,
+          240,
+          130
+        ],
+        [
+          70,
+          230,
+          210
+        ],
+        [
+          90,
+          220,
+          255
+        ]
+      ],
+      "levels": [
+        0.1,
+        0.19,
+        0.227,
+        0.283,
+        0.277,
+        0.336,
+        0.338,
+        0.338,
+        0.418,
+        0.423,
+        0.471,
+        0.375,
+        0.391,
+        0.457,
+        0.553,
+        0.489,
+        0.394,
+        0.468,
+        0.492,
+        0.37,
+        0.383,
+        0.457,
+        0.428,
+        0.396,
+        0.391,
+        0.404,
+        0.452,
+        0.42,
+        0.55,
+        0.643,
+        0.505,
+        0.664,
+        0.733,
+        0.936,
+        1.0,
+        0.947,
+        0.719,
+        0.547,
+        0.5,
+        0.481,
+        0.542,
+        0.563,
+        0.473,
+        0.407,
+        0.344,
+        0.269,
+        0.1
+      ]
+    }
+  },
+  "animated_variant": "orcsdr_wave_small_anim.gif",
+  "kind": "image",
+  "file": "orcsdr_wave_small.png",
+  "preview": "orcsdr_wave_small_preview_6x.png",
+  "size": "64x64",
+  "frames": 1,
+  "frame_ms": null,
+  "bytes": 1070,
+  "loop": null,
+  "layout64": "banner-faithful v2: octagon orc, 2x wordmark, spectrum",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

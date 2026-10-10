@@ -1,0 +1,16 @@
+{
+  "name": "p_code_llm",
+  "kind": "gif",
+  "file": "p_code_llm.gif",
+  "still": "p_code_llm.png",
+  "preview": "p_code_llm_preview_10x.png",
+  "family": "code",
+  "title": "Local LLM tokens",
+  "description": "'LOCAL AI' with a token stream of varied-width blocks flowing through",
+  "frames": 16,
+  "frame_ms": 60,
+  "bytes": 8359,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_llm"
+}

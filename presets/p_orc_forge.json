@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_forge",
+  "kind": "gif",
+  "file": "p_orc_forge.gif",
+  "still": "p_orc_forge.png",
+  "preview": "p_orc_forge_preview_10x.png",
+  "family": "orc",
+  "title": "Orc forge",
+  "description": "Hammer striking an anvil with a burst of sparks, 'FORGE'",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 3979,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_forge"
+}

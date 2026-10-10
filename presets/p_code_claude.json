@@ -1,0 +1,16 @@
+{
+  "name": "p_code_claude",
+  "kind": "gif",
+  "file": "p_code_claude.gif",
+  "still": "p_code_claude.png",
+  "preview": "p_code_claude_preview_10x.png",
+  "family": "code",
+  "title": "Claude spark",
+  "description": "An 8-ray spark slowly rotating beside 'CLAUDE' (orange accent variety)",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 1870,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_claude"
+}

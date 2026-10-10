@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_mthood",
+  "still": "p_orco_mthood.png",
+  "family": "orc_co",
+  "title": "Mt Hood broadcast",
+  "description": "Snow-capped Mt Hood with an antenna on the summit broadcasting rings, small Oregon outline marking the spot + 'MT HOOD'",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "kind": "gif",
+  "file": "p_orco_mthood.gif",
+  "preview": "p_orco_mthood_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 13425,
+  "loop": "seamless",
+  "layout64": "snow-capped Mt Hood, summit antenna broadcasting rings, Oregon locator + MT HOOD",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:48"
+}

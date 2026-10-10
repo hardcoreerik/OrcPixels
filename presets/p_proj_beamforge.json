@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_beamforge",
+  "kind": "gif",
+  "file": "p_proj_beamforge.gif",
+  "still": "p_proj_beamforge.png",
+  "preview": "p_proj_beamforge_preview_10x.png",
+  "family": "proj",
+  "title": "BeamForge",
+  "description": "DMX laser fan sweeping from a projector + 'BEAMFORGE'",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 9120,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_beamforge"
+}

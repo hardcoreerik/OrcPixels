@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_theorc",
+  "kind": "gif",
+  "file": "p_proj_theorc.gif",
+  "still": "p_proj_theorc.png",
+  "preview": "p_proj_theorc_preview_10x.png",
+  "family": "proj",
+  "title": "TheOrc",
+  "description": "Orc icon + 'TheOrc' with a tusk-glint highlight sweeping the name",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 8669,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_theorc"
+}

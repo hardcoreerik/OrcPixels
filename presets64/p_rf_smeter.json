@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_smeter",
+  "still": "p_rf_smeter.png",
+  "family": "rf",
+  "title": "Analog S-meter",
+  "description": "Analog S-meter arc with a needle swinging S3..S9+20 and scale marks",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_smeter.gif",
+  "preview": "p_rf_smeter_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 9913,
+  "loop": "seamless",
+  "layout64": "cream analog S-meter face, needle swings S3..S9+20",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:52"
+}

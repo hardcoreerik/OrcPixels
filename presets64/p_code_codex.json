@@ -1,0 +1,19 @@
+{
+  "name": "p_code_codex",
+  "still": "p_code_codex.png",
+  "family": "code",
+  "title": "Codex thinking",
+  "description": "'CODEX' with three thinking dots bouncing in a wave",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_codex.gif",
+  "preview": "p_code_codex_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 80,
+  "bytes": 9511,
+  "loop": "seamless",
+  "layout64": "'CODEX' in a chat bubble with three dots bouncing in a wave",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

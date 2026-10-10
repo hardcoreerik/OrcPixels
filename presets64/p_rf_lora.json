@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_lora",
+  "still": "p_rf_lora.png",
+  "family": "rf",
+  "title": "LoRa chirps",
+  "description": "Up-chirp spectrogram: diagonal LoRa chirps sweeping and wrapping, + 'LORA'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_lora.gif",
+  "preview": "p_rf_lora_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 13943,
+  "loop": "seamless",
+  "layout64": "full-field up-chirp spectrogram, diagonal chirps wrapping",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

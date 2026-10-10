@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_night",
+  "still": "p_orco_night.png",
+  "family": "orc_co",
+  "title": "Night broadcast",
+  "description": "Starfield night: twinkling stars, drifting near stars, a moon, tower with blinking aviation light sending rings + 'ORC RADIO / LATE NITE'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "kind": "gif",
+  "file": "p_orco_night.gif",
+  "preview": "p_orco_night_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 120,
+  "bytes": 20654,
+  "loop": "seamless",
+  "layout64": "twinkling + drifting stars, moon, tower with aviation light + ORC RADIO / LATE NITE",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:49"
+}

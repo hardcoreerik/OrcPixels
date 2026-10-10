@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_iq",
+  "still": "p_rf_iq.png",
+  "family": "rf",
+  "title": "IQ constellation",
+  "description": "QPSK constellation slowly rotating with I and Q sine traces beside it",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_iq.gif",
+  "preview": "p_rf_iq_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 9399,
+  "loop": "seamless",
+  "layout64": "QPSK constellation rotating a quarter turn, I/Q traces below",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

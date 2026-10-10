@@ -1,0 +1,18 @@
+{
+  "name": "p_orco_dongle",
+  "kind": "gif",
+  "file": "p_orco_dongle.gif",
+  "still": "p_orco_dongle.png",
+  "preview": "p_orco_dongle_preview_10x.png",
+  "family": "orc_co",
+  "title": "SDR dongle",
+  "description": "RTL-style SDR dongle with blinking LEDs streaming bits out of its USB plug toward 'TheOrc.dev', '2.4 MSPS'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5656,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "uses_theorc_dev": true,
+  "generator": "tools/make_orco_presets.py::p_orco_dongle"
+}

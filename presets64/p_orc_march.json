@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_march",
+  "still": "p_orc_march.png",
+  "family": "orc",
+  "title": "Warband march",
+  "description": "A column of tiny orcs with spears marching across and wrapping",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_march.gif",
+  "preview": "p_orc_march_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 100,
+  "bytes": 7679,
+  "loop": "seamless",
+  "layout64": "two columns of tiny orcs with spears marching and wrapping",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

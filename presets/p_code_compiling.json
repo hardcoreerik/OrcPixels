@@ -1,0 +1,16 @@
+{
+  "name": "p_code_compiling",
+  "kind": "gif",
+  "file": "p_code_compiling.gif",
+  "still": "p_code_compiling.png",
+  "preview": "p_code_compiling_preview_10x.png",
+  "family": "code",
+  "title": "Compiling",
+  "description": "'COMPILING' with cycling dots and an indeterminate progress block sliding (wrap)",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 5489,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_compiling"
+}

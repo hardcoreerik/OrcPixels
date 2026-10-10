@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_tusks",
+  "kind": "gif",
+  "file": "p_orc_tusks.gif",
+  "still": "p_orc_tusks.png",
+  "preview": "p_orc_tusks_preview_10x.png",
+  "family": "orc",
+  "title": "Stay Orc",
+  "description": "Orc icon with a tusk gleam and 'STAY ORC' pulsing",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5079,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_tusks"
+}

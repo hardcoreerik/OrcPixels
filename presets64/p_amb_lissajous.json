@@ -1,0 +1,19 @@
+{
+  "name": "p_amb_lissajous",
+  "still": "p_amb_lissajous.png",
+  "family": "amb",
+  "title": "Lissajous",
+  "description": "A 1:2 Lissajous figure-eight with a glowing trail and slowly turning phase",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_amb_lissajous.gif",
+  "preview": "p_amb_lissajous_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 14747,
+  "loop": "seamless",
+  "layout64": "1:2 Lissajous figure with glowing trail, phase turns once",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

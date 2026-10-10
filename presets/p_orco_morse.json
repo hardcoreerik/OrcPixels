@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_morse",
+  "kind": "gif",
+  "file": "p_orco_morse.gif",
+  "still": "p_orco_morse.png",
+  "preview": "p_orco_morse_preview_10x.png",
+  "family": "orc_co",
+  "title": "Morse ORC",
+  "description": "'ORC' keyed in Morse (--- .-. -.-.): a tape scrolls under a cursor, the lamp keys and the letter being sent lights up",
+  "frames": 42,
+  "frame_ms": 90,
+  "bytes": 11187,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "generator": "tools/make_orco_presets.py::p_orco_morse"
+}

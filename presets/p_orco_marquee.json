@@ -1,0 +1,17 @@
+{
+  "name": "p_orco_marquee",
+  "kind": "gif",
+  "file": "p_orco_marquee.gif",
+  "still": "p_orco_marquee.png",
+  "preview": "p_orco_marquee_preview_10x.png",
+  "family": "orc_co",
+  "title": "OREGON RADIO CO marquee",
+  "description": "Seamless unifont marquee 'OREGON RADIO CO' in green-blue-amber, with a filled Oregon state as the separator",
+  "frames": 51,
+  "frame_ms": 75,
+  "bytes": 10933,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "generator": "tools/make_orco_presets.py::p_orco_marquee"
+}

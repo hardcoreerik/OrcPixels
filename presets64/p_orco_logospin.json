@@ -1,0 +1,21 @@
+{
+  "name": "p_orco_logospin",
+  "still": "p_orco_logospin.png",
+  "family": "orc_co",
+  "title": "Logo coin spin",
+  "description": "An 'ORC' coin spinning in 3D, the Oregon outline on its reverse, beside 'TheOrc.dev' and 'OREGON RADIO'",
+  "live_data": false,
+  "uses_oregon_outline": true,
+  "uses_theorc_dev": true,
+  "kind": "gif",
+  "file": "p_orco_logospin.gif",
+  "preview": "p_orco_logospin_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 10587,
+  "loop": "seamless",
+  "layout64": "ORC coin spins in 3D (Oregon on the reverse) + TheOrc.dev / OREGON RADIO",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:48"
+}

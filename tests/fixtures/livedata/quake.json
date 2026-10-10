@@ -1,0 +1,56 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "properties": {
+    "mag": 1.73,
+    "place": "3 km NNE of Winlock, Washington",
+    "time": 1790974477630,
+    "type": "explosion",
+    "title": "M 1.7 Explosion - 3 km NNE of Winlock, Washington"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -122.927166666667,
+     46.5206666666667,
+     -0.27
+    ]
+   }
+  },
+  {
+   "properties": {
+    "mag": 1.78,
+    "place": "8 km S of Princeton, Canada",
+    "time": 1790961291950,
+    "type": "explosion",
+    "title": "M 1.8 Explosion - 8 km S of Princeton, Canada"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -120.500666666667,
+     49.3823333333333,
+     -0.36
+    ]
+   }
+  },
+  {
+   "properties": {
+    "mag": 1.54,
+    "place": "7 km NW of Mount Hood Village, Oregon",
+    "time": 1790893649300,
+    "type": "explosion",
+    "title": "M 1.5 Explosion - 7 km NW of Mount Hood Village, Oregon"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -122.053833333333,
+     45.4051666666667,
+     -0.61
+    ]
+   }
+  }
+ ]
+}

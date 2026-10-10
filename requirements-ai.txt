@@ -1,0 +1,3 @@
+# Optional: AI status / buddy feature (Windows foreground-window detection)
+pywin32>=306; sys_platform == "win32"
+psutil>=5.9

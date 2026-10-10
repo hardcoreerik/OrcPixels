@@ -1,0 +1,15 @@
+{
+  "name": "orcsdr_orc",
+  "kind": "image",
+  "file": "orcsdr_orc.png",
+  "preview": "orcsdr_orc_preview_10x.png",
+  "project": "OrcSDR",
+  "description": "OrcSDR orc icon + gradient 'OrcSDR' wordmark (the frame the user approved). Frozen byte-for-byte copy of assets/projects/orcsdr_banner_64x16.png as sent 2026-09-29 22:08 PT.",
+  "md5": "41cb629af8321ad59a8fb4b6154bae1b",
+  "generator": "tools/make_assets.py (orcsdr_banner_64x16)",
+  "params": {
+    "icon": "orcsdr_16: hand-tuned ORC pixel map, face sampled from orcsdr_banner.png (~#8cfc28), shadow #287810, glint #e6ff8c, tusks #e6e6e6",
+    "wordmark": {"text": "OrcSDR", "font": "GNU Unifont 16px, 1-bit threshold 128", "x": 16, "width": 48,
+                 "gradient_stops": [[210, 250, 255], [120, 250, 150], [210, 252, 56]]}
+  }
+}

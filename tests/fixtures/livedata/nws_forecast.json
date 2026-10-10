@@ -1,0 +1,73 @@
+{
+ "properties": {
+  "updateTime": "2026-10-03T02:41:10+00:00",
+  "periods": [
+   {
+    "number": 1,
+    "name": "Tonight",
+    "isDaytime": false,
+    "temperature": 56,
+    "temperatureUnit": "F",
+    "windSpeed": "3 mph",
+    "windDirection": "NNW",
+    "shortForecast": "Mostly Clear",
+    "icon": "https://api.weather.gov/icons/land/night/few?size=medium"
+   },
+   {
+    "number": 2,
+    "name": "Saturday",
+    "isDaytime": true,
+    "temperature": 81,
+    "temperatureUnit": "F",
+    "windSpeed": "3 mph",
+    "windDirection": "NNW",
+    "shortForecast": "Sunny",
+    "icon": "https://api.weather.gov/icons/land/day/few?size=medium"
+   },
+   {
+    "number": 3,
+    "name": "Saturday Night",
+    "isDaytime": false,
+    "temperature": 56,
+    "temperatureUnit": "F",
+    "windSpeed": "3 mph",
+    "windDirection": "N",
+    "shortForecast": "Mostly Clear",
+    "icon": "https://api.weather.gov/icons/land/night/few?size=medium"
+   },
+   {
+    "number": 4,
+    "name": "Sunday",
+    "isDaytime": true,
+    "temperature": 82,
+    "temperatureUnit": "F",
+    "windSpeed": "2 mph",
+    "windDirection": "N",
+    "shortForecast": "Sunny",
+    "icon": "https://api.weather.gov/icons/land/day/few?size=medium"
+   },
+   {
+    "number": 5,
+    "name": "Sunday Night",
+    "isDaytime": false,
+    "temperature": 58,
+    "temperatureUnit": "F",
+    "windSpeed": "2 mph",
+    "windDirection": "N",
+    "shortForecast": "Partly Cloudy",
+    "icon": "https://api.weather.gov/icons/land/night/sct?size=medium"
+   },
+   {
+    "number": 6,
+    "name": "Monday",
+    "isDaytime": true,
+    "temperature": 77,
+    "temperatureUnit": "F",
+    "windSpeed": "1 to 5 mph",
+    "windDirection": "NNW",
+    "shortForecast": "Mostly Sunny",
+    "icon": "https://api.weather.gov/icons/land/day/sct?size=medium"
+   }
+  ]
+ }
+}

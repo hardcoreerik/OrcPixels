@@ -1,0 +1,24 @@
+{
+  "name": "orcsdr_style07",
+  "still": "orcsdr_style07.png",
+  "project": "OrcSDR",
+  "title": "Ice waterfall word (up)",
+  "description": "Ice waterfall word (up): 'OrcSDR' painted into an ICE-colored waterfall scrolling UP, full width.",
+  "params": {
+    "font": "4x6 scaled 2x2",
+    "scroll": "up",
+    "map": "ICE_MAP",
+    "loop": "34-row wrapping history"
+  },
+  "kind": "gif",
+  "file": "orcsdr_style07.gif",
+  "preview": "orcsdr_style07_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 34419,
+  "loop": "seamless",
+  "layout64": "ICE waterfall, the wordmark rises",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:44"
+}

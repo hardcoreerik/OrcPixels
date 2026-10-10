@@ -1,0 +1,16 @@
+{
+  "name": "p_proj_orclink",
+  "kind": "gif",
+  "file": "p_proj_orclink.gif",
+  "still": "p_proj_orclink.png",
+  "preview": "p_proj_orclink_preview_10x.png",
+  "family": "proj",
+  "title": "OrcLink",
+  "description": "Chain links with a data pulse running through + 'ORCLINK / RUST EDGE'",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 5065,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_proj_orclink"
+}

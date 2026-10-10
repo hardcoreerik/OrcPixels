@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_airband",
+  "still": "p_rf_airband.png",
+  "family": "rf",
+  "title": "Airband AM",
+  "description": "Plane crossing over an AM carrier whose sidebands swell with voice bursts",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_airband.gif",
+  "preview": "p_rf_airband_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 100,
+  "bytes": 5633,
+  "loop": "seamless",
+  "layout64": "plane crossing over an AM carrier with swelling sidebands",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

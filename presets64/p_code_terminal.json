@@ -1,0 +1,19 @@
+{
+  "name": "p_code_terminal",
+  "still": "p_code_terminal.png",
+  "family": "code",
+  "title": "Orc terminal",
+  "description": "A tiny terminal: build log lines scrolling up under a blinking '>' prompt",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_code_terminal.gif",
+  "preview": "p_code_terminal_preview_6x.png",
+  "size": "64x64",
+  "frames": 39,
+  "frame_ms": 100,
+  "bytes": 24471,
+  "loop": "seamless",
+  "layout64": "terminal window: build log scrolls up, blinking prompt",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-09T18:05:29"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_proj_orcmaps",
+  "still": "p_proj_orcmaps.png",
+  "family": "proj",
+  "title": "OrcMaps",
+  "description": "Contour-line terrain scrolling under a bouncing map pin + 'ORCMAPS'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_proj_orcmaps.gif",
+  "preview": "p_proj_orcmaps_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 90,
+  "bytes": 34174,
+  "loop": "seamless",
+  "layout64": "contour-line terrain scrolling under a bouncing map pin",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:50"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_p25",
+  "still": "p_rf_p25.png",
+  "family": "rf",
+  "title": "P25 trunking",
+  "description": "'P25' + control channel and voice channels lighting in a trunking rotation, C4FM dibit strip",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_p25.gif",
+  "preview": "p_rf_p25_preview_6x.png",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 19155,
+  "loop": "seamless",
+  "layout64": "2x 'P25' + control channel and voice channels lighting in rotation",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:52"
+}

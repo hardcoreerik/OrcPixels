@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_torches",
+  "still": "p_orc_torches.png",
+  "family": "orc",
+  "title": "Torch-lit hall",
+  "description": "Two flickering torches framing 'WARCHIEF' in the hall",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_torches.gif",
+  "preview": "p_orc_torches_preview_6x.png",
+  "size": "64x64",
+  "frames": 12,
+  "frame_ms": 100,
+  "bytes": 16315,
+  "loop": "seamless",
+  "layout64": "two flickering torches framing 'WAR' / 'CHIEF'",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

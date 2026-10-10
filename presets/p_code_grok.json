@@ -1,0 +1,16 @@
+{
+  "name": "p_code_grok",
+  "kind": "gif",
+  "file": "p_code_grok.gif",
+  "still": "p_code_grok.png",
+  "preview": "p_code_grok_preview_10x.png",
+  "family": "code",
+  "title": "Grok orbit",
+  "description": "'GROK' with a particle orbiting a ring once per loop",
+  "frames": 24,
+  "frame_ms": 80,
+  "bytes": 5139,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_code_grok"
+}

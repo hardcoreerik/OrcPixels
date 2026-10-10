@@ -1,0 +1,19 @@
+{
+  "name": "p_hw_antenna",
+  "still": "p_hw_antenna.png",
+  "family": "hw",
+  "title": "Antenna",
+  "description": "Mast antenna radiating wavefronts to both sides + 'RTL-SDR V4'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_hw_antenna.gif",
+  "preview": "p_hw_antenna_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 10555,
+  "loop": "seamless",
+  "layout64": "mast antenna radiating wavefronts both ways + 'RTL-SDR V4'",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

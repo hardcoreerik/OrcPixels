@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_acronym",
+  "still": "p_orco_acronym.png",
+  "family": "orc_co",
+  "title": "ORC = Oregon Radio Company",
+  "description": "Big 'ORC' whose letters type out OREGON / RADIO / COMPANY beside them with a cursor, hold, then erase",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "kind": "gif",
+  "file": "p_orco_acronym.gif",
+  "preview": "p_orco_acronym_preview_6x.png",
+  "size": "64x64",
+  "frames": 48,
+  "frame_ms": 90,
+  "bytes": 14719,
+  "loop": "seamless",
+  "layout64": "big O/R/C column, the words type out beside it, hold, erase",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}

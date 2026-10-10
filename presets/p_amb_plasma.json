@@ -1,0 +1,16 @@
+{
+  "name": "p_amb_plasma",
+  "kind": "gif",
+  "file": "p_amb_plasma.gif",
+  "still": "p_amb_plasma.png",
+  "preview": "p_amb_plasma_preview_10x.png",
+  "family": "amb",
+  "title": "Brand plasma",
+  "description": "Classic demoscene plasma in black/green/lime/cyan (ambient)",
+  "frames": 24,
+  "frame_ms": 90,
+  "bytes": 6619,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_amb_plasma"
+}

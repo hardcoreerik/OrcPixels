@@ -1,0 +1,32 @@
+{
+  "_comment": "Per-project branding keyed by repo name. icon: 16x16 PNG, banner: optional 64x16 PNG, match: case-insensitive globs for repo/worktree folder names. Paths relative to the OrcPixels root.",
+  "OrcSDR": {
+    "display": "OrcSDR",
+    "icon": "assets/projects/orcsdr_16.png",
+    "accent": "#8cfc28",
+    "banner": "presets/orcsdr_orc.png",
+    "banner_alt": "presets/orcsdr_wave.png",
+    "source_art": "assets/projects/orcsdr_banner.png",
+    "match": [
+      "OrcSDR",
+      "OrcSDR-*"
+    ],
+    "presets": [
+      "orcsdr_wave_small_anim",
+      "orcsdr_wave_small",
+      "orcsdr_wave_small_v1",
+      "orcsdr_orc",
+      "orcsdr_wave"
+    ],
+    "default_preset": "orcsdr_wave_small_anim"
+  },
+  "OrcPixels": {
+    "display": "OrcPixels",
+    "icon": "assets/orc_16.png",
+    "accent": "#50ff28",
+    "match": [
+      "OrcPixels",
+      "OrcPixels-*"
+    ]
+  }
+}

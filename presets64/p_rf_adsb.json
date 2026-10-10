@@ -1,0 +1,19 @@
+{
+  "name": "p_rf_adsb",
+  "still": "p_rf_adsb.png",
+  "family": "rf",
+  "title": "ADS-B radar",
+  "description": "Radar sweep with aircraft blips that flare as the beam passes + 'ADS-B 1090'",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_rf_adsb.gif",
+  "preview": "p_rf_adsb_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 120,
+  "bytes": 27165,
+  "loop": "seamless",
+  "layout64": "full radar scope, sweep once per loop, blips flare as it passes",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:51"
+}

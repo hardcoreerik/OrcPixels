@@ -1,0 +1,107 @@
+{
+  "_comment": "Desktop-app identity for the AI status watcher (orcpixels/sources/ai_watcher.py). process_names: lowercase exe of the foreground window; path_contains: extra exe-path filter (ChatGPT.exe is also the plain ChatGPT app); cli_process_names: CLI exes looked for under a foreground terminal; terminal_title_regex: active-tab title hints; log: which session-log reader to use. Machine-specific additions/overrides go in config/apps.local.json (gitignored, merged per app key).",
+  "codex": {
+    "display": "Codex",
+    "icon": "assets/icons/apps/codex_16.png",
+    "accent": "#9db4ff",
+    "process_names": [
+      "chatgpt.exe",
+      "codex.exe"
+    ],
+    "path_contains": [
+      "OpenAI.Codex",
+      "\\OpenAI\\Codex\\"
+    ],
+    "title_regex": [
+      "^Codex$"
+    ],
+    "cli_process_names": [
+      "codex.exe"
+    ],
+    "cli_cmdline_contains": [
+      "@openai/codex"
+    ],
+    "terminal_title_regex": [
+      "\\bcodex\\b"
+    ],
+    "terminal_hosts": [
+      "windowsterminal.exe",
+      "openconsole.exe",
+      "conhost.exe",
+      "pwsh.exe",
+      "powershell.exe",
+      "cmd.exe",
+      "wezterm-gui.exe",
+      "alacritty.exe"
+    ],
+    "log": "codex"
+  },
+  "claude": {
+    "display": "Claude",
+    "icon": "assets/icons/apps/claude_16.png",
+    "accent": "#d97757",
+    "process_names": [
+      "claude.exe"
+    ],
+    "path_contains": [
+      "\\WindowsApps\\Claude_",
+      "\\AnthropicClaude\\"
+    ],
+    "cli_process_names": [
+      "claude.exe"
+    ],
+    "cli_cmdline_contains": [
+      "@anthropic-ai/claude-code"
+    ],
+    "terminal_title_regex": [
+      "Claude Code",
+      "^✳"
+    ],
+    "terminal_hosts": [
+      "windowsterminal.exe",
+      "openconsole.exe",
+      "conhost.exe",
+      "pwsh.exe",
+      "powershell.exe",
+      "cmd.exe",
+      "wezterm-gui.exe",
+      "alacritty.exe"
+    ],
+    "log": "claude"
+  },
+  "grok": {
+    "display": "Grok",
+    "icon": "assets/icons/apps/grok_16.png",
+    "accent": "#e8e8e8",
+    "process_names": [
+      "grok bot.exe",
+      "grok.exe"
+    ],
+    "cli_process_names": [
+      "grok.exe"
+    ],
+    "terminal_hosts": [
+      "windowsterminal.exe",
+      "openconsole.exe",
+      "conhost.exe",
+      "pwsh.exe",
+      "powershell.exe",
+      "cmd.exe",
+      "wezterm-gui.exe",
+      "alacritty.exe"
+    ],
+    "log": "grok"
+  },
+  "cursor": {
+    "display": "Cursor",
+    "icon": "assets/icons/apps/cursor_16.png",
+    "accent": "#c8c8c8",
+    "process_names": [
+      "cursor.exe"
+    ],
+    "title_regex": [
+      " - Cursor$"
+    ],
+    "log": "cursor"
+  }
+}

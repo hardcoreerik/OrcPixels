@@ -1,0 +1,19 @@
+{
+  "name": "p_orc_drums",
+  "still": "p_orc_drums.png",
+  "family": "orc",
+  "title": "War drums",
+  "description": "Two war drums pounding in a 4-beat rhythm with impact rings",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_orc_drums.gif",
+  "preview": "p_orc_drums_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 90,
+  "bytes": 7559,
+  "loop": "seamless",
+  "layout64": "two war drums pounding a 4-beat with impact rings, 'WAR DRUMS'",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:46"
+}

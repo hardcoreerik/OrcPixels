@@ -1,0 +1,19 @@
+{
+  "name": "p_amb_heartbeat",
+  "still": "p_amb_heartbeat.png",
+  "family": "amb",
+  "title": "RF heartbeat",
+  "description": "ECG-style lime pulse trace scrolling (the node is alive)",
+  "live_data": false,
+  "kind": "gif",
+  "file": "p_amb_heartbeat.gif",
+  "preview": "p_amb_heartbeat_preview_6x.png",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 16337,
+  "loop": "seamless",
+  "layout64": "ECG trace over a dotted monitor grid, two beats wide",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:45"
+}

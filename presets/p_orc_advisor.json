@@ -1,0 +1,16 @@
+{
+  "name": "p_orc_advisor",
+  "kind": "gif",
+  "file": "p_orc_advisor.gif",
+  "still": "p_orc_advisor.png",
+  "preview": "p_orc_advisor_preview_10x.png",
+  "family": "orc",
+  "title": "Warchief's Advisor",
+  "description": "Orc icon fixed left, 'THE WARCHIEF'S ADVISOR' scrolling beside it (seamless)",
+  "frames": 32,
+  "frame_ms": 70,
+  "bytes": 7814,
+  "loop": "seamless (tools/loopcheck.py)",
+  "live_data": false,
+  "generator": "tools/make_personal_presets.py::p_orc_advisor"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "p_orco_coast",
+  "still": "p_orco_coast.png",
+  "family": "orc_co",
+  "title": "Pacific coast signal",
+  "description": "Pacific waves rolling onto a headland lighthouse that blinks and sends radio arcs + 'OREGON COAST'",
+  "live_data": false,
+  "uses_oregon_outline": false,
+  "kind": "gif",
+  "file": "p_orco_coast.gif",
+  "preview": "p_orco_coast_preview_6x.png",
+  "size": "64x64",
+  "frames": 16,
+  "frame_ms": 120,
+  "bytes": 30160,
+  "loop": "seamless",
+  "layout64": "waves roll onto a headland lighthouse; beam blinks, radio arcs + OREGON COAST",
+  "generator": "tools/make_presets64.py",
+  "created": "2026-10-08T19:32:47"
+}
