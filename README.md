@@ -22,14 +22,14 @@ The AI status feature currently needs Windows; elsewhere it reports itself unava
 
 ```powershell
 # Windows
-git clone https://github.com/hardcoreerik/OrcPixels-public.git OrcPixels
+git clone https://github.com/hardcoreerik/OrcPixels.git OrcPixels
 cd OrcPixels
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -Shortcut        # add -WithAI for the AI feature
 ```
 
 ```bash
 # macOS / Linux
-git clone https://github.com/hardcoreerik/OrcPixels-public.git OrcPixels
+git clone https://github.com/hardcoreerik/OrcPixels.git OrcPixels
 cd OrcPixels
 ./install.sh --shortcut
 ```
