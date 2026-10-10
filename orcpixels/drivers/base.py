@@ -167,8 +167,9 @@ class Driver:
         return out
 
     def _wire_size_before_rotation(self) -> tuple[int, int]:
-        if self.layout.rotation in (90, 270):
-            return self.height, self.width
+        """width x height is the *viewing* size (how the panel is looked at); layout.rotation
+        is the physical mounting, applied after composing (a 16x64 portrait view on a 64x16
+        panel mounted on its side: width 16, height 64, rotation 90)."""
         return self.width, self.height
 
     def pixels(self, img: Image.Image) -> bytes:

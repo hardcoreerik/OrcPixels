@@ -568,7 +568,84 @@ def create_app(address: str | None = None, display: dict | None = None,
 
     @app.get("/api/presets")
     async def presets_list():
-        return PR.list_presets()
+        from . import adaptive as AD
+        dd = D.current()
+        pw, ph = int(dd["width"]), int(dd["height"])
+        out = PR.list_presets()
+        for m in out:
+            m["rating"] = AD.rating_for(m["name"], pw, ph)
+        return out
+
+    # ---- adaptive layouts (docs/DESIGN.md): any preset at any size + compatibility rating
+    def _adapt_args(name, w, h, strategy):
+        from . import layout as LY
+        if not (4 <= w <= 512 and 4 <= h <= 512):
+            raise HTTPException(400, "size must be 4..512")
+        if strategy not in LY.STRATEGIES:
+            raise HTTPException(400, f"strategy: {', '.join(LY.STRATEGIES)}")
+
+    _adapt_cache: dict = {}
+
+    def _adapt_render(name, w, h, strategy):
+        from . import adaptive as AD
+        key = (name, w, h, strategy)
+        if key not in _adapt_cache:
+            try:
+                _adapt_cache[key] = AD.render_preset(name, w, h, strategy)
+            except KeyError as e:
+                raise HTTPException(404, str(e))
+            while len(_adapt_cache) > 48:
+                _adapt_cache.pop(next(iter(_adapt_cache)))
+        return _adapt_cache[key]
+
+    @app.get("/api/adaptive/list")
+    async def adaptive_list():
+        from . import adaptive as AD
+        dd = D.current()
+        pw, ph = int(dd["width"]), int(dd["height"])
+        return {"panel": [pw, ph], "items": [{**n, "rating": AD.rating_for(n["name"], pw, ph)} for n in AD.names()]}
+
+    @app.get("/api/adaptive/info")
+    async def adaptive_info(name: str, w: int, h: int, strategy: str = "adaptive"):
+        from . import layout as LY
+        _adapt_args(name, w, h, strategy)
+        fr, durs, rating = await asyncio.to_thread(_adapt_render, name, w, h, strategy)
+        return {**LY.Ctx(w, h).describe(), "name": name, "strategy": strategy, "rating": rating,
+                "frames": len(fr), "loop_ms": sum(durs)}
+
+    @app.get("/api/adaptive/render.gif")
+    async def adaptive_render(name: str, w: int, h: int, strategy: str = "adaptive", scale: int = 0):
+        from . import layout as LY
+        from .render import encode_gif
+        _adapt_args(name, w, h, strategy)
+        fr, durs, rating = await asyncio.to_thread(_adapt_render, name, w, h, strategy)
+        sc = scale or max(2, min(8, 384 // max(w, h)))
+        step = max(1, len(fr) // 120)                       # preview: at most ~120 frames
+        led = await asyncio.to_thread(lambda: [LY.led_preview(f, sc) for f in fr[::step]])
+        data = encode_gif(led, [d * step for d in durs[::step]]) if len(led) > 1 else None
+        if data is None:
+            buf = io.BytesIO()
+            led[0].save(buf, format="PNG")
+            return Response(buf.getvalue(), media_type="image/png", headers={"X-Rating": rating})
+        return Response(data, media_type="image/gif", headers={"X-Rating": rating, "Cache-Control": "max-age=300"})
+
+    @app.post("/api/adaptive/{name}/show")
+    async def adaptive_show(name: str, strategy: str = "adaptive"):
+        """Render for this display's panel and show it (normal send path)."""
+        from .activity import labelled
+        from .render import encode_gif
+        dd = D.current()
+        pw, ph = int(dd["width"]), int(dd["height"])
+        fr, durs, rating = await asyncio.to_thread(_adapt_render, name, pw, ph, strategy)
+        if D.is_ipixel(dd):                                  # legacy transport: keep uploads small
+            from .layout import reduce_frames
+            fr, durs = reduce_frames(fr, durs, 48)
+        with labelled(f"adaptive {name}"):
+            if len(fr) > 1:
+                await sign.send_gif(encode_gif(fr, durs))
+            else:
+                await sign.send_image(fr[0])
+        return {"name": name, "size": [pw, ph], "rating": rating}
 
     @app.get("/api/presets/{name}/preview.png")
     async def preset_preview(name: str, scale: int = 8):

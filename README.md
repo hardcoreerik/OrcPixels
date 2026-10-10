@@ -177,3 +177,7 @@ Build it yourself: `powershell -ExecutionPolicy Bypass -File tools\build_install
 | Tidbyt / Tronbyt | `tidbyt` | HTTPS push API | experimental, untested on hardware |
 
 Profiles live in `profiles/` (see `profiles/README.md`); add a panel with **Settings > Add display**. Other panel sizes render the closest curated set and are auto-fitted.
+
+## Design and docs
+
+See [docs/](docs/README.md), in particular [docs/DESIGN.md](docs/DESIGN.md): how OrcPixels adapts layouts to any panel size (aspect families, detail tiers, topology, compatibility rating).

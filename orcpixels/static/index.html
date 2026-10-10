@@ -84,6 +84,7 @@ html.sq #nowimg{aspect-ratio:1/1!important}
 label.chk{display:inline-flex;gap:5px;align-items:center}
 .ctl{display:grid;grid-template-columns:110px 1fr 46px;gap:6px;align-items:center;font-size:12px}
 .ctl span:last-child{text-align:right;color:var(--mute)}
+.badge.rate-native{background:#16371f;color:#7f7}.badge.rate-adaptive{background:#13304a;color:#8cf}.badge.rate-scaled{background:#3a3412;color:#fd6}.badge.rate-fallback{background:#3d1d1d;color:#f99}
 </style></head><body>
 <header>
  <img src="/logo.png" width="40" height="40" alt="OrcPixels">
@@ -149,6 +150,14 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
   <div class="row" style="gap:18px;align-items:flex-start">
    <div><div class="muted">on the sign (last frame sent)</div><img id="live" class="panel p512" src="/api/frame.png" alt="last frame"></div>
    <div><div class="muted">draft (hover a preset, type text)</div><img id="draft" class="panel p512" alt="draft"></div></div>
+ </div>
+ <div class="card" id="trysize"><h2>Try the resolution <span class="muted">real renders: adaptive scenes lay themselves out, fixed presets show their rating</span></h2>
+  <div class="row">Preset <select id="tsname" onchange="tsRun()"></select>
+   Target <select id="tssize" onchange="tsRun()"></select>
+   <span id="tscust" style="display:none"><input id="tsw" size="4" value="96">x<input id="tsh" size="4" value="24"> <button class="alt sm" onclick="tsRun()">Render</button></span>
+   Strategy <span id="tsstrat"></span></div>
+  <div class="row" style="align-items:flex-start;gap:18px"><div id="tsimgbox" style="min-height:80px;background:#0b0d10;padding:8px;border-radius:6px"><img id="tsimg" alt="render"></div>
+   <div class="mono" id="tsinfo" style="line-height:1.7"></div></div>
  </div>
  <div class="card"><h2>Presets <span class="muted" id="pcount"></span></h2>
   <div class="row">Family <select id="pfam" onchange="renderPresets()"><option value="">all</option></select>
@@ -497,7 +506,7 @@ function renderPresets(){
   const ps=PRESETS.filter(p=>(!fam||(p.family||'core')===fam)&&(!q||(p.name+' '+(p.title||'')+' '+(p.description||'')).toLowerCase().includes(q)));
   $('pcount').textContent=ps.length+' preset(s)';
   $('presets').innerHTML=ps.map(p=>`<div class="pcard"><img data-src="${psrc(p)}" width="${SQ?192:256}" height="${SQ?192:64}" decoding="async" alt="${esc(p.name)}" title="${esc(p.description||'')}" onmouseenter="$('draft').src=this.dataset.src" onclick="showPreset('${p.name}')">
-    <div class="n">${esc(p.title&&p.title!==p.name?p.title:p.name)}</div><div class="muted">${esc(p.name)} &middot; ${p.kind==='gif'?(p.frames?p.frames+' fr':'anim'):'still'}${p.bytes?' &middot; '+kb(p.bytes):''}</div>
+    <div class="n">${esc(p.title&&p.title!==p.name?p.title:p.name)} ${p.rating?`<span class="badge rate-${p.rating}" title="compatibility with this display">${p.rating}</span>`:''}</div><div class="muted">${esc(p.name)} &middot; ${p.kind==='gif'?(p.frames?p.frames+' fr':'anim'):'still'}${p.bytes?' &middot; '+kb(p.bytes):''}</div>
     <div class="row" style="justify-content:center"><button class="sm" onclick="showPreset('${p.name}')">Show</button><button class="alt sm" onclick="plAdd('${p.name}');toast('added ${esc(p.name)} to the playlist editor','info',2000)">+ playlist</button></div></div>`).join(''); lazyThumbs($('presets')); }
 function thumb(n,w=(SQ?128:256)){ const p=PRESETS.find(x=>x.name===n);
   return p?`<img class="th" data-src="${psrc(p,SQ?2:4)}" width="${w}" height="${Math.round(w*DH/DW)}" decoding="async" alt="${esc(n)}">`:`<span class="muted" style="display:inline-block;width:${w}px">${esc(n)}</span>`; }
@@ -908,6 +917,22 @@ async function adAdd(){ const p=PROFS.find(x=>x.id===$('adprof').value); if(!p) 
   if(r){ toast(`added <b>${esc(r.label||r.id)}</b>: press Connect`,'ok',5000); dispLoad(); } }
 adLoad();
 if(location.hash==='#add-display'){ showTab('settings'); $('addnet').open=true; setTimeout(()=>$('addnet').scrollIntoView(),300); }
+// ---- Try the resolution (docs/DESIGN.md)
+const TS_SIZES=['16x16','32x32','64x16','64x32','64x64','96x24','96x32','128x16','128x32','128x64','128x128','256x16','16x64','32x64','custom'];
+let TSSTRAT='adaptive';
+async function tsLoad(){ const r=await (await fetch('/api/adaptive/list')).json().catch(()=>null); if(!r) return;
+  $('tsname').innerHTML=r.items.map(i=>`<option value="${esc(i.name)}">${i.adaptive?'\u2726 ':''}${esc(i.title)} (${i.rating} here)</option>`).join('');
+  const me=new URLSearchParams(location.search).get('ts')||`${r.panel[0]}x${r.panel[1]}`; $('tssize').innerHTML=TS_SIZES.map(s=>`<option ${s===me?'selected':''}>${s}</option>`).join('');
+  $('tsstrat').innerHTML=['adaptive','contain','crop'].map(s=>`<button class="sm ${s===TSSTRAT?'':'alt'}" onclick="TSSTRAT='${s}';tsLoad.strat();tsRun()">${s}</button>`).join(' ');
+  tsRun(); }
+tsLoad.strat=()=>{ $('tsstrat').querySelectorAll('button').forEach(b=>b.className='sm '+(b.textContent===TSSTRAT?'':'alt')); };
+async function tsRun(){ const v=$('tssize').value; $('tscust').style.display=v==='custom'?'':'none';
+  const [w,h]=(v==='custom'?[+$('tsw').value,+$('tsh').value]:v.split('x').map(Number)); const n=$('tsname').value; if(!n||!w||!h) return;
+  const q=`name=${encodeURIComponent(n)}&w=${w}&h=${h}&strategy=${TSSTRAT}`;
+  $('tsimg').src='/api/adaptive/render.gif?'+q;
+  const r=await fetch('/api/adaptive/info?'+q); const j=await r.json().catch(()=>({}));
+  $('tsinfo').innerHTML=r.ok?`Dimensions <b>${j.width}x${j.height}</b><br>Aspect ratio <b>${j.ratio_label}</b><br>Layout family <b>${esc(j.family_label)}</b><br>Detail tier <b>${j.tier}</b><br>Rating <span class="badge rate-${j.rating}">${j.rating}</span><br>${j.frames} frames, ${(j.loop_ms/1000).toFixed(1)} s loop`:esc(j.detail||'error'); }
+tsLoad();
 if(SQ){ $('cvled').width=$('cvled').height=384; $('edled').width=$('edled').height=384; $('ed').width=DW*7; $('ed').height=DH*7; }
 
 // playlist create / rename

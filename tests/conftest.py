@@ -29,3 +29,12 @@ def sample_settings(monkeypatch):
     orig = LF._setting
     monkeypatch.setattr(LF, "_setting", lambda k: orig(k) or SAMPLE_SETTINGS.get(k))
     yield
+
+
+@pytest.fixture(autouse=True)
+def _fresh_nws_points():
+    """Process-wide /points cache: start every test empty (fixture renders fill it)."""
+    from orcpixels.sources import livefeeds as _LF
+    _LF._POINTS.clear()
+    yield
+    _LF._POINTS.clear()
