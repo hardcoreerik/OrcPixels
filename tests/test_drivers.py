@@ -338,4 +338,5 @@ def test_web_add_virtual_display(tmp_path, monkeypatch):
         assert r.status_code == 200, r.text
         info = r.json()
         assert info["driver"] == "virtual" and info["render_size"] == [64, 16]
+        assert (info["width"], info["height"], info["id"]) == (64, 32, "virtual64x32")
         assert c.post("/api/displays/add", json={"profile": "wled-32x8", "host": "bad host!"}).status_code == 400

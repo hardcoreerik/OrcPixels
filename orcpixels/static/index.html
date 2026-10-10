@@ -907,6 +907,7 @@ async function adAdd(){ const p=PROFS.find(x=>x.id===$('adprof').value); if(!p) 
   const r=await api('/api/displays/add',b);
   if(r){ toast(`added <b>${esc(r.label||r.id)}</b>: press Connect`,'ok',5000); dispLoad(); } }
 adLoad();
+if(location.hash==='#add-display'){ showTab('settings'); $('addnet').open=true; setTimeout(()=>$('addnet').scrollIntoView(),300); }
 if(SQ){ $('cvled').width=$('cvled').height=384; $('edled').width=$('edled').height=384; $('ed').width=DW*7; $('ed').height=DH*7; }
 
 // playlist create / rename

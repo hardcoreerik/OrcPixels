@@ -111,8 +111,13 @@ def _validate_driver(d: dict, existing: list[dict] | None, new: bool) -> dict:
     d["options"] = {str(k): v for k, v in opts.items() if isinstance(v, (str, int, float, bool))}
     d["address"] = ""
     if not d.get("id"):
-        tag = (host or ser or d["driver"]).split("/")[-1].replace(".", "").replace(":", "")[-6:].lower() or "x"
-        d["id"] = re.sub(r"[^a-z0-9_-]", "", f"{d['driver']}{w}x{h}_{tag}")[:24]
+        base = re.sub(r"[^a-z0-9_-]", "", f"{d['driver']}{w}x{h}")[:20]
+        taken = {e["id"] for e in existing or []}
+        d["id"] = base
+        n = 2
+        while d["id"] in taken:
+            d["id"] = f"{base}_{n}"
+            n += 1
     if not ID_RE.match(d["id"]):
         raise ValueError("id: lowercase letters, digits, - or _ (max 24)")
     d["label"] = (str(d.get("label") or prof.get("label") or f"{d['driver']} {w}x{h}")).strip()[:40]

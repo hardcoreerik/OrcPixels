@@ -264,7 +264,7 @@ def test_live_pauses_cleanly_while_link_is_down():
         assert live.info()["label"] == "paused: sign reconnecting"
         assert live.enabled and calls == []
         sign.connected = True
-        await until(lambda: sign.frames > n + 2)
+        await until(lambda: sign.frames > n + 2 and not live.ble_paused)
         assert not live.ble_paused and live.info()["label"] == "streaming"
         assert await live.on_sign_reconnect() is True and calls == []   # streaming: no playlist
         await live.stop()
@@ -278,7 +278,7 @@ def test_reconnect_while_waiting_reasserts_playlist():
         await live.start(interval=0.0)
         await until(lambda: sign.frames >= 2)
         live.client.up = False
-        await until(lambda: live.state == "waiting")
+        await until(lambda: live.state == "waiting" and calls == ["playlist"])
         assert calls == ["playlist"]
         assert await live.on_sign_reconnect() is True
         assert calls == ["playlist", "playlist"]
@@ -321,7 +321,7 @@ def test_idle_connection_plays_saved_playlist(sign):
         sign.on_idle = on_idle
         await sign.connect()
         sign.start_supervisor()
-        await until(lambda: calls == ["play"])
+        await until(lambda: calls == ["play"] and sign.idle_resumes == 1)   # counter set after on_idle returns
         assert sign.connected and sign.idle_resumes == 1 and not sign.gave_up
         await asyncio.sleep(0.4)
         assert calls == ["play"]                    # once per link-up, not a loop
@@ -393,7 +393,7 @@ def test_stuck_link_setup_is_abandoned_and_disconnected(sign):
         sign._client.power_cut()
         await until(lambda: sign.gave_up, timeout=5)
         bad = FakeBleak.instances[-1]
-        await until(lambda: bad.disconnect_calls >= 1)            # fully let go
+        await until(lambda: bad.disconnect_calls >= 1 and not sign.connected)            # fully let go
         assert not sign.connected
         assert "link setup" in sign.gave_up_reason
         release.set()

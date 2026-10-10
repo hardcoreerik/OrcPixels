@@ -653,8 +653,8 @@ class AddReq(BaseModel):
     options: Optional[dict] = None
     name: Optional[str] = None
     label: Optional[str] = None
-    width: int = 64
-    height: int = 16
+    width: Optional[int] = None              # None: from the profile (iPixel default 64x16)
+    height: Optional[int] = None
     rotate_180: Optional[bool] = None
     id: Optional[str] = None
 
@@ -829,7 +829,7 @@ class MultiDisplayApp:
         async def displays_add(r: AddReq):
             prim = self.displays.get(self.primary)
             try:
-                d = D.add({**r.model_dump(), "autoconnect": False})
+                d = D.add({**{k: v for k, v in r.model_dump().items() if v is not None}, "autoconnect": False})
             except ValueError as e:
                 raise HTTPException(400, str(e))
             if prim is not None and d["id"] == self.primary:
