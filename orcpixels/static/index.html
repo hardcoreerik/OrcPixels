@@ -228,6 +228,12 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <div class="ctl"><span>colors (0 = all)</span><input type="range" id="cv_colors" min="0" max="64" step="1" value="0"><span></span></div>
    <div class="row">dither <select id="cv_dither" onchange="cvRun()"><option value="none">none</option><option value="fs">Floyd-Steinberg</option></select></div>
    <h2 style="margin-top:14px">Animation (GIF sources)</h2>
+   <div class="muted mono" id="cvsrc"></div>
+   <div class="row">layout <select id="cv_strategy" onchange="cvRun()"><option value="">use Framing</option><option value="adaptive">adaptive (cover if the shape is close, else contain)</option><option value="contain">contain</option><option value="crop">crop</option></select>
+    <label class="chk"><input type="checkbox" id="cv_fit_limits" checked onchange="cvRun()"> fit to the sign's limits</label></div>
+   <div class="ctl"><span>trim start (ms)</span><input type="range" id="cv_trim_start" min="0" max="10000" step="20" value="0"><span></span></div>
+   <div class="ctl"><span>trim end (ms, 0 = end)</span><input type="range" id="cv_trim_end" min="0" max="10000" step="20" value="0"><span></span></div>
+   <div class="ctl"><span>speed</span><input type="range" id="cv_speed" min="0.25" max="4" step="0.05" value="1"><span></span></div>
    <div class="ctl"><span>fps</span><input type="range" id="cv_fps" min="1" max="30" step="1" value="10"><span></span></div>
    <div class="ctl"><span>max frames</span><input type="range" id="cv_max_frames" min="1" max="64" step="1" value="32"><span></span></div>
    <div class="row">seamless loop <select id="cv_loop" onchange="cvRun()"><option value="none">as is</option><option value="pingpong">ping-pong</option><option value="crossfade">crossfade tail</option></select>
@@ -731,7 +737,7 @@ function actionsHtml(p){ return `<div class="row" style="margin-top:10px"><butto
   <div class="row"><input type="text" id="${p}_name" placeholder="preset name (a-z 0-9 _)" style="width:190px"><select id="${p}_family">${FAMILIES.map(f=>`<option value="${f}">${FAMNAMES[f]||f}</option>`).join('')}</select>
    <input type="text" id="${p}_title" placeholder="title (optional)" style="width:150px"></div>
   <div class="row"><label class="chk"><input type="checkbox" id="${p}_over"> overwrite</label><label class="chk"><input type="checkbox" id="${p}_force"> save even if the loop jumps</label>
-   <button class="alt" onclick="jobSave('${p}')">Save as preset</button></div>
+   <button class="alt" onclick="jobSave('${p}')">Save as preset</button><button class="alt sm" id="${p}_pladd" style="display:none" onclick="jobPlAdd('${p}')">+ playlist</button></div>
   <div class="row">slot <input type="number" id="${p}_slot" min="1" max="100" value="${p==='cv'?90:95}" oninput="slotHint('${p}')"><button class="blue" onclick="jobStore('${p}')">Store in slot</button><span class="muted" id="${p}_slotinfo"></span></div>`; }
 function slotHint(p){ const n=+$(p+'_slot').value, e=PLDATA&&PLDATA.device.slots[n], a=PLDATA&&PLDATA.device.active;
   $(p+'_slotinfo').textContent=!e?'empty (not written by OrcPixels)':`holds ${slotLabel(e)} (${ptIso(e.written)})`+(a&&a.slots.includes(n)?' \u00b7 in the play order: playlist re-plays after the write':''); }
@@ -740,7 +746,9 @@ async function jobSend(p){ const id=await jobId(p); if(!id){ toast('nothing to s
 async function jobSave(p){ const id=await jobId(p); if(!id){ toast('nothing to save yet','bad'); return; }
   const name=$(p+'_name').value.trim(); if(!name){ toast('give the preset a name','bad'); return; }
   const r=await api('/api/studio/jobs/'+id+'/save',{name,family:$(p+'_family').value,title:$(p+'_title').value,overwrite:$(p+'_over').checked,force:$(p+'_force').checked});
-  if(r){ SAVED[p]=r.preset.name; toast(`saved preset <b>${esc(r.preset.name)}</b> (${kb(r.preset.bytes)})`,'info'); loadPresets(); } }
+  if(r){ SAVED[p]=r.preset.name; toast(`saved preset <b>${esc(r.preset.name)}</b> (${kb(r.preset.bytes)})`,'info'); await loadPresets();
+    const b=$(p+'_pladd'); if(b){ b.style.display=''; b.textContent='+ playlist: '+r.preset.name; } } }
+function jobPlAdd(p){ if(!SAVED[p]) return; plAdd(SAVED[p]); toast(`added ${esc(SAVED[p])} to the playlist editor (Playlists tab: save to keep it)`,'info',3500); }
 async function jobStore(p){ const id=await jobId(p); if(!id){ toast('nothing to store yet','bad'); return; }
   const slot=+$(p+'_slot').value; const e=PLDATA&&PLDATA.device.slots[slot];
   if(e && !confirm(`Slot ${slot} holds "${slotLabel(e)}" (written ${ptIso(e.written)}). Overwrite it?`)) return;
@@ -755,11 +763,11 @@ function showJob(p, j, frames){ JOB[p]=j; $(p+'badge').innerHTML=loopBadge(j); $
   else if(j.warnings&&j.warnings.length) $('edinfo').textContent+='\n'+j.warnings.join(' \u00b7 '); }
 
 // converter
-const CVK=['mode','pos_x','pos_y','zoom','bg','brightness','contrast','saturation','colors','dither','fps','max_frames','loop','xfade'];
+const CVK=['mode','pos_x','pos_y','zoom','bg','brightness','contrast','saturation','colors','dither','fps','max_frames','loop','xfade','strategy','trim_start','trim_end','speed','fit_limits'];
 const CVDEF={}; let CV={file:null,sid:null}, cvSeq=0, cvT=null;
-CVK.forEach(k=>{ const el=$('cv_'+k); CVDEF[k]=el.value; if(el.type==='range'){ const lab=el.nextElementSibling; const upd=()=>lab.textContent=el.value; upd(); el.oninput=()=>{ upd(); clearTimeout(cvT); cvT=setTimeout(cvRun,220); }; } });
-function cvReset(){ CVK.forEach(k=>{ const el=$('cv_'+k); el.value=CVDEF[k]; if(el.type==='range') el.nextElementSibling.textContent=el.value; }); cvRun(); }
-function cvParams(){ const p={}; CVK.forEach(k=>{ const el=$('cv_'+k); p[k]=(el.type==='range'||el.type==='number')?+el.value:el.value; }); return p; }
+CVK.forEach(k=>{ const el=$('cv_'+k); CVDEF[k]=el.type==='checkbox'?el.checked:el.value; if(el.type==='range'){ const lab=el.nextElementSibling; const upd=()=>lab.textContent=el.value; upd(); el.oninput=()=>{ upd(); clearTimeout(cvT); cvT=setTimeout(cvRun,220); }; } });
+function cvReset(){ CVK.forEach(k=>{ const el=$('cv_'+k); if(el.type==='checkbox') el.checked=CVDEF[k]; else el.value=CVDEF[k]; if(el.type==='range') el.nextElementSibling.textContent=el.value; }); cvRun(); }
+function cvParams(){ const p={}; CVK.forEach(k=>{ const el=$('cv_'+k); p[k]=el.type==='checkbox'?el.checked:(el.type==='range'||el.type==='number')?+el.value:el.value; }); return p; }
 function cvPick(f){ if(!f) return; CV={file:f,sid:null}; $('cvname').textContent=`${f.name} (${kb(f.size)})`; cvRun(); }
 async function cvRun(retry){ if(!CV.file) return; const seq=++cvSeq; const fd=new FormData(); fd.append('params',JSON.stringify(cvParams()));
   if(CV.sid&&!retry) fd.append('source_id',CV.sid); else fd.append('file',CV.file);
@@ -767,6 +775,9 @@ async function cvRun(retry){ if(!CV.file) return; const seq=++cvSeq; const fd=ne
   const r=await fetch('/api/studio/convert',{method:'POST',body:fd});
   if(!r.ok){ const j=await r.json().catch(()=>({detail:r.statusText})); if(!retry&&CV.sid){ CV.sid=null; return cvRun(true); } $('cvinfo').textContent='Error: '+j.detail; return; }
   const j=await r.json(); if(seq!==cvSeq) return; CV.sid=j.source_id;
+  const si=j.source_info; if(si){ $('cvsrc').textContent=`source: ${si.format} ${si.width}x${si.height}, ${si.frames} frame(s)`+(si.frames>1?`, ${(si.duration_ms/1000).toFixed(2)} s, loop ${si.loop===0?'forever':si.loop==null?'once':si.loop+'x'}`:'');
+    if(si.duration_ms){ ['trim_start','trim_end'].forEach(k=>{ $('cv_'+k).max=si.duration_ms; }); } }
+  if(j.notes&&j.notes.length) j.warnings=(j.warnings||[]).concat(j.notes);
   const frames=await Promise.all(j.frame_urls.map(urlToData)); if(seq!==cvSeq) return; showJob('cv',j,frames); }
 const drop=$('cvdrop');
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('hover'); }));

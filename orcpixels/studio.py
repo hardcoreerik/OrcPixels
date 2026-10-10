@@ -46,7 +46,11 @@ BIG_GIF = 15 * 1024          # same budget as tests/test_personal_presets.py (BL
 DEFAULTS = {"mode": "fit", "pos_x": 0.5, "pos_y": 0.5, "zoom": 1.0, "bg": "#000000",
             "brightness": 1.0, "contrast": 1.0, "saturation": 1.0,
             "colors": 0, "dither": "none", "fps": 10.0, "max_frames": 32,
-            "loop": "none", "xfade": 4}
+            "loop": "none", "xfade": 4,
+            # animated-GIF import (2026-10-09): trim on the source timeline (ms; end 0 = to the
+            # end), playback speed, layout strategy at the display size, fit to sign limits
+            "trim_start": 0, "trim_end": 0, "speed": 1.0, "strategy": "", "fit_limits": True}
+STRATEGIES = ("", "adaptive", "contain", "crop")      # "" = use `mode` as is
 
 
 # ------------------------------------------------------------------ helpers
@@ -86,8 +90,23 @@ def flatten(img: Image.Image, bg=(0, 0, 0)) -> Image.Image:
     return Image.alpha_composite(base, rgba).convert("RGB")
 
 
+def source_info(data: bytes) -> dict:
+    """What an uploaded file is: format, size, frame count, total duration, GIF loop count
+    (0 = forever, None = play once)."""
+    im = Image.open(io.BytesIO(data))
+    n = getattr(im, "n_frames", 1)
+    total = 0
+    for i in range(min(n, MAX_SRC_FRAMES)):
+        im.seek(i)
+        total += int(im.info.get("duration", 100) or 100)
+    return {"format": im.format, "width": im.width, "height": im.height, "frames": n,
+            "duration_ms": total if n > 1 else 0, "loop": im.info.get("loop") if n > 1 else None}
+
+
 def decode_frames(data: bytes) -> tuple[list[Image.Image], list[int]]:
-    """Any PIL image (PNG/JPG/GIF/animated PNG/WebP) -> RGBA frames + durations (ms)."""
+    """Any PIL image (PNG/JPG/GIF/animated PNG/WebP) -> RGBA frames + durations (ms).
+    Every frame is the fully composited picture (Pillow applies GIF disposal / partial
+    frames), so frame i is what a browser shows at that moment."""
     im = Image.open(io.BytesIO(data))
     frames, durs = [], []
     for fr in ImageSequence.Iterator(im):
@@ -101,6 +120,83 @@ def decode_frames(data: bytes) -> tuple[list[Image.Image], list[int]]:
 
 
 # ------------------------------------------------------------------ converter steps
+def trim(frames: list, durs: list[int], start_ms: int = 0, end_ms: int = 0) -> tuple[list, list[int]]:
+    """Keep the source frames shown between start_ms and end_ms (0 = the end); the first
+    and last kept frames are shortened to the cut."""
+    if len(frames) < 2 or (start_ms <= 0 and end_ms <= 0):
+        return frames, durs
+    total = sum(durs)
+    a = max(0, min(int(start_ms), total - 20))
+    b = total if end_ms <= 0 else max(a + 20, min(int(end_ms), total))
+    out, od, t = [], [], 0
+    for f, d in zip(frames, durs):
+        s0, s1 = t, t + d
+        t = s1
+        lo, hi = max(s0, a), min(s1, b)
+        if hi - lo >= 1:
+            out.append(f)
+            od.append(max(20, hi - lo))
+    return (out, od) if out else (frames[:1], [durs[0]])
+
+
+def speed_up(durs: list[int], speed: float) -> list[int]:
+    sp = max(0.1, min(float(speed or 1.0), 10.0))
+    return [max(20, round(d / sp)) for d in durs]
+
+
+def strategy_mode(strategy: str, src_size: tuple[int, int], mode: str) -> str:
+    """adaptive: cover the panel when the picture's shape is close to the panel's (little is
+    lost), letterbox when it isn't; contain = fit; crop = fill."""
+    if strategy == "contain":
+        return "fit"
+    if strategy == "crop":
+        return "fill"
+    if strategy == "adaptive":
+        W, H = _wh()
+        a, b = src_size[0] / max(1, src_size[1]), W / H
+        return "fill" if max(a, b) / min(a, b) <= 1.34 else "fit"
+    return mode
+
+
+def legacy_limits() -> dict:
+    """Upload limits for the selected display: iPixel BLE signs get the 15 KB budget and the
+    64-frame cap; network/USB drivers only the frame cap."""
+    from . import displays as D
+    try:
+        ip = D.is_ipixel(D.current())
+    except Exception:  # noqa: BLE001
+        ip = True
+    return {"max_frames": MAX_FRAMES, "max_bytes": BIG_GIF if ip else 0, "ble": ip}
+
+
+def fit_to_limits(frames: list[Image.Image], ms: int, colors: int, dither: str, lim: dict):
+    """Shrink until the encoded GIF fits: fewer colours first (64, 32, 16, 8), then drop
+    every other frame (the frame time doubles, so speed and loop are kept). Returns
+    frames, frame_ms, notes."""
+    notes = []
+    if len(frames) < 2 or not lim.get("max_bytes"):
+        return frames, ms, notes
+    def size(fr, m):
+        return len(encode_gif(fr, m))
+    if size(frames, ms) <= lim["max_bytes"]:
+        return frames, ms, notes
+    base = frames
+    for c in (64, 32, 16, 8):
+        if colors and colors <= c:
+            continue
+        cand = reduce_colors(base, c, dither)
+        if size(cand, ms) <= lim["max_bytes"]:
+            notes.append(f"reduced to {c} colours for the sign's upload budget")
+            return cand, ms, notes
+    cand, m, c = reduce_colors(base, 16, dither), ms, 16
+    notes.append("reduced to 16 colours")
+    while len(cand) >= 4 and size(cand, m) > lim["max_bytes"]:
+        cand, m = cand[::2], m * 2
+    notes.append(f"{len(cand)} frames at {m} ms (every {len(base) // max(1, len(cand))}th frame) for the sign's upload budget")
+    return cand, m, notes
+
+
+
 def fit_frame(img: Image.Image, mode: str = "fit", pos_x: float = 0.5, pos_y: float = 0.5,
               zoom: float = 1.0, bg=(0, 0, 0)) -> Image.Image:
     """fit = letterbox (whole image visible), fill = cover the panel (cropped at pos),
@@ -200,6 +296,9 @@ class Job:
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:10])
     created: float = field(default_factory=time.time)
     _enc: bytes | None = None
+    notes: list = field(default_factory=list)
+    src_info: dict | None = None
+    src_bytes: bytes | None = None
 
     @property
     def animated(self) -> bool:
@@ -224,7 +323,8 @@ class Job:
                "frames": len(self.frames), "frame_ms": self.frame_ms,
                "fps": round(1000 / self.frame_ms, 2), "bytes": len(enc),
                "upload_s": round(len(enc) / 1100 + 0.6, 1), "loop": m, "warnings": warn,
-               "params": self.params}
+               "params": self.params, "notes": self.notes, "source_info": self.src_info,
+               "size": list(self.frames[0].size)}
         if with_frames:
             out["frame_urls"] = [data_url(f) for f in self.frames]
         return out
@@ -269,6 +369,12 @@ def norm_params(params: dict | None) -> dict:
     if p["dither"] not in ("none", "fs"):
         raise ValueError("dither must be none|fs")
     p["max_frames"] = max(1, min(int(p["max_frames"]), MAX_FRAMES))
+    if p["strategy"] not in STRATEGIES:
+        raise ValueError("strategy must be adaptive|contain|crop")
+    p["speed"] = max(0.1, min(float(p["speed"]), 10.0))
+    p["trim_start"], p["trim_end"] = max(0, int(p["trim_start"])), max(0, int(p["trim_end"]))
+    if p["trim_end"] and p["trim_end"] <= p["trim_start"]:
+        raise ValueError("trim end must be after trim start")
     return p
 
 
@@ -277,14 +383,24 @@ def convert(data: bytes, params: dict | None = None) -> Job:
     if len(data) > MAX_UPLOAD:
         raise ValueError("file too large (max 8 MB)")
     p = norm_params(params)
+    info = source_info(data)
     src, durs = decode_frames(data)
+    src, durs = trim(src, durs, p["trim_start"], p["trim_end"])
+    durs = speed_up(durs, p["speed"])
     src, ms = resample(src, durs, p["fps"], p["max_frames"])
     bg = hex_rgb(p["bg"])
-    frames = [adjust(fit_frame(f, p["mode"], p["pos_x"], p["pos_y"], p["zoom"], bg),
+    mode = strategy_mode(p["strategy"], (info["width"], info["height"]), p["mode"])
+    frames = [adjust(fit_frame(f, mode, p["pos_x"], p["pos_y"], p["zoom"], bg),
                      p["brightness"], p["contrast"], p["saturation"]) for f in src]
     frames = reduce_colors(frames, p["colors"], p["dither"])
     frames = make_loop(frames, p["loop"], p["xfade"])
-    return Job(frames=frames, frame_ms=ms, source="converter", params=p)
+    notes = []
+    if p["fit_limits"]:
+        frames, ms, notes = fit_to_limits(frames, ms, p["colors"], p["dither"], legacy_limits())
+    job = Job(frames=frames, frame_ms=ms, source="converter", params={**p, "applied_mode": mode})
+    job.notes, job.src_info = notes, info
+    job.src_bytes = data if info["frames"] > 1 else None
+    return job
 
 
 def from_frames(urls: list[str], frame_ms: int = 100, loop: str = "none", xfade: int = 4) -> Job:
@@ -460,7 +576,9 @@ def save_preset(job: Job, name: str, family: str = "user", title: str = "", desc
         raise ValueError("names starting with p_ or ending in _v<N> are reserved")
     if family not in FAMILIES:
         raise ValueError(f"family must be one of {FAMILIES}")
-    meta_p = PR.save_dir_for() / f"{name}.json"
+    size = tuple(job.frames[0].size)
+    sdir = PR.save_dir_for(size)          # the display size's set (presets64 for a 64x64 sign)
+    meta_p = sdir / f"{name}.json"
     if meta_p.exists() and not overwrite:
         raise FileExistsError(f"preset {name!r} exists (tick overwrite)")
     m = loop_metric_frames(job.frames) if job.animated else None
@@ -469,17 +587,26 @@ def save_preset(job: Job, name: str, family: str = "user", title: str = "", desc
                            "fix the loop or save anyway with force")
     enc = job.encoded()
     ext = "gif" if job.animated else "png"
-    (PR.save_dir_for() / f"{name}.{ext}").write_bytes(enc)
+    (sdir / f"{name}.{ext}").write_bytes(enc)
     prev = f"{name}_preview_10x.png"
-    (PR.save_dir_for() / prev).write_bytes(png_bytes(job.frames[0], 10))
+    (sdir / prev).write_bytes(png_bytes(job.frames[0], 10))
     meta = {"name": name, "kind": "gif" if job.animated else "image", "file": f"{name}.{ext}",
             "preview": prev, "family": family, "title": title or name,
             "description": description or f"made in the web {job.source}",
-            "frames": len(job.frames), "frame_ms": job.frame_ms, "bytes": len(enc),
+            "frames": len(job.frames), "frame_ms": job.frame_ms, "bytes": len(enc), "size": list(size),
             "loop": (("seamless" if m["ok"] else "JUMP (saved with force)") if m else None),
             "live_data": False, "generator": f"web studio ({job.source})", "created": _now()}
     if job.params:
         meta["params"] = job.params
+    if job.src_bytes:                     # keep the original GIF in the user's Library
+        try:
+            from . import paths
+            lib = paths.library() / "imports"
+            lib.mkdir(parents=True, exist_ok=True)
+            (lib / f"{name}.gif").write_bytes(job.src_bytes)
+            meta["source_file"] = f"imports/{name}.gif"
+        except OSError:
+            pass
     meta_p.write_text(json.dumps(meta, indent=2), encoding="utf-8")
     return meta
 
