@@ -14,10 +14,9 @@ import sys
 import threading
 import time
 import urllib.request
-import webbrowser
-
 from . import paths
 from . import settings as S
+from .winproc import clean_dll_search, open_url
 
 log = logging.getLogger("orcpixels.tray")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -85,8 +84,9 @@ def addresses(port: int, lan: bool) -> list[str]:
 def copy_text(text: str) -> None:
     if os.name == "nt":
         import subprocess
-        subprocess.run(["clip"], input=text.encode("utf-16-le"), check=False,
-                       creationflags=0x08000000)          # CREATE_NO_WINDOW
+        with clean_dll_search():
+            subprocess.run(["clip"], input=text.encode("utf-16-le"), check=False,
+                           creationflags=0x08000000)      # CREATE_NO_WINDOW
     else:
         try:
             import subprocess
@@ -148,7 +148,7 @@ def build_menu(pystray, srv: Server, on_quit):
     item, Menu = pystray.MenuItem, pystray.Menu
 
     def opener(path):
-        return lambda icon, it: webbrowser.open(url + path)
+        return lambda icon, it: open_url(url + path)
 
     def copier(a):
         return lambda icon, it: copy_text(a)
@@ -174,9 +174,9 @@ def build_menu(pystray, srv: Server, on_quit):
     def upd_now(icon, it):
         st = upd_status()
         if st.get("can_install"):
-            webbrowser.open(url + "/#update")         # confirm + progress in the web UI
+            open_url(url + "/#update")         # confirm + progress in the web UI
         else:
-            webbrowser.open((st.get("latest") or {}).get("url") or UP.RELEASES_PAGE)
+            open_url((st.get("latest") or {}).get("url") or UP.RELEASES_PAGE)
 
     def upd_check(icon, it):
         threading.Thread(target=lambda: (UP.check(True), icon.update_menu()), daemon=True).start()
@@ -203,7 +203,7 @@ def main(argv: list[str] | None = None) -> int:
     port = int(os.environ.get("ORCPIXELS_PORT") or cfg.get("port") or 8765)
     srv = Server(port, bool(cfg.get("listen_lan")))
     if srv.already_running():                       # second launch: just open the UI
-        webbrowser.open(f"http://127.0.0.1:{port}")
+        open_url(f"http://127.0.0.1:{port}")
         return 0
     srv.start()
     for _ in range(80):
@@ -211,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:
             break
         time.sleep(0.25)
     if "--no-browser" not in (argv or sys.argv[1:]):
-        webbrowser.open(f"http://127.0.0.1:{port}")
+        open_url(f"http://127.0.0.1:{port}")
     try:
         import pystray
     except ImportError:

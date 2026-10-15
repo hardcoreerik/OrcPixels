@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed: "Update now" rolled back
+- The update installer no longer races the app's shutdown: OrcPixels passes its process id (`/WAITPID`) and Setup waits for it to exit before checking for files in use. Setup also waits by name when an older OrcPixels (0.2.2 to 0.2.4) starts it.
+- A browser opened from OrcPixels no longer inherits OrcPixels' DLL folder, so browser helpers stop loading `VCRUNTIME140.dll` from the install folder and blocking updates.
+- Setup only treats OrcPixels' own programs as "in use". The shared Microsoft runtime DLLs are version-checked: an unchanged copy is skipped, and a newer one that's locked is replaced at the next restart.
+- When an update fails, Setup starts the old version again, and the Updates card shows why, taken from the installer log. The previous attempt's log is kept as `update-install.prev.log`.
+
 ## 0.2.4 (2026-10-15)
 
 ### Free API live sources

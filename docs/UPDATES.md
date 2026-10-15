@@ -15,9 +15,16 @@ OrcPixels checks the public [Releases](https://github.com/hardcoreerik/OrcPixels
 
 1. Downloads `OrcPixels-Setup-<version>.exe` and the release's `SHA256SUMS` to a temp folder.
 2. Checks the installer's SHA-256 against `SHA256SUMS`. If anything is missing or doesn't match, the file is deleted and nothing is installed.
-3. Starts the installer with `/SILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /RELAUNCH=1`, into the same folder (`/DIR`) with the same data and Library folders (`/CONFIGDIR`, `/LIBRARYDIR`). A Program Files install runs through Windows' "run as administrator" prompt (UAC); a per-user install (`/CURRENTUSER`) needs no prompt.
-4. Stops the server cleanly: Live engines stop, and BLE links close through the normal shutdown. Nothing is sent to a sign.
-5. When the install finishes, the installer starts OrcPixels again as the normal user.
+3. Starts the installer with `/SILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /RELAUNCH=1 /WAITPID=<pid> /LOG=...\out\update-install.log`, into the same folder (`/DIR`) with the same data and Library folders (`/CONFIGDIR`, `/LIBRARYDIR`). A Program Files install runs through Windows' "run as administrator" prompt (UAC); a per-user install (`/CURRENTUSER`) needs no prompt.
+4. Stops the server cleanly and exits: Live engines stop, and BLE links close through the normal shutdown. Nothing is sent to a sign. If the clean stop hangs, the app exits anyway after 30 s.
+5. Setup waits for that process to exit (`/WAITPID`, up to 60 s), then installs. Only OrcPixels' own `.exe` files count as "in use" (`CloseApplicationsFilter=*.exe`).
+6. When the install finishes, the installer starts OrcPixels again as the normal user. If it fails or rolls back, it starts the old version again, and the Updates card shows why (read from the installer log at startup).
+
+### Why an update can fail, and how it's handled
+
+- **The app is still shutting down.** Setup used to start about 1 s before the app stopped, and Restart Manager found `OrcPixels.exe` still running. Now Setup waits for the PID. Installers built after this fix also wait by name when an older app starts them.
+- **Another program has our DLLs loaded.** PyInstaller sets the app's DLL folder with `SetDllDirectory`, and child processes inherit it. A browser opened from OrcPixels, and everything that browser starts later (for example a Chrome extension's native host), then loaded `_internal\VCRUNTIME140.dll` from the install folder. Setup couldn't close those, so it rolled back. The app now resets the DLL search path for any program it starts (`orcpixels/winproc.py`). The Microsoft runtime DLLs are installed version-checked with `restartreplace`, so a locked copy no longer blocks an update.
+- **Logs:** `%APPDATA%\OrcPixels\out\update-install.log` (latest attempt) and `update-install.prev.log` (the one before). Inno's rollback removes newly added files but doesn't restore files it already replaced. If an update fails late, run the installer from the Releases page once to repair.
 
 Your settings, displays, playlists, user presets and Library live in `%APPDATA%\OrcPixels` and the Library folder. The installer never writes there, except `config\install.json` (Library path and installed version).
 

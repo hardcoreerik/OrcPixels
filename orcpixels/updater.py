@@ -6,7 +6,10 @@ check()    GitHub Releases API (public repo), at startup + every 24 h unless tur
 install()  only on an explicit "Update now": download OrcPixels-Setup-<v>.exe to a temp
            folder, verify its SHA-256 against the release's SHA256SUMS asset, start it with
            /SILENT (UAC prompt when the install folder needs admin), stop the server
-           cleanly; the installer relaunches OrcPixels. User data (%APPDATA%\\OrcPixels,
+           cleanly and exit; the installer waits for this process to be gone (/WAITPID),
+           installs, and relaunches OrcPixels (also after a failed install).
+reconcile_install()  at startup: read the installer's log (/LOG) and record whether the
+           last update installed or rolled back, and why. User data (%APPDATA%\\OrcPixels,
            the Library) is never touched by an update.
 Source checkouts / dev mode never self-update: they only get a notice ("git pull").
 """
@@ -38,6 +41,7 @@ MIN_MANUAL_S = 60                 # "Check for updates" at most once a minute
 ASSET_RE = re.compile(r"^OrcPixels-Setup-(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\.exe$")
 SUMS_NAMES = ("SHA256SUMS", "SHA256SUMS.txt")
 UA = f"OrcPixels/{__version__} (+{RELEASES_PAGE})"
+HARD_EXIT_S = 30.0               # "Update now": exit for sure, even if a thread hangs on shutdown
 _lock = threading.Lock()
 
 
@@ -287,16 +291,34 @@ def needs_admin(d: Path | None = None) -> bool:
         return True
 
 
-def installer_args(d: Path | None = None) -> list[str]:
-    """Inno Setup silent update into the same folder, same install mode, same data/Library."""
+def install_log() -> Path:
+    return paths.OUT / "update-install.log"
+
+
+def installer_args(d: Path | None = None, wait_pid: int | None = None) -> list[str]:
+    """Inno Setup silent update into the same folder, same install mode, same data/Library.
+    /WAITPID: Setup waits (up to 60 s) for this process to exit before it checks for files in
+    use; without it Setup raced our shutdown and found OrcPixels.exe still running.
+    /LOG: always, so a failed update can be explained (reconcile_install)."""
     from . import settings as S
     d = d or install_dir()
     lib = S.load().get("library_dir") or str(paths.library())
     args = ["/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS", "/RELAUNCH=1",
+            f"/WAITPID={wait_pid or os.getpid()}",
             f'/DIR="{d}"', f'/CONFIGDIR="{paths.DATA}"', f'/LIBRARYDIR="{lib}"',
-            f'/LOG="{paths.OUT / "update-install.log"}"']
+            f'/LOG="{install_log()}"']
     args.append("/ALLUSERS" if needs_admin(d) else "/CURRENTUSER")
     return args
+
+
+def _rotate_install_log() -> None:
+    """Keep the previous attempt's log next to the new one (update-install.prev.log)."""
+    p = install_log()
+    try:
+        if p.exists():
+            os.replace(p, p.with_name("update-install.prev.log"))
+    except OSError as e:
+        log.warning("install log rotate: %s", e)
 
 
 def launch_installer(exe: Path, args: list[str]) -> None:
@@ -304,15 +326,17 @@ def launch_installer(exe: Path, args: list[str]) -> None:
     (Windows shows the UAC prompt); otherwise a normal process."""
     if os.name != "nt":
         raise OSError("installing updates is Windows-only")
+    from .winproc import clean_dll_search
     params = " ".join(args)
-    if "/ALLUSERS" in args:
-        import ctypes
-        rc = ctypes.windll.shell32.ShellExecuteW(None, "runas", str(exe), params, None, 1)
-        if rc <= 32:
-            raise OSError(f"could not start the installer (UAC declined?) code {rc}")
-        return
-    subprocess.Popen(f'"{exe}" {params}', close_fds=True,
-                     creationflags=0x00000008 | 0x00000200)      # DETACHED_PROCESS | NEW_PROCESS_GROUP
+    with clean_dll_search():                     # Setup must not inherit our DLL folder
+        if "/ALLUSERS" in args:
+            import ctypes
+            rc = ctypes.windll.shell32.ShellExecuteW(None, "runas", str(exe), params, None, 1)
+            if rc <= 32:
+                raise OSError(f"could not start the installer (UAC declined?) code {rc}")
+            return
+        subprocess.Popen(f'"{exe}" {params}', close_fds=True,
+                         creationflags=0x00000008 | 0x00000200)  # DETACHED_PROCESS | NEW_PROCESS_GROUP
 
 
 def _set_install_state(**kw) -> None:
@@ -337,14 +361,96 @@ def install(shutdown, launcher=launch_installer) -> dict:
         raise
     _set_install_state(state="verified", sha256=sha256_file(exe), file=str(exe))
     args = installer_args()
+    _rotate_install_log()
     try:
         launcher(exe, args)
     except Exception as e:
         _set_install_state(state="failed", error=str(e))
         raise
-    _set_install_state(state="installing")
-    threading.Timer(1.0, shutdown).start()        # let the HTTP answer go out first
+    _set_install_state(state="installing", from_version=__version__)
+    threading.Timer(1.0, _exit_for_update, (shutdown,)).start()   # let the HTTP answer go out first
     return {"ok": True, "version": latest["version"], "installer": str(exe), "args": args}
+
+
+def _exit_for_update(shutdown, hard_exit=None, timeout: float | None = None, arm: bool | None = None) -> None:
+    """Clean stop (Live engines, BLE links), then make sure the process is really gone:
+    Setup waits for this PID before it replaces our files. The watchdog (installed build
+    only) hard-exits if the clean stop hangs."""
+    arm = paths.FROZEN if arm is None else arm
+    hard_exit = hard_exit or os._exit
+    if arm:
+        def watchdog():
+            time.sleep(HARD_EXIT_S if timeout is None else timeout)
+            log.warning("update: clean shutdown took too long, exiting now")
+            hard_exit(0)
+        threading.Thread(target=watchdog, name="orcpixels-update-exit", daemon=True).start()
+    try:
+        shutdown()
+    except Exception as e:  # noqa: BLE001
+        log.warning("update shutdown: %s", e)
+        if arm:
+            hard_exit(0)
+
+
+# ------------------------------------------------------------------ last install result
+_LOG_REASONS = (
+    (re.compile(r"Setup was unable to automatically close all applications"), "files in use"),
+    (re.compile(r"Some applications could not be shut down"), "files in use"),
+    (re.compile(r"DeleteFile failed|MoveFile failed|being used by another process"), "files in use"),
+    (re.compile(r"User canceled the installation process"), "canceled"),
+)
+
+
+def parse_install_log(text: str) -> dict:
+    """Inno Setup /LOG -> {"ok": bool|None, "reason": str, "blockers": [exe names], "detail": str}."""
+    blockers = sorted(set(re.findall(r"RestartManager found an application using one of our files: (.+?)\s*$",
+                                     text, re.M)))
+    if re.search(r"Installation process succeeded|Need to restart Windows\? No", text) and "Rolling back" not in text:
+        return {"ok": True, "reason": "", "blockers": blockers, "detail": ""}
+    if "Rolling back changes" not in text and "Setup exit code" not in text and "Log closed" not in text:
+        return {"ok": None, "reason": "", "blockers": blockers, "detail": ""}   # still running / empty
+    reason, detail = "rolled back", ""
+    for rx, why in _LOG_REASONS:
+        m = rx.search(text)
+        if m:
+            reason = why
+            detail = m.group(0)
+            break
+    if reason == "files in use" and blockers:
+        detail = f"in use by: {', '.join(blockers)}"
+    return {"ok": False, "reason": reason, "blockers": blockers, "detail": detail}
+
+
+def reconcile_install() -> dict | None:
+    """At startup after an "Update now": installed, or rolled back (and why)?
+    The log wins over the version: Inno's rollback removes new files but does not restore
+    ones it already replaced, so a late failure can leave a mixed install that reports the
+    new version; that needs one manual run of the installer."""
+    c = _read_cache()
+    inst = c.get("install") or {}
+    if inst.get("state") != "installing":
+        return None
+    want = inst.get("version")
+    try:
+        text = install_log().read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        text = ""
+    r = parse_install_log(text)
+    upgraded = bool(want and parse(want) and parse(__version__) and parse(__version__) >= parse(want))
+    if r["ok"] is not False and upgraded:
+        _set_install_state(state="done", error=None)
+        log.info("update to v%s installed", want)
+        return _read_cache().get("install")
+    why = r["reason"] or "the installer did not finish"
+    if r["detail"]:
+        why += f": {r['detail']}"
+    msg = f"Update to v{want} did not install ({why}). "
+    msg += (f"Some files may already be v{want}: run the installer from the Releases page once to repair."
+            if upgraded else f"Still on v{__version__}.")
+    msg += f" Installer log: {install_log()}"
+    _set_install_state(state="failed", error=msg, blockers=r["blockers"])
+    log.warning("update failed: %s", msg)
+    return _read_cache().get("install")
 
 
 # ------------------------------------------------------------------ shutdown hook
@@ -364,6 +470,11 @@ def start_background(stop: threading.Event | None = None) -> threading.Thread:
     stop = stop or threading.Event()
     if os.environ.get("ORCPIXELS_NO_UPDATE_CHECK"):
         stop.set()
+
+    try:
+        reconcile_install()
+    except Exception as e:  # noqa: BLE001
+        log.warning("update reconcile: %s", e)
 
     def run():
         if stop.wait(20):

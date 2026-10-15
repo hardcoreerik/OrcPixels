@@ -180,11 +180,12 @@ def test_install_flow(env, monkeypatch, tmp_path):
     monkeypatch.setattr(UP, "install_dir", lambda: tmp_path / "app")
     (tmp_path / "app").mkdir()
     launched, shut = [], []
-    monkeypatch.setattr(UP.threading, "Timer", lambda s, f: type("T", (), {"start": lambda self: f()})())
+    monkeypatch.setattr(UP.threading, "Timer", lambda s, f, a=(): type("T", (), {"start": lambda self: f(*a)})())
     r = UP.install(lambda: shut.append(1), launcher=lambda exe, args: launched.append((exe, args)))
     exe, args = launched[0]
     assert exe.read_bytes() == EXE and r["version"] == "0.2.2" and shut == [1]
     assert "/SILENT" in args and "/RELAUNCH=1" in args and "/CURRENTUSER" in args
+    assert f"/WAITPID={UP.os.getpid()}" in args and any(x.startswith("/LOG=") for x in args)
     assert any(a.startswith("/DIR=") and str(tmp_path / "app") in a for a in args)
     assert any(a.startswith("/CONFIGDIR=") for a in args) and any(a.startswith("/LIBRARYDIR=") for a in args)
     assert UP.status()["install"]["state"] == "installing"
