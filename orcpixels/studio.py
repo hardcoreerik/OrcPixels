@@ -694,7 +694,7 @@ def install(app, sign, auto=None):
             raise HTTPException(404, str(e))
 
     async def stop_live():
-        for attr in ("orcsdr_live", "livedata_live"):
+        for attr in ("orcsdr_live", "livedata_live", "push_live"):
             live = getattr(app.state, attr, None)
             if live is not None and live.enabled:
                 await live.stop()

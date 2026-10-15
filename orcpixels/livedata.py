@@ -291,6 +291,27 @@ class FeedCfgReq(BaseModel):
     values: dict[str, Optional[str]] = {}
 
 
+class OrcsdrTestReq(BaseModel):
+    """Settings > OrcSDR connection > Test connection (the form's values, not saved)."""
+    source: Optional[str] = None
+    port: Optional[str] = None
+    baud: Optional[str] = None
+    url: Optional[str] = None
+
+
+def orcsdr_conn() -> dict:
+    """Settings > OrcSDR connection: current FT8 source settings + the serial ports."""
+    from .sources import ft8feed as FT
+    cur = S.load()
+    return {"source": FT.cfg("livedata_ft8_source"), "port": FT.cfg("livedata_ft8_port"),
+            "baud": FT.cfg("livedata_ft8_baud"), "url": FT.base_url(),
+            "ft8_url": str(cur.get("livedata_ft8_url") or ""), "home_grid": str(cur.get("livedata_ft8_home_grid") or ""),
+            "home_grid_auto": FT.home_grid(), "auto_port": FT.SOURCE.auto_port, "last_port": FT.SOURCE.port,
+            "via": FT.SOURCE.via, "ports": FT.port_info(), "bauds": list(FT.BAUDS),
+            "sources": [["auto", "Auto (network, then USB)"], ["serial", "USB serial"], ["http", "Network (Wi-Fi / LAN)"],
+                        ["off", "Off"]]}
+
+
 def feed_config() -> dict:
     """Markets/news settings (symbols, currencies, RSS URLs) with defaults. Secrets are
     reported as set / not set only, never echoed."""
@@ -462,15 +483,34 @@ def install(app, sign, auto=None, feeds=None) -> DataLive:
         touched = set(upd)
         ft8_touched = bool(touched & set(FT.CONFIG)) or bool(touched & {"home_lat", "home_lon"})
         place_touched = bool(touched & set(PLACE.CONFIG))
-        if ft8_touched:
-            FT.SOURCE.http_off_until = 0.0                  # new URL / source: ask HTTP again
-            FT.SOURCE.polled_at = 0.0
+        if ft8_touched:                                     # new URL / source / port: ask again now
+            FT.SOURCE.settings_changed(serial=bool(touched & {"livedata_ft8_source", "livedata_ft8_port",
+                                                             "livedata_ft8_baud"}))
         for f in live.feeds.values():
             keys = {getattr(f, "setting", None)} | ({"livedata_x_user", "livedata_x_bearer_token"} if f.key == "x_feed" else set())
             if (touched & keys or (ft8_touched and isinstance(f, FT.Ft8Feed))
                     or (place_touched and f.key in PLACE.PLACE_FEEDS)):
                 f.attempt_at, f.error = None, None          # due now; old value kept until it answers
         return {**feed_config(), **payload()}
+
+    # ---- Settings > OrcSDR connection (2026-10-15): FT8 source, COM port, baud, URL, test
+    @app.get("/api/livedata/orcsdr")
+    async def ld_orcsdr():
+        return await asyncio.to_thread(orcsdr_conn)
+
+    @app.post("/api/livedata/orcsdr/test")
+    async def ld_orcsdr_test(r: OrcsdrTestReq):
+        """Read-only probe with the form's values: GET /api/ft8 and/or `FT8 STATUS`."""
+        from .sources import ft8feed as FT
+        try:
+            src = FT.validate("livedata_ft8_source", r.source) or "auto"
+            port = FT.validate("livedata_ft8_port", r.port)
+            baud = int(FT.validate("livedata_ft8_baud", r.baud) or 115200)
+            url = FT.validate("livedata_ft8_url", r.url) or FT.base_url()
+        except ValueError as e:
+            raise HTTPException(400, str(e))
+        res = await asyncio.to_thread(FT.test_connection, src, port, baud, url)
+        return {**res, "conn": await asyncio.to_thread(orcsdr_conn)}
 
     # ---- free sources: declarative catalog + free API keys (2026-10-14)
     def free_status():

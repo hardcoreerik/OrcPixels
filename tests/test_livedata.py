@@ -95,6 +95,7 @@ def net(monkeypatch, tmp_path):
     def no_serial(port, baud):                                 # never a real COM port in tests
         raise OSError(f"serial disabled in tests ({port})")
     monkeypatch.setattr(FT, "SERIAL_OPEN", no_serial)
+    monkeypatch.setattr(FT, "LIST_PORTS", lambda: [])          # and no real port enumeration
     FT.SOURCE.reset()
     return n
 
@@ -656,8 +657,9 @@ def test_routes_list_preview_config(app):
     st, _ = asgi(app, "POST", "/api/livedata/config", {"transport": "warp"})
     assert st == 400
     assert "legacy" in r["live"]["transports"]
-    assert app.state.orcsdr_live.peers == [app.state.livedata_live]
-    assert app.state.livedata_live.peers == [app.state.orcsdr_live]
+    assert app.state.orcsdr_live.peers == [app.state.livedata_live, app.state.push_live]
+    assert app.state.livedata_live.peers == [app.state.orcsdr_live, app.state.push_live]
+    assert app.state.push_live.peers == [app.state.orcsdr_live, app.state.livedata_live]
 
 
 # ------------------------------------------------------------------ wire capture (22:38 PT)

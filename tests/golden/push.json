@@ -1,0 +1,16 @@
+{
+ "flash@64x16": "36aa8e2fb7732f11",
+ "flash@64x64": "f116ff98a0ef5e22",
+ "rsa flash DONE@64x16": "4853ea3e7558948e",
+ "rsa flash DONE@64x64": "6bbe06ad6d07aa2d",
+ "rsa flash FAIL@64x16": "e79f653d008bae23",
+ "rsa flash FAIL@64x64": "797146a4e43b6a6d",
+ "rsa status@64x16": "6e94ac8be7637c8f",
+ "rsa status@64x64": "216e9431030db6a1",
+ "status (no pct)@64x16": "883d96acbe94b3b3",
+ "status (no pct)@64x64": "71a0f1f5ec99727a",
+ "status 100%@64x16": "1706ca534caec9cb",
+ "status 100%@64x64": "c05c2c127716abcb",
+ "status 42%@64x16": "c66177f725597934",
+ "status 42%@64x64": "4c442a33c4cd8579"
+}

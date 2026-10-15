@@ -1252,7 +1252,21 @@ def render(key: str, feed, k: int = 0, now: float | None = None) -> Image.Image:
     if v is None:
         title = lay.title if lay and lay.title else scr.short
         header(img, title or scr.short, lay.col if lay else LPB)
-        if getattr(feed, "needs_key", False):
+        hint = getattr(feed, "hint", None)
+        if hint:                                     # SetupNeeded: big words, then the small detail
+            rows, cur = [], ""
+            for w in hint[0].split():
+                if cur and big_w(cur + " " + w) > 62:
+                    rows.append(cur)
+                    cur = w
+                else:
+                    cur = (cur + " " + w).strip()
+            rows = (rows + [cur])[:3] if cur else rows[:3]
+            for i, ln in enumerate(rows):
+                UC(img, 11 + 14 * i, ln, AMB)
+            for i, ln in enumerate(wrapn(hint[1], 64, 2)):
+                CT(img, 13 + 14 * len(rows) + 6 * i, ln, DIM)
+        elif getattr(feed, "needs_key", False):
             UC(img, 12, "SET", AMB)
             UC(img, 26, "TOKEN", AMB)
             if feed.key_env:

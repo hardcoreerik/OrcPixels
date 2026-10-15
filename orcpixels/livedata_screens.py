@@ -727,7 +727,13 @@ def render(key: str, feed: LF.Feed, k: int = 0, now: float | None = None,
     v = feed.value
     if v is None:
         txt(img, 1, 1, scr.short, LPB)
-        if getattr(feed, "needs_key", False):
+        hint = getattr(feed, "hint", None)
+        if hint:                                            # SetupNeeded: the headline is the message
+            end = txt(img, 1, 9, fit(hint[0], 62), AMB)
+            rest = fit(hint[1], 62 - end - 3) if hint[1] else ""
+            if rest == hint[1]:                             # detail only when it fits whole
+                txt(img, end + 3, 9, rest, DIM)
+        elif getattr(feed, "needs_key", False):
             txt(img, 1, 9, "SET TOKEN", AMB)
             if feed.key_env:
                 txt(img, 1 + text_width("SET TOKEN") + 3, 9, fit(feed.key_env.split("_")[0], 20), DIM)

@@ -50,7 +50,11 @@ your config, and are safe to re-run.
 4. Optional, in the **Live** tab's feed settings: home latitude / longitude, a short place
    tag, time zone, and the stations you want (NWS station, tide station, USGS river gauge,
    GitHub user, RSS URLs, X handle and token, OrcSDR URL / serial port for FT8).
-   Screens whose source isn't set stay on a "not configured" screen.
+   Screens whose source isn't set stay on a "not configured" screen. The FT8 screens find
+   a USB-connected OrcSDR by themselves when no serial port is set (they ask each Espressif
+   USB serial port `FT8 STATUS`); if none answers they show **SET ORCSDR PORT**, and a port
+   held by another program (a serial monitor) shows **COMxx BUSY**. Pick the port, baud and
+   OrcSDR URL, and test them, in **Settings > OrcSDR connection**.
 
 ## Configuration
 

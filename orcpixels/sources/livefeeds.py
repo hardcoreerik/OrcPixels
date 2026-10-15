@@ -125,6 +125,16 @@ def compass(deg: float | None) -> str:
 
 
 # ------------------------------------------------------------------ feed base
+class SetupNeeded(RuntimeError):
+    """The feed can't run until the user sets something up (e.g. which serial port the
+    radio is on). Screens draw `hint` (a short headline + detail) as a friendly set-up
+    frame instead of NO DATA + an exception name; the Live tab shows "set up"."""
+
+    def __init__(self, msg: str, hint: tuple[str, str] = ("SET UP", "IN SETTINGS")):
+        super().__init__(msg)
+        self.hint = (str(hint[0]), str(hint[1]) if len(hint) > 1 else "")
+
+
 class Feed:
     key = ""
     title = ""
@@ -133,12 +143,14 @@ class Feed:
     poll_s = 600.0
     key_env: str | None = None      # optional API key env var (never required)
     local = False            # computed locally, no network
+    setup_card: str | None = None    # web UI card id where this feed is set up (SetupNeeded link)
 
     def __init__(self):
         self.value: dict | None = None
         self.ok_at: float | None = None
         self.attempt_at: float | None = None
         self.error: str | None = None
+        self.hint: tuple[str, str] | None = None   # SetupNeeded: friendly set-up frame
         self.fails = 0
         self.fetches = 0
         self.requests = 0
@@ -181,6 +193,7 @@ class Feed:
     def state(self) -> dict:
         return {"key": self.key, "ok_at": self.ok_at, "attempt_at": self.attempt_at,
                 "next_due": self.next_due() if self.attempt_at else None, "error": self.error,
+                "hint": list(self.hint) if self.hint else None, "setup_card": self.setup_card,
                 "fails": self.fails, "stale": self.stale, "usable": self.usable,
                 "fetches": self.fetches, "requests": self.requests, "poll_s": self.poll_s}
 
@@ -206,12 +219,14 @@ class Feed:
             if not isinstance(v, dict):
                 raise ValueError("feed returned no data")
             self.value, self.ok_at, self.error, self.fails = v, time.time(), None, 0
+            self.hint = None
             self.fetches += 1
         except asyncio.CancelledError:
             raise
         except Exception as e:  # noqa: BLE001
             self.fails += 1
             self.error = f"{type(e).__name__}: {e}"[:240]
+            self.hint = getattr(e, "hint", None) if isinstance(e, SetupNeeded) else None
             log.info("live data feed %s failed (#%d): %s", self.key, self.fails, self.error)
         finally:
             self._busy = False

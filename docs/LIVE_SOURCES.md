@@ -22,6 +22,8 @@ animation library.
 
 ![Categories](img/categories/categories_overview.png)
 
+Other programs can also push their own status screen. That is the Push API, see [PUSH_API.md](PUSH_API.md).
+
 ## Sports (ESPN, keyless)
 
 The source is ESPN's public scoreboard JSON,

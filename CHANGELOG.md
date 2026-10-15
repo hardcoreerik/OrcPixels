@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.6 (2026-10-15)
+
+### OrcSDR serial auto-detect for the FT8 screens
+- With no FT8 serial port set, `auto` finds the OrcSDR itself: each Espressif USB serial port (VID 0x303A) is asked the read-only `FT8 STATUS` once, with DTR/RTS low so nothing resets. The port that answers is used until it stops answering, then the ports are scanned again (otherwise at most every 5 minutes, or at once when the port list changes). Other USB serial adapters and Bluetooth ports are never opened.
+- No OrcSDR found, or its port held by another program: the screens show a set-up frame (**SET ORCSDR PORT** / **COM16 BUSY**) instead of `NO DATA RuntimeError`, and the Live tab shows "set up" instead of "error". Any Live source can raise `SetupNeeded` for the same frame.
+- The FT8 snapshot now includes the serial port in use (`port`, "COM16 (auto)" when detected).
+
+### Settings > OrcSDR connection
+- New card in the Settings tab: source (Auto / USB serial / Network / Off), a COM port dropdown with friendly names (Espressif ports flagged "OrcSDR?", the port OrcSDR answered on flagged "OrcSDR") and a Refresh button, baud (default 115200), the OrcSDR IP / URL (shared with OrcSDR Live) and the FT8 home grid. Save takes effect right away: the FT8 screens poll again and forget the old auto-detected port.
+- **Test connection** runs the read-only checks with the form's values before saving: `GET /api/ft8` on the network and/or one `FT8 STATUS` per USB port. It reports e.g. "USB OK: OrcSDR answered on COM16 (FT8 20m, 14.074 MHz, ready)", "COM16 busy: another app has it open" or "firmware has no /api/ft8 yet".
+- The FT8 screens' **set up** badge in the Live tab, the Ham Radio category and the Live sources panel all link to the card. The set-up frame on the sign now reads SET ORCSDR PORT / SETTINGS > ORCSDR.
+
+### Push API for other local apps
+- `POST /api/push/status`, `/api/push/flash` and `/api/push/clear` let another program on this PC put a progress screen (step + bar) or a short done flash on the sign. It's native at 64x16 and 64x64 and adaptive at other sizes. See [docs/PUSH_API.md](docs/PUSH_API.md).
+- It takes over like a live source and goes back to what the sign showed before when it ends. If you take the sign yourself, the pushing source stays muted until its run ends.
+- It uses the legacy transport at 1 frame/s at most, and fast updates coalesce to the newest one. Statuses expire after `ttl_s`, so a crashed client never leaves the sign stuck.
+- `GET /api/health` is a cheap up-check: 200 when the sign is connected, otherwise 503 with a reason.
+- RSA Sandbox routes `/api/rsa/status`, `/api/rsa/flash` (green DONE or red FAIL) and `/api/rsa/clear`.
+- Localhost only, unless LAN mode is on and a LAN token is set.
+
 ## 0.2.5 (2026-10-15)
 
 ### Fixed: "Update now" rolled back

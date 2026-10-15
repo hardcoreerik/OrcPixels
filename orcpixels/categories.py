@@ -67,7 +67,8 @@ category("weather", "Weather", 20, (120, 200, 255), "NWS conditions, forecast, a
 category("markets", "Markets & Money", 30, (60, 225, 90), "stocks, indexes, crypto, forex, rates")
 category("news", "News", 40, (255, 236, 190), "headlines from public RSS feeds")
 category("space", "Space & Science", 50, (180, 120, 255), "Kp, X-ray flares, ISS, earthquakes")
-category("ham", "Ham Radio", 60, (255, 168, 20), "FT8 / FT4 and HF band conditions (DX tools to come)")
+category("ham", "Ham Radio", 60, (255, 168, 20), "FT8 / FT4 and HF band conditions (DX tools to come)",
+         links=[{"title": "OrcSDR connection (FT8 port / URL)", "card": "card-sdrconn"}])
 category("sports", "Sports", 70, (255, 120, 40), "ESPN scoreboards: live scores, today's games, favourite teams")
 category("entertainment", "Entertainment", 80, (255, 90, 170), "TV schedule, airing now, charts, trending")
 category("local", "Time & Local", 90, (90, 170, 255), "clocks, sun and moon, tides, rivers, aircraft")

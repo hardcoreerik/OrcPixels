@@ -86,6 +86,7 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
 .ctl{display:grid;grid-template-columns:110px 1fr 46px;gap:6px;align-items:center;font-size:12px}
 .ctl span:last-child{text-align:right;color:var(--mute)}
 .badge.rate-native{background:#16371f;color:#7f7}.badge.rate-adaptive{background:#13304a;color:#8cf}.badge.rate-scaled{background:#3a3412;color:#fd6}.badge.rate-fallback{background:#3d1d1d;color:#f99}
+.card.flash{box-shadow:0 0 0 2px #ffa814;transition:box-shadow .3s}
 </style></head><body>
 <header>
  <img src="/logo.png" width="40" height="40" alt="OrcPixels">
@@ -130,6 +131,7 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <span class="muted" id="ldqn"></span></div>
   <div id="ldgrid"></div>
   <details id="ldfc" ontoggle="if(this.open) ldFcLoad()"><summary class="muted">Live sources: place, markets &amp; news (symbols, currencies, RSS, optional X token), sports favourite teams, TV country + my shows, FT8 decoder (OrcSDR port / URL, my call, home grid)</summary>
+   <div class="row"><span class="muted">FT8 / OrcSDR COM port, baud, URL and a connection test:</span><button class="alt sm" onclick="openCard('card-sdrconn')">Settings &gt; OrcSDR connection</button></div>
    <div class="muted">Comma-separated Yahoo symbols (e.g. AAPL, ^GSPC, GC=F, BTC-USD). Empty = default. Feeds refetch once after a change.</div>
    <div id="ldfcf" style="display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;max-width:820px;margin:6px 0"></div>
    <div class="row"><label>X bearer token <input type="password" id="ldxtok" placeholder="not set" autocomplete="off" style="width:240px"></label>
@@ -322,6 +324,17 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <div class="muted">Only for services without a keyless option. Click <b>Get free key</b>, sign up, paste the key, Save. Keys stay on this PC (settings.json) and are never shown again.</div>
    <div id="fskeys" style="display:grid;grid-template-columns:max-content max-content 1fr max-content;gap:6px 10px;align-items:center;margin-top:6px"></div>
   </div>
+  <div class="card" id="card-sdrconn"><h2>OrcSDR connection <span class="muted" id="scstate"></span></h2>
+   <div class="muted">Where the FT8 / FT4 screens (Live &gt; Ham Radio) read decodes from your OrcSDR. <b>Auto</b> tries the network first, then finds the radio on USB by itself. Read-only: OrcPixels only asks <span class="mono">FT8 STATUS</span> / <span class="mono">FT8 DECODES</span>.</div>
+   <div class="row"><label>Source <select id="sc_src" onchange="scMode()"><option value="auto">Auto (network, then USB)</option><option value="serial">USB serial</option><option value="http">Network (Wi-Fi / LAN)</option><option value="off">Off</option></select></label></div>
+   <div class="row" id="sc_serrow"><label>COM port <select id="sc_port" style="min-width:300px"></select></label>
+    <button class="alt sm" onclick="scLoad(true)" title="list the serial ports again (after plugging the OrcSDR in)">Refresh</button>
+    <label>Baud <select id="sc_baud"></select></label></div>
+   <div class="row" id="sc_netrow"><label>OrcSDR IP / URL <input id="sc_url" placeholder="http://192.168.x.x or http://orcsdr.local" style="width:260px"></label><span class="muted">shared with OrcSDR Live</span></div>
+   <div class="row"><label>Home grid <input id="sc_grid" size="8" placeholder="e.g. CN85"></label><span class="muted" id="sc_gridnote">for distances and the map</span></div>
+   <div class="row"><button onclick="scSave()">Save</button><button class="alt" onclick="scTest()">Test connection</button><span class="muted" id="scmsg"></span></div>
+   <div class="mono" id="sctest" style="white-space:pre-wrap;font-size:12px"></div>
+  </div>
   <div class="card"><h2>Connection</h2>
    <div class="muted">Each display has its own link, settings, rotation, playlists and Live. Pick which one this page controls; signs are only ever connected by their saved address. New panels are found with an explicit scan.</div>
    <div id="displist2" style="margin:6px 0"></div>
@@ -412,6 +425,8 @@ function toast(msg,kind='ok',ms=4500){ const d=document.createElement('div'); d.
   const box=$('toasts'); box.appendChild(d); setTimeout(()=>d.remove(),ms); while(box.children.length>5) box.firstChild.remove(); }
 
 // ------------------------------------------------------------------ tabs
+function openCard(id){ const c=$(id); if(!c) return; const tab=c.closest('.tab'); if(tab) showTab(tab.id.replace(/^tab-/,''));
+  if(id==='card-sdrconn') scLoad(); setTimeout(()=>{ c.scrollIntoView({behavior:'smooth',block:'start'}); c.classList.add('flash'); setTimeout(()=>c.classList.remove('flash'),1600); },60); }
 function showTab(t){ if(!$('tab-'+t)) t='live';
   document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+t));
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
@@ -680,7 +695,7 @@ function ldPrev(force){ if(!LDDATA) return; const k=LDPICK||LDDATA.live.current;
   const src=`/api/livedata/screens/${k}/led.gif?scale=8&v=${sc.ok_at||0}${sc.stale?'s':''}${Math.floor(Date.now()/60000)}`;
   if(force||$('ldprev').dataset.src!==src){ $('ldprev').dataset.src=src; $('ldprev').src=src; }
   $('ldprevt').textContent=`preview: ${sc.title}`; }
-function ldStatus(sc){ if(sc.needs_key) return ['b-warn','needs token']; if(sc.error&&sc.usable) return ['b-warn','stale']; if(sc.error) return ['b-bad','error'];
+function ldStatus(sc){ if(sc.needs_key) return ['b-warn','needs token']; if(sc.hint&&!sc.usable) return ['b-warn','set up']; if(sc.error&&sc.usable) return ['b-warn','stale']; if(sc.error) return ['b-bad','error'];
   if(!sc.ok_at) return ['','not fetched']; return [sc.stale?'b-warn':'b-ok', sc.stale?'stale':'fresh']; }
 function ldAge(s){ return s==null?'':(s<90?s+' s':(s<5400?Math.round(s/60)+' min':Math.round(s/3600)+' h'))+' ago'; }
 function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
@@ -700,7 +715,7 @@ function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
     g.innerHTML=cats.map(c=>`<details class="ldcat" data-c="${c.id}" ${shut.has(c.id)?'':'open'} ontoggle="ldCatToggle(this)">
      <summary><b style="color:${c.color||'var(--text)'}">${esc(c.title)}</b> <span class="muted ldcn"></span> <span class="muted">${esc(c.blurb||'')}</span>
       ${c.screens.length?`<label class="chk" onclick="event.stopPropagation()" title="turn every screen in this category on / off"><input type="checkbox" class="ldall" onchange="ldCatAll('${c.id}',this.checked)"> all</label>`:''}</summary>
-     ${(c.links||[]).length?`<div class="row" style="margin:4px 0">${c.links.map(x=>`<button class="alt sm" onclick="document.getElementById('${x.card}').scrollIntoView({behavior:'smooth'})">${esc(x.title)}</button>`).join('')}</div>`:''}
+     ${(c.links||[]).length?`<div class="row" style="margin:4px 0">${c.links.map(x=>`<button class="alt sm" onclick="openCard('${x.card}')">${esc(x.title)}</button>`).join('')}</div>`:''}
      <div class="ldgrid">${c.screens.filter(k=>by[k]).map(k=>{ const s=by[k]; return `<div class="ldtile" data-k="${s.key}" data-q="${esc((s.title+' '+s.key+' '+s.source+' '+c.title).toLowerCase())}" onclick="ldPick('${s.key}')">
      <img alt="${esc(s.title)}"><div class="t"><span><b>${esc(s.title)}</b></span><span class="badge"></span>
      <label class="chk sw" onclick="event.stopPropagation()" title="enable: include this screen in the rotation"><input type="checkbox" data-k="${s.key}" onchange="ldCfg()"> on</label></div>
@@ -710,6 +725,8 @@ function ldRender(d){ LDDATA=d; const l=d.live; ldOn=l.enabled;
     t.classList.toggle('sel',s.key===LDPICK);
     const c=t.querySelector('input'); if(document.activeElement!==c) c.checked=l.rotate?chk.has(s.key):c.checked||false;
     const [cls,txt]=ldStatus(s); const b=t.querySelector('.badge'); b.className='badge '+cls; b.textContent=txt;
+    const go=s.hint&&s.setup_card&&!s.usable; b.style.cursor=go?'pointer':''; b.title=go?'set it up: '+s.hint.join(' '):'';
+    b.onclick=go?(e=>{ e.stopPropagation(); openCard(s.setup_card); }):null;
     t.querySelector('.s').textContent=`${s.source}${s.key_env?(s.needs_key?' (needs '+s.key_env+')':' (optional '+s.key_env+')'):''} · every ${s.poll_s>=60?Math.round(s.poll_s/60)+' min':s.poll_s+' s'} · ${ldAge(s.age_s)}`+(s.error?' · '+s.error.slice(0,80):'');
     const im=t.querySelector('img'); const src=`/api/livedata/screens/${s.key}/led.gif?scale=4&v=${s.ok_at||0}${s.stale?'s':''}${Math.floor(Date.now()/60000)}`;
     if(im.dataset.src!==src && $('tab-live').classList.contains('on') && t.closest('details').open && t.style.display!=='none'){ im.dataset.src=src; im.src=src; } }
@@ -1010,6 +1027,36 @@ async function fsGet(){ $('fsmsg').textContent='fetching the catalog\u2026'; con
 async function fsKey(svc,clear){ const i=$('fsk_'+svc); const v=clear?'':i.value.trim(); if(!clear&&!v) return;
   const r=await api('/api/livedata/keys',{values:{[svc]:v}}); i.value=''; if(r){ fsShow(r); if(r.screens) ldRender(r); $('fsmsg').textContent=clear?'key cleared':'key saved'; } }
 fsLoad();
+
+// ---- Settings > OrcSDR connection (FT8 source, COM port, baud, URL, home grid, test)
+let SC_CONN=null;
+function scMode(){ const m=$('sc_src').value; $('sc_serrow').style.display=(m==='http'||m==='off')?'none':''; $('sc_netrow').style.display=(m==='serial'||m==='off')?'none':''; }
+function scFill(c,keepForm){ SC_CONN=c; const pick=keepForm?$('sc_port').value:c.port;
+  const opts=[`<option value="">Auto-detect (asks each Espressif USB port)${c.auto_port?' \u2013 found '+esc(c.auto_port):''}</option>`]
+    .concat(c.ports.map(p=>`<option value="${esc(p.device)}">${esc(p.label)}</option>`));
+  if(pick&&!c.ports.some(p=>p.device===pick)) opts.push(`<option value="${esc(pick)}">${esc(pick)} (not connected now)</option>`);
+  $('sc_port').innerHTML=opts.join(''); $('sc_port').value=pick||'';
+  if(!keepForm){ $('sc_src').value=c.source||'auto'; $('sc_url').value=c.url||''; $('sc_grid').value=c.home_grid||'';
+    $('sc_baud').innerHTML=c.bauds.map(b=>`<option>${b}</option>`).join(''); $('sc_baud').value=c.baud||'115200'; }
+  $('sc_gridnote').textContent='for distances and the map'+(c.home_grid?'':(c.home_grid_auto?` (blank = ${c.home_grid_auto} from your home location)`:' (blank = from your home location)'));
+  const esp=c.ports.filter(p=>p.espressif).length;
+  $('scstate').textContent=c.last_port?`OrcSDR on ${c.last_port}`:(c.via==='http'?'OrcSDR via network':`${c.ports.length} serial port${c.ports.length===1?'':'s'}, ${esp} Espressif`);
+  scMode(); }
+async function scLoad(refresh){ const r=await fetch('/api/livedata/orcsdr').catch(()=>null); if(!(r&&r.ok)) return; scFill(await r.json(), !!refresh&&!!SC_CONN);
+  if(refresh) $('scmsg').textContent='ports refreshed'; }
+function scForm(){ return {source:$('sc_src').value, port:$('sc_port').value, baud:$('sc_baud').value, url:$('sc_url').value.trim()}; }
+async function scSave(){ const f=scForm(); $('scmsg').textContent='saving\u2026';
+  if(f.url){ const u=/^https?:\/\//i.test(f.url)?f.url:'http://'+f.url; if(!await api('/api/orcsdr/config',{url:u})){ $('scmsg').textContent=''; return; } }
+  const r=await api('/api/livedata/feed-config',{values:{livedata_ft8_source:f.source, livedata_ft8_port:f.port, livedata_ft8_baud:f.baud,
+    livedata_ft8_url:'', livedata_ft8_home_grid:$('sc_grid').value.trim()}});
+  if(!r){ $('scmsg').textContent=''; return; } $('scmsg').textContent='saved '+ptTime(Date.now()/1000)+' '+TZL+': the FT8 screens poll again now';
+  if(r.screens) ldRender(r); scLoad(); }
+async function scTest(){ const f=scForm(); const o=$('sctest'); o.style.color='var(--mute)'; o.textContent='testing'+(f.port?' '+f.port:'')+'\u2026';
+  const r=await api('/api/livedata/orcsdr/test',{...f, url:f.url&&!/^https?:\/\//i.test(f.url)?'http://'+f.url:f.url});
+  if(!r){ o.textContent=''; return; } o.style.color=r.ok?'#8cfc28':'var(--warn)';
+  const more=r.lines.filter(x=>x!==r.message); o.textContent=(r.ok?'\u2714 ':'\u2716 ')+r.message+(more.length?'\n'+more.join('\n'):'');
+  if(r.conn) scFill(r.conn,true); }
+scLoad();
 
 if(location.hash==='#update'){ showTab('settings'); setTimeout(()=>$('update').scrollIntoView(),300); }
 // ---- Try the resolution (docs/DESIGN.md)

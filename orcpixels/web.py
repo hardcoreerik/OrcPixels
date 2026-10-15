@@ -125,6 +125,26 @@ def _png(img: Image.Image, scale: int = 1) -> Response:
     return Response(buf.getvalue(), media_type="image/png", headers={"Cache-Control": "no-store"})
 
 
+def health(displays: list, display: Optional[str] = None):
+    """GET /api/health: 200 + ok=true only when the target sign is usable (connected);
+    otherwise 503 + ok=false + reason (same body). Target = ?display=<id>, else the
+    primary display (where un-prefixed /api/push/* and /api/rsa/* requests go)."""
+    from fastapi.responses import JSONResponse
+
+    from . import __version__
+    tgt = next((d for d in displays if display and d.get("id") == display), None) or \
+        next((d for d in displays if d.get("primary")), displays[0] if displays else None)
+    usable = bool(tgt and tgt.get("connected"))
+    reason = None if usable else ("no display registered" if tgt is None else
+                                  f"{tgt.get('label') or tgt.get('id') or 'sign'} not connected (Connect it in OrcPixels)")
+    body = {"ok": usable, "usable": usable, "reason": reason, "app": "OrcPixels", "version": __version__,
+            "pid": os.getpid(), "display": tgt.get("id") if tgt else None,
+            "push": {"api": 1, "status": "/api/push/status", "flash": "/api/push/flash",
+                     "clear": "/api/push/clear", "rsa": "/api/rsa/status"},
+            "displays": displays}
+    return JSONResponse(body, status_code=200 if usable else 503, headers={"Cache-Control": "no-store"})
+
+
 def _hex(c: Optional[str]) -> Optional[str]:
     return c.lstrip("#") if c else None
 
@@ -147,7 +167,7 @@ def create_app(address: str | None = None, display: dict | None = None,
     async def resume_after_reconnect():
         """SignClient keeper hook (link came back, e.g. sign power-cycled): Live resumes by
         itself if armed; Auto status re-sends; otherwise re-show the last playlist/preset."""
-        for attr in ("orcsdr_live", "livedata_live"):
+        for attr in ("push_live", "orcsdr_live", "livedata_live"):
             live = getattr(app.state, attr, None)
             if live is not None and await live.on_sign_reconnect():
                 return
@@ -231,8 +251,11 @@ def create_app(address: str | None = None, display: dict | None = None,
     _install_orcsdr(app, sign, auto)
     from .livedata import install as _install_livedata   # Live Data screens (free web APIs)
     _install_livedata(app, sign, auto, feeds=feeds)
-    app.state.orcsdr_live.peers = [app.state.livedata_live]   # one live source at a time
-    app.state.livedata_live.peers = [app.state.orcsdr_live]
+    from .push import install as _install_push           # Push API (other local apps)
+    _install_push(app, sign, auto)
+    _engines = [app.state.orcsdr_live, app.state.livedata_live, app.state.push_live]
+    for _e in _engines:                                  # one live source at a time
+        _e.peers = [x for x in _engines if x is not _e]
     from .ai_status import install as _install_ai     # AI status + buddy (the Auto status provider)
     _install_ai(app, sign, auto)
     from .playlist import install as _install_playlist   # on-device playlists (slots + 0x8008)
@@ -339,7 +362,8 @@ def create_app(address: str | None = None, display: dict | None = None,
 
     def live_engines() -> list:
         return [x for x in (getattr(app.state, "orcsdr_live", None),
-                            getattr(app.state, "livedata_live", None)) if x is not None]
+                            getattr(app.state, "livedata_live", None),
+                            getattr(app.state, "push_live", None)) if x is not None]
 
     def active_live():
         """The enabled live engine (OrcSDR Live / Live Data; at most one), else None."""
@@ -353,12 +377,19 @@ def create_app(address: str | None = None, display: dict | None = None,
         return {"enabled": live.enabled, "state": live.state, "label": live.label(),
                 "stopped_reason": live.stopped_reason, "stopped_at": live.stopped_at,
                 "started_at": live.started_wall, "frames_sent": live.frames_sent,
-                "source": "livedata" if live is getattr(app.state, "livedata_live", None) else "orcsdr",
+                "source": ("livedata" if live is getattr(app.state, "livedata_live", None) else
+                           "push" if live is getattr(app.state, "push_live", None) else "orcsdr"),
                 "name": live.NAME}
 
     def busy_with(what: str) -> bool:
         return any(e["what"] == what and e["status"] in ("queued", "sending")
                    for e in sign.activity.recent(50))
+
+    @app.get("/api/health")
+    async def api_health():
+        """Cheap up-check for other local apps (no BLE, no disk): 200 only when this sign
+        is usable (connected), else 503 with a reason. See docs/PUSH_API.md."""
+        return health([_display_brief() | {"connected": bool(sign.connected), "primary": True}])
 
     @app.get("/api/now")
     async def api_now():
@@ -827,7 +858,8 @@ class MultiDisplayApp:
         return self.primary, scope
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] == "lifespan" or scope.get("path", "").startswith(("/api/displays", "/api/update")):
+        if scope["type"] == "lifespan" or scope.get("path", "").startswith(("/api/displays", "/api/update",
+                                                                             "/api/health")):
             return await self.root(scope, receive, send)
         did, scope = self.pick(scope)
         tok = self.D.CURRENT.set(self.displays[did])
@@ -872,6 +904,17 @@ class MultiDisplayApp:
                 upd.stop_event.set()
 
         root = FastAPI(title="OrcPixels displays", lifespan=lifespan)
+
+        @root.get("/api/health")
+        async def root_health(display: Optional[str] = None):
+            """Cheap up-check (no BLE, no disk): which displays exist and are connected."""
+            out = []
+            for did, d in self.displays.items():
+                sign = self.apps[did].state.sign
+                out.append({"id": did, "label": d.get("label"), "primary": did == self.primary,
+                            "connected": bool(sign.connected),
+                            "width": int(sign.state.width), "height": int(sign.state.height)})
+            return health(out, display)
 
         # ---- updates (docs/UPDATES.md): check / notice / explicit "Update now" only
         @root.get("/api/update")
@@ -1006,7 +1049,7 @@ class MultiDisplayApp:
             sub = self.apps.pop(did)
             self.displays.pop(did)
             try:
-                for attr in ("orcsdr_live", "livedata_live"):
+                for attr in ("orcsdr_live", "livedata_live", "push_live"):
                     live = getattr(sub.state, attr, None)
                     if live is not None and live.enabled:
                         await live.stop()

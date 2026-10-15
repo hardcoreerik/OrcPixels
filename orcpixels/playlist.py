@@ -463,7 +463,7 @@ def install(app, sign, auto=None):
 
     async def stop_live():
         """Live modes send to slot 0 and would halt the program list: stop them."""
-        for attr in ("orcsdr_live", "livedata_live"):
+        for attr in ("orcsdr_live", "livedata_live", "push_live"):
             live = getattr(app.state, attr, None)
             if live is not None and live.enabled:
                 await live.stop()

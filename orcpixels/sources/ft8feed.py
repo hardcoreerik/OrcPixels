@@ -3,8 +3,12 @@
 Read-only, two transports (settings `livedata_ft8_*`, edited in the Live tab):
   * HTTP  GET {url}/api/ft8  -> JSON (needs the proposed OrcSDR `claude/ft8-ticker-feed`
           firmware; stock 62afeed answers 404, which `auto` remembers for 10 minutes)
-  * serial (USB CDC, set livedata_ft8_port, @115200): the existing read-only console queries
+  * serial (USB CDC, livedata_ft8_port, @115200): the existing read-only console queries
           `FT8 STATUS` and `FT8 DECODES 64` (ORC_FT8_STATUS / ORC_FT8_DECODE lines).
+          Port blank = auto-detect: every Espressif USB serial port (VID 0x303A, what the
+          Tab5 enumerates as) is asked `FT8 STATUS` once; the first that answers
+          ORC_FT8_STATUS is used until it stops answering. No OrcSDR found / port busy ->
+          SetupNeeded, so the screens say "SET ORCSDR PORT" instead of a RuntimeError.
           The port is opened per poll (~0.3 s) with DTR/RTS low (no board reset) and
           closed again, so OrcSDR's own tools can still use it between polls.
 Nothing is ever written to the radio except those two query lines; no PAIR/AUTH, no
@@ -28,7 +32,7 @@ from collections import OrderedDict, deque
 
 from . import hamgeo as G
 from . import livefeeds as LF
-from .livefeeds import Feed
+from .livefeeds import Feed, SetupNeeded
 
 # ------------------------------------------------------------------ configuration
 CONFIG = {        # settings key -> (default, kind, label)
@@ -49,6 +53,11 @@ HISTORY_S = 3600.0            # session history kept for top callers / maps
 MAX_HISTORY = 1500
 FAR_KM = 8000.0               # "far DX" alert threshold
 NEW_AFTER_S = 600.0           # new-grid alerts start 10 min into the session (else every grid is new)
+ESPRESSIF_VID = 0x303A        # ESP32-P4 (Tab5) / S3 USB serial; other USB serial chips are never probed
+DETECT_EVERY_S = 300.0        # no OrcSDR found: scan the ports again after 5 min (or on a settings change)
+PROBE_TIMEOUT_S = 1.5         # per candidate port
+NOT_SET_HINT = ("SET ORCSDR PORT", "SETTINGS > ORCSDR")
+SETUP_CARD = "card-sdrconn"      # web UI: Settings > OrcSDR connection
 
 
 def home_grid() -> str:
@@ -212,9 +221,186 @@ def _serial_open(port: str, baud: int):
 SERIAL_OPEN = _serial_open     # tests replace this
 
 
+def _list_ports() -> list[tuple]:
+    """[(device, vid, pid, description)] of every serial port the OS knows."""
+    try:
+        from serial.tools import list_ports
+    except Exception:  # noqa: BLE001  (pyserial missing: nothing to detect)
+        return []
+    return [(p.device, p.vid, p.pid, p.description or "") for p in list_ports.comports()]
+
+
+LIST_PORTS = _list_ports       # tests replace this
+
+
+def _port_sort(dev: str):
+    m = re.match(r"^COM(\d+)$", dev, re.I)
+    return (0, int(m.group(1)), "") if m else (1, 0, dev)
+
+
+def candidate_ports() -> list[str]:
+    """Serial ports that may be an OrcSDR: Espressif USB (VID 0x303A) only, so Bluetooth
+    links, CH34x / FTDI adapters and anything else are never written to."""
+    out = []
+    for p in LIST_PORTS():
+        dev, vid = p[0], p[1]
+        if vid == ESPRESSIF_VID and dev and PORT_RE.match(dev):
+            out.append(dev)
+    return sorted(set(out), key=_port_sort)
+
+
+def is_busy(e: BaseException) -> bool:
+    """Port open failed because another program holds it (Windows: access denied, POSIX: busy)."""
+    s = f"{type(e).__name__} {e}".lower()
+    return isinstance(e, PermissionError) or any(t in s for t in (
+        "access is denied", "permissionerror", "errno 13", "resource busy", "errno 16", "in use"))
+
+
+def busy_error(port: str) -> SetupNeeded:
+    return SetupNeeded(f"{port} is busy: another program (a serial monitor?) has it open",
+                       hint=(f"{port} BUSY", "CLOSE OTHER SERIAL APP"))
+
+
+def probe_port(port: str, baud: int, timeout: float | None = None) -> str:
+    """'ok' if `port` answers `FT8 STATUS` like an OrcSDR, 'busy' if it can't be opened
+    because another program has it, else 'no'. Read-only: one query line, DTR/RTS low."""
+    r = probe_detail(port, baud, timeout)[0]
+    return "no" if r == "missing" else r
+
+
+def probe_detail(port: str, baud: int, timeout: float | None = None) -> tuple[str, dict | None, str]:
+    """(result, status, error): result 'ok' (status = parsed ORC_FT8_STATUS), 'busy'
+    (another program holds the port), 'missing' (can't open: unplugged / no such port)
+    or 'no' (opened, but no FT8 STATUS reply)."""
+    timeout = PROBE_TIMEOUT_S if timeout is None else timeout
+    try:
+        s = SERIAL_OPEN(port, baud)
+    except Exception as e:  # noqa: BLE001
+        return ("busy", None, "") if is_busy(e) else ("missing", None, f"{type(e).__name__}: {e}"[:140])
+    try:
+        try:
+            s.reset_input_buffer()
+        except Exception:  # noqa: BLE001
+            pass
+        s.write(b"FT8 STATUS\n")
+        buf, t0 = b"", time.monotonic()
+        while time.monotonic() - t0 < timeout:
+            chunk = s.read(4096)
+            if chunk:
+                buf += chunk
+                i = buf.find(b"ORC_FT8_STATUS")
+                if i >= 0 and b"\n" in buf[i:]:
+                    return "ok", parse_serial_reply(buf.decode("utf-8", "replace"))[0], ""
+        return "no", None, ""
+    except Exception as e:  # noqa: BLE001
+        return "no", None, f"{type(e).__name__}: {e}"[:140]
+    finally:
+        try:
+            s.close()
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def port_info() -> list[dict]:
+    """Serial ports for the Settings > OrcSDR connection dropdown: friendly name, the
+    Espressif (possible OrcSDR) ones flagged, the port OrcSDR last answered on first."""
+    good = SOURCE.auto_port or SOURCE.port.split(" ")[0]
+    out = []
+    for p in LIST_PORTS():
+        dev, vid, pid, desc = (tuple(p) + (None, None, None, None))[:4]
+        if not dev or not PORT_RE.match(str(dev)):
+            continue
+        name = re.sub(r"\s*\((COM\d+|/dev/\S+)\)\s*$", "", str(desc or "")).strip() or "Serial port"
+        esp = vid == ESPRESSIF_VID
+        tag = "OrcSDR" if dev == good else ("Espressif USB: OrcSDR?" if esp else "")
+        out.append({"device": dev, "name": name, "espressif": esp, "orcsdr": dev == good,
+                    "vid": f"{vid:04X}" if isinstance(vid, int) else "", "pid": f"{pid:04X}" if isinstance(pid, int) else "",
+                    "label": f"{dev}: {name}" + (f" [{tag}]" if tag else "")})
+    out.sort(key=lambda d: (not d["orcsdr"], not d["espressif"], _port_sort(d["device"])))
+    return out
+
+
+def _status_text(st: dict | None) -> str:
+    if not st:
+        return "status line not parsed"
+    bits = [f"{st.get('mode') or 'FT8'} {st.get('band') or ''}".strip()]
+    if st.get("dial_hz"):
+        bits.append(f"{st['dial_hz'] / 1e6:.3f} MHz")
+    if st.get("runtime"):
+        bits.append(st["runtime"])
+    if st.get("clock_ok") is False:
+        bits.append("clock not set")
+    return ", ".join(bits)
+
+
+BUSY_TIP = "close serial monitors, Arduino IDE or idf.py monitor"
+
+
+def test_connection(source: str = "auto", port: str = "", baud: int = 115200, url: str = "") -> dict:
+    """Settings > OrcSDR connection > Test connection, with the form's (unsaved) values.
+    Read-only: GET {url}/api/ft8 and/or one `FT8 STATUS` per serial port."""
+    source = (source or "auto").lower()
+    lines: list[str] = []
+    res = {"ok": False, "via": "", "port": "", "message": "", "lines": lines, "status": None}
+    if source == "off":
+        res["message"] = "FT8 source is off: pick Auto, USB serial or Network"
+        return res
+    if source in ("auto", "http"):
+        if not url:
+            lines.append("Network: no OrcSDR IP / URL set")
+        else:
+            try:
+                st, _ = parse_http_json(LF.HTTP(url.rstrip("/") + "/api/ft8?n=1", {"Accept": "application/json"}, 4.0))
+                res.update(ok=True, via="http", status=st, message=f"Network OK: {url} answered /api/ft8 ({_status_text(st)})")
+                lines.append(res["message"])
+                return res
+            except urllib.error.HTTPError as e:
+                lines.append(f"Network: {url} is reachable but its firmware has no /api/ft8 yet; use USB serial"
+                             if e.code == 404 else f"Network: {url} answered HTTP {e.code}")
+            except Exception as e:  # noqa: BLE001
+                lines.append(f"Network: can't reach {url} ({type(e).__name__})")
+        if source == "http":
+            res["message"] = lines[-1]
+            return res
+    ports = [port] if port else candidate_ports()
+    if not ports:
+        lines.append("USB: no Espressif USB serial port found; plug the OrcSDR in with a data USB cable")
+        res["message"] = lines[-1]
+        return res
+    busy = []
+    with SOURCE.lock:                       # never at the same time as a poll
+        for p in ports:
+            r, st, err = probe_detail(p, baud)
+            if r == "ok":
+                if not port:
+                    SOURCE.auto_port, SOURCE.detect_fail = p, None
+                res.update(ok=True, via="serial", port=p, status=st, message=f"USB OK: OrcSDR answered on {p} ({_status_text(st)})")
+                lines.append(res["message"])
+                return res
+            if r == "busy":
+                busy.append(p)
+                lines.append(f"{p} busy: another app has it open ({BUSY_TIP})")
+            elif r == "missing":
+                lines.append(f"{p}: can't open ({err})")
+            else:
+                lines.append(f"{p}: no FT8 STATUS reply (not an OrcSDR, or wrong baud)")
+    if busy:
+        res["message"] = f"{busy[0]} busy: another app has it open ({BUSY_TIP})"
+    elif len(ports) == 1:
+        res["message"] = lines[-1]
+    else:
+        res["message"] = f"No OrcSDR answered on {', '.join(ports)}"
+    return res
+
+
 def serial_query(port: str, baud: int, n: int = 64, timeout: float = 6.0) -> str:
     """Ask the console `FT8 STATUS` then `FT8 DECODES n`; return the raw reply text."""
-    s = SERIAL_OPEN(port, baud)
+    try:
+        s = SERIAL_OPEN(port, baud)
+    except Exception as e:  # noqa: BLE001
+        if is_busy(e):
+            raise busy_error(port) from None
+        raise
     out: list[str] = []
     try:
         try:
@@ -268,9 +454,56 @@ class Ft8Source:
         self.cfg_sig = None
         self.primed = False
         self.started = None                 # first merge (session start)
+        self.port = ""                      # serial port of the last good poll
+        self.auto_port = ""                 # auto-detected OrcSDR port (livedata_ft8_port blank)
+        self.detect_at = 0.0                # last scan
+        self.detect_sig = None              # (candidates, baud) of the last scan
+        self.detect_fail: SetupNeeded | None = None
+
+    # auto-detect -----------------------------------------------------------
+    def detect(self, baud: int) -> str:
+        """The OrcSDR serial port when none is configured: the cached one, else scan the
+        Espressif ports (at most every DETECT_EVERY_S unless the port list changed).
+        Raises SetupNeeded when there is none."""
+        if self.auto_port:
+            return self.auto_port
+        cands = candidate_ports()
+        sig = (tuple(cands), baud)
+        if self.detect_fail is not None and sig == self.detect_sig and time.time() - self.detect_at < DETECT_EVERY_S:
+            raise self.detect_fail
+        self.detect_at, self.detect_sig = time.time(), sig
+        busy = []
+        for p in cands:
+            r = probe_port(p, baud)
+            if r == "ok":
+                self.auto_port, self.detect_fail = p, None
+                return p
+            if r == "busy":
+                busy.append(p)
+        if busy:
+            self.detect_fail = SetupNeeded(
+                f"OrcSDR not found; {', '.join(busy)} busy (another program has it open). Close it or "
+                "set the OrcSDR port in Settings > OrcSDR connection", hint=(f"{busy[0]} BUSY", "OR SET ORCSDR PORT"))
+        elif cands:
+            self.detect_fail = SetupNeeded(
+                f"no OrcSDR answered on {', '.join(cands)}: set the OrcSDR port in Settings > OrcSDR connection",
+                hint=NOT_SET_HINT)
+        else:
+            self.detect_fail = SetupNeeded(
+                "OrcSDR not found on USB: plug it in or set the OrcSDR port in Settings > OrcSDR connection",
+                hint=NOT_SET_HINT)
+        raise self.detect_fail
 
     def reset(self):
         self.__init__()
+
+    def settings_changed(self, serial: bool = True):
+        """Settings saved: ask HTTP again, poll now, and (serial settings) forget the
+        auto-detected port and the cached "not found", so the next poll scans again."""
+        self.http_off_until = 0.0
+        self.polled_at = 0.0
+        if serial:
+            self.auto_port, self.detect_fail = "", None
 
     # transport -------------------------------------------------------------
     def query(self, feed: Feed | None = None) -> tuple[dict | None, list[dict], str]:
@@ -299,15 +532,24 @@ class Ft8Source:
                     self.http_off_until = time.time() + 120.0     # unreachable: serial for 2 min
             if src == "http":
                 raise RuntimeError("; ".join(errs))
+        baud = int(cfg("livedata_ft8_baud"))
         port = cfg("livedata_ft8_port")
-        if not port:
-            errs.append("serial: no port set")
-            raise RuntimeError("; ".join(errs))
+        auto = not port
+        if auto:
+            try:
+                port = self.detect(baud)
+            except SetupNeeded as e:
+                raise SetupNeeded("; ".join(errs + [str(e)]), hint=e.hint) from None
         try:
-            text = serial_query(port, int(cfg("livedata_ft8_baud")))
+            text = serial_query(port, baud)
+        except SetupNeeded as e:                # port busy
+            raise SetupNeeded("; ".join(errs + [str(e)]), hint=e.hint) from None
         except Exception as e:  # noqa: BLE001
+            if auto:                            # unplugged / renumbered / not OrcSDR any more: rescan next poll
+                self.auto_port, self.detect_fail = "", None
             errs.append(f"serial {port}: {type(e).__name__}: {e}"[:160])
             raise RuntimeError("; ".join(errs)) from None
+        self.port = port + (" (auto)" if auto else "")
         st, decs = parse_serial_reply(text)
         return st, decs, "serial"
 
@@ -415,7 +657,8 @@ class Ft8Source:
                 "decodes": decs[:400], "cq": cq[:12], "calls": sorted(calls.values(), key=lambda c: (-c["n"], -(c["best"] if c["best"] is not None else -99)))[:20],
                 "far": far[:20], "located": list(located.values())[:120], "alerts": list(self.alerts)[:8],
                 "grids": len(self.seen_grids), "dxcc": len(self.seen_dxcc), "unique": len(calls),
-                "mycall": cfg("livedata_ft8_mycall").upper(), "home": home_grid()}
+                "mycall": cfg("livedata_ft8_mycall").upper(), "home": home_grid(),
+                "port": self.port if self.via == "serial" else ""}
 
     # poll ------------------------------------------------------------------
     def poll(self, feed: Feed | None = None) -> dict:
@@ -435,6 +678,7 @@ class Ft8Feed(Feed):
     key, title, source = "ft8", "FT8 / FT4 decodes", "OrcSDR Tab5 (USB serial / GET /api/ft8)"
     url = "serial FT8 DECODES / GET /api/ft8 (read-only)"
     poll_s = 15.0            # one FT8 cycle; FT4 cycles are faster but 15 s keeps the port free
+    setup_card = SETUP_CARD  # SET UP badge / frame points at Settings > OrcSDR connection
     local = True             # LAN / USB device, no internet
 
     @property
