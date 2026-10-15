@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_modwave",
+  "kind": "gif",
+  "file": "p_sig_modwave.gif",
+  "still": "p_sig_modwave.png",
+  "preview": "p_sig_modwave_preview_10x.png",
+  "family": "rf_sig",
+  "title": "Modulation waveform",
+  "description": "Two dotted carriers twist past each other under a travelling AM envelope, blue to magenta, with emitter rings at both ends",
+  "live_data": false,
+  "native_size": "64x16",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "frames": 32,
+  "frame_ms": 100,
+  "bytes": 10014,
+  "loop": "seamless (tools/loopcheck.py)",
+  "layout16": "carrier pair across the full width, envelope travels, rings at both ends",
+  "generator": "tools/make_rfsig_presets.py::p_sig_modwave@64x16"
+}

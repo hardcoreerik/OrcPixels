@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_foxhunt",
+  "kind": "gif",
+  "file": "p_sig_foxhunt.gif",
+  "preview": "p_sig_foxhunt_preview_6x.png",
+  "family": "rf_sig",
+  "title": "Fox hunt",
+  "description": "Midnight fox on the ridge with a direction-finding target pulsing over the hills and a blinking transmitter (the 'fox') on the far peak",
+  "live_data": false,
+  "native_size": "64x16",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 22235,
+  "loop": "seamless",
+  "layout64": "square: big DF target in the sky, fox (2x) on the ridge, tower on the right peak",
+  "generator": "tools/make_rfsig_presets.py::p_sig_foxhunt@64x64"
+}

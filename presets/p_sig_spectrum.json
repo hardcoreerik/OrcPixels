@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_spectrum",
+  "kind": "gif",
+  "file": "p_sig_spectrum.gif",
+  "still": "p_sig_spectrum.png",
+  "preview": "p_sig_spectrum_preview_10x.png",
+  "family": "rf_sig",
+  "title": "Spectrum analyzer",
+  "description": "FFT spectrum of the 2.4 GHz band: three channel humps breathing over the noise floor, dBm scale and graticule, in Midnight Synth colours",
+  "live_data": false,
+  "native_size": "64x64",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 9018,
+  "loop": "seamless (tools/loopcheck.py)",
+  "layout16": "strip: full-width spectrum with gradient bars, white peak caps, faint graticule",
+  "generator": "tools/make_rfsig_presets.py::p_sig_spectrum@64x16"
+}

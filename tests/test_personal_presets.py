@@ -9,7 +9,8 @@ import pytest
 
 PRESETS = Path(__file__).resolve().parents[1] / "presets"
 FAMILIES = {"proj", "rf", "orc", "code", "hw", "amb"}
-PERSONAL = sorted(p for p in PRESETS.glob("p_*.json") if not p.stem.startswith("p_orco_"))  # orc_co: test_orco_presets.py
+PERSONAL = sorted(p for p in PRESETS.glob("p_*.json")
+                  if not p.stem.startswith(("p_orco_", "p_sig_")))  # orc_co / rf_sig: own test files
 
 
 def test_fifty_personal_presets():

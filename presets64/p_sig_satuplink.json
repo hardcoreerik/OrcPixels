@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_satuplink",
+  "kind": "gif",
+  "file": "p_sig_satuplink.gif",
+  "preview": "p_sig_satuplink_preview_6x.png",
+  "family": "rf_sig",
+  "title": "Satellite uplink",
+  "description": "Ground dish beaming data packets up to a satellite over the night side of the Earth; city lights glow along the blue limb",
+  "live_data": false,
+  "native_size": "64x64",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 21687,
+  "loop": "seamless",
+  "layout64": "dish bottom-left, packet beam to the satellite top-right, Earth limb with city lights",
+  "generator": "tools/make_rfsig_presets.py::p_sig_satuplink@64x64"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_aprs",
+  "kind": "gif",
+  "file": "p_sig_aprs.gif",
+  "preview": "p_sig_aprs_preview_6x.png",
+  "family": "rf_sig",
+  "title": "APRS decode",
+  "description": "Packet decode panel: example APRS position report (placeholder callsign N0CALL) with packets hopping between stations over the globe and a satellite relay",
+  "live_data": false,
+  "native_size": "64x64",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 25605,
+  "loop": "seamless",
+  "layout64": "'DECODE>APRS' header, 6 example fields in the 3x5 font, globe with packet path + satellite",
+  "generator": "tools/make_rfsig_presets.py::p_sig_aprs@64x64"
+}

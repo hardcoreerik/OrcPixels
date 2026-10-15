@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_jamstorm",
+  "kind": "gif",
+  "file": "p_sig_jamstorm.gif",
+  "preview": "p_sig_jamstorm_preview_6x.png",
+  "family": "rf_sig",
+  "title": "Jamming storm",
+  "description": "A violet spiral storm over the ground station: lightning cracks, interference streaks race across the band and the dish rides it out",
+  "live_data": false,
+  "native_size": "64x16",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "size": "64x64",
+  "frames": 32,
+  "frame_ms": 100,
+  "bytes": 30973,
+  "loop": "seamless",
+  "layout64": "square: big spiral storm, three lightning bolts, streak band, dish station bottom-left",
+  "generator": "tools/make_rfsig_presets.py::p_sig_jamstorm@64x64"
+}

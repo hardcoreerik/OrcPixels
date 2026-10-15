@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_beacon",
+  "kind": "gif",
+  "file": "p_sig_beacon.gif",
+  "still": "p_sig_beacon.png",
+  "preview": "p_sig_beacon_preview_10x.png",
+  "family": "rf_sig",
+  "title": "Transmitter beacon",
+  "description": "Mountain-top transmitter with a blinking lamp sending ripples of signal out over the range toward the moon; town lights twinkle below",
+  "live_data": false,
+  "native_size": "64x16",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 9566,
+  "loop": "seamless (tools/loopcheck.py)",
+  "layout16": "tower + hut on the left peak, ripples spreading right, moon right, town lights",
+  "generator": "tools/make_rfsig_presets.py::p_sig_beacon@64x16"
+}

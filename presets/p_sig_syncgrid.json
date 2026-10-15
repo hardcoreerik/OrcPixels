@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_syncgrid",
+  "kind": "gif",
+  "file": "p_sig_syncgrid.gif",
+  "still": "p_sig_syncgrid.png",
+  "preview": "p_sig_syncgrid_preview_10x.png",
+  "family": "rf_sig",
+  "title": "Digital sync grid",
+  "description": "Sync rings pulse out of a star above a lone tower while a neon perspective grid rolls toward you",
+  "live_data": false,
+  "native_size": "64x64",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 7981,
+  "loop": "seamless (tools/loopcheck.py)",
+  "layout16": "strip: small ring burst over the tower on the left half of the sky, grid floor rolls below",
+  "generator": "tools/make_rfsig_presets.py::p_sig_syncgrid@64x16"
+}

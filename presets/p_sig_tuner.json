@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_tuner",
+  "kind": "gif",
+  "file": "p_sig_tuner.gif",
+  "still": "p_sig_tuner.png",
+  "preview": "p_sig_tuner_preview_10x.png",
+  "family": "rf_sig",
+  "title": "Analog tuner",
+  "description": "Radio front panel: tuning knob turning, dial needle sweeping the band over a live oscilloscope trace, and a signal meter bouncing",
+  "live_data": false,
+  "native_size": "64x16",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "frames": 32,
+  "frame_ms": 100,
+  "bytes": 11819,
+  "loop": "seamless (tools/loopcheck.py)",
+  "layout16": "knob left, dial scale + oscilloscope trace + sweeping needle centre, VU meter right",
+  "generator": "tools/make_rfsig_presets.py::p_sig_tuner@64x16"
+}

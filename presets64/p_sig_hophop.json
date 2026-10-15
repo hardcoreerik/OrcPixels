@@ -1,0 +1,19 @@
+{
+  "name": "p_sig_hophop",
+  "kind": "gif",
+  "file": "p_sig_hophop.gif",
+  "preview": "p_sig_hophop_preview_6x.png",
+  "family": "rf_sig",
+  "title": "Frequency hopping",
+  "description": "Neon equalizer bars with a signal hopping between channel peaks along dotted arcs, mirrored in a rippling reflection",
+  "live_data": false,
+  "native_size": "64x64",
+  "concept": "Midnight Synth RF / Signal board (2026-10-14)",
+  "size": "64x64",
+  "frames": 24,
+  "frame_ms": 100,
+  "bytes": 23173,
+  "loop": "seamless",
+  "layout64": "segmented bars, three dotted hop arcs with ring markers, water reflection below",
+  "generator": "tools/make_rfsig_presets.py::p_sig_hophop@64x64"
+}
