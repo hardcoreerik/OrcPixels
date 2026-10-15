@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.5 (2026-10-15)
 
 ### Fixed: "Update now" rolled back
 - The update installer no longer races the app's shutdown: OrcPixels passes its process id (`/WAITPID`) and Setup waits for it to exit before checking for files in use. Setup also waits by name when an older OrcPixels (0.2.2 to 0.2.4) starts it.
