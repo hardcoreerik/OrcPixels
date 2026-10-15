@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.3 (2026-10-14)
+
+### RF / Signal presets
+- New preset family **RF / Signal**: 10 animated concepts in a Midnight Synth palette (blue, violet and magenta on black), drawn for real LEDs.
+- Every concept comes at both 64x16 and 64x64. Five are native strips (Fox hunt, Jamming storm, Modulation waveform, Transmitter beacon, Analog tuner) and five are native squares (Satellite uplink, Digital sync grid, Frequency hopping, Spectrum analyzer, APRS decode). Each has a hand-laid version at the other size.
+- All loop seamlessly and fit the BLE upload budget. The APRS screen shows example data only (placeholder callsign N0CALL).
+- Pick **RF / Signal** in the Presets family filter to find them.
+
+### Updates
+- This is the first release that installs through the in-app updater from 0.2.2.
+
 ## 0.2.2 (2026-10-14)
 
 ### Updates (OTA)

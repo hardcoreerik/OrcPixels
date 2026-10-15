@@ -1,5 +1,5 @@
 # Build the Windows installer: dist\OrcPixels-Setup-<version>.exe
-#   powershell -ExecutionPolicy Bypass -File tools\build_installer.ps1 [-Version 0.2.2] [-Python py]
+#   powershell -ExecutionPolicy Bypass -File tools\build_installer.ps1 [-Version 0.2.3] [-Python py]
 # Uses its own build venv (build\venv); never touches your dev venv or config.
 param([string]$Version = "", [string]$Python = "", [switch]$SkipTests)
 $ErrorActionPreference = "Stop"
