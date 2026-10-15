@@ -348,9 +348,16 @@ def install(app, sign, auto=None, feeds=None) -> DataLive:
     app.state.livedata_live = live
     gif_cache: dict = {}
 
+    def ensure_feeds():
+        """Screens added at run time (free-source catalog) get their feed on first use."""
+        for k, s in SC.SCREENS.items():
+            if k not in live.feeds:
+                live.feeds[k] = s.feed()
+
     def feed_or_404(key: str):
         if key not in SC.SCREENS:
             raise HTTPException(404, f"unknown screen {key}")
+        ensure_feeds()
         return live.feeds[key]
 
     async def warm(keys):
@@ -362,6 +369,7 @@ def install(app, sign, auto=None, feeds=None) -> DataLive:
             pass
 
     def payload():
+        ensure_feeds()
         return {"live": live.info(), "screens": screen_list(live), "categories": CAT.as_json(SC.SCREENS)}
 
     @app.get("/api/livedata/screens")
@@ -463,6 +471,42 @@ def install(app, sign, auto=None, feeds=None) -> DataLive:
                     or (place_touched and f.key in PLACE.PLACE_FEEDS)):
                 f.attempt_at, f.error = None, None          # due now; old value kept until it answers
         return {**feed_config(), **payload()}
+
+    # ---- free sources: declarative catalog + free API keys (2026-10-14)
+    def free_status():
+        from . import live_catalog as CATL
+        from . import live_templates as LT
+        return {"catalog": CATL.status(SC.SCREENS), "keys": LT.key_status()}
+
+    @app.get("/api/livedata/sources-catalog")
+    async def ld_catalog():
+        return free_status()
+
+    @app.post("/api/livedata/sources-catalog/refresh")
+    async def ld_catalog_refresh():
+        """'Get more free sources': fetch + validate the catalog JSON (data only), add new screens."""
+        from . import live_catalog as CATL
+        res = await asyncio.to_thread(CATL.refresh, SC.SCREENS, live.feeds)
+        return {"result": {k: v for k, v in res.items() if k != "catalog"}, **free_status(), **payload()}
+
+    @app.post("/api/livedata/keys")
+    async def ld_keys(r: FeedCfgReq):
+        """Paste / clear a free API key; write-only (never echoed back)."""
+        from . import live_templates as LT
+        upd = {}
+        for svc, val in r.values.items():
+            k = LT.KEYS.get(svc)
+            if not k:
+                raise HTTPException(400, f"unknown key service {svc}")
+            v = (val or "").strip()
+            if v and (len(v) > 200 or not all(c.isalnum() or c in "-_.:" for c in v)):
+                raise HTTPException(400, f"{svc}: that does not look like an API key")
+            upd[k["setting"]] = v
+        S.save(upd)
+        for f in live.feeds.values():
+            if getattr(f, "service", "") in r.values:
+                f.attempt_at, f.error = None, None
+        return {**free_status(), **payload()}
 
     @app.post("/api/livedata/config")
     async def ld_config(r: DataCfgReq):

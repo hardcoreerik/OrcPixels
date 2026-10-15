@@ -1,0 +1,41 @@
+{
+ "schema": 1,
+ "version": "2026.10.14",
+ "about": "OrcPixels free-source catalog: declarative JSON only (URL, field paths, layout template, poll, category). Picked from github.com/hardcoreerik/public-apis (fork of public-apis/public-apis). Validated by orcpixels/live_catalog.py; nothing here is executed.",
+ "categories": [
+  {"id": "fun", "title": "Fun & Facts", "order": 95, "color": "#ffd23c", "blurb": "jokes, quotes, facts, trivia, on this day, xkcd"}
+ ],
+ "keys": [],
+ "sources": [
+  {"id": "dad_joke", "title": "Dad joke", "short": "DAD JOKE", "category": "fun", "color": "#ffd23c",
+   "url": "https://icanhazdadjoke.com/", "headers": {"Accept": "application/json"}, "poll_s": 3600,
+   "template": "text", "fields": {"title": "", "body": "joke"}, "attribution": "ICANHAZDADJOKE",
+   "provider": "icanhazdadjoke.com", "listed": "public-apis: Entertainment", "docs": "https://icanhazdadjoke.com/api"},
+  {"id": "useless_fact", "title": "Useless fact of the day", "short": "FUN FACT", "category": "fun", "color": "#ffd23c",
+   "url": "https://uselessfacts.jsph.pl/api/v2/facts/today?language=en", "poll_s": 21600,
+   "template": "text", "fields": {"body": "text"}, "attribution": "",
+   "provider": "uselessfacts.jsph.pl", "listed": "public-apis: Entertainment (Useless Facts)", "docs": "https://uselessfacts.jsph.pl/"},
+  {"id": "zen_quote", "title": "Quote of the day (ZenQuotes)", "short": "QUOTE", "category": "fun", "color": "#ffd23c",
+   "url": "https://zenquotes.io/api/today", "poll_s": 21600,
+   "template": "text", "fields": {"body": "0.q", "attribution": "{0.a} / ZENQUOTES.IO"},
+   "provider": "zenquotes.io (attribution required)", "listed": "public-apis: Personality (Zen Quotes)", "docs": "https://docs.zenquotes.io/"},
+  {"id": "advice", "title": "Advice slip", "short": "ADVICE", "category": "fun", "color": "#ffd23c",
+   "url": "https://api.adviceslip.com/advice", "poll_s": 7200,
+   "template": "text", "fields": {"body": "slip.advice"},
+   "provider": "adviceslip.com", "listed": "public-apis: Personality (Advice Slip)", "docs": "https://api.adviceslip.com/"},
+  {"id": "trivia", "title": "Trivia question + answer", "short": "TRIVIA", "category": "fun", "color": "#ffd23c",
+   "url": "https://opentdb.com/api.php?amount=1&type=multiple", "poll_s": 900,
+   "template": "text", "fields": {"title": "TRIVIA {results.0.difficulty|upper}",
+                                  "body": "{results.0.question|html} ... ANSWER: {results.0.correct_answer|html}",
+                                  "attribution": "OPENTDB"},
+   "provider": "Open Trivia DB (CC BY-SA 4.0)", "listed": "public-apis: Games & Comics (Open Trivia)", "docs": "https://opentdb.com/api_config.php"},
+  {"id": "xkcd", "title": "Latest xkcd", "short": "XKCD", "category": "fun", "color": "#ffd23c",
+   "url": "https://xkcd.com/info.0.json", "poll_s": 21600,
+   "template": "text", "fields": {"title": "XKCD {num}", "body": "{safe_title}: {alt}", "attribution": "XKCD.COM"},
+   "provider": "xkcd.com", "listed": "public-apis: Comic (xkcd)", "docs": "https://xkcd.com/json.html"},
+  {"id": "on_this_day", "title": "On this day (Wikipedia)", "short": "ON THIS DAY", "category": "fun", "color": "#ffd23c",
+   "url": "https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/selected/{mm}/{dd}", "poll_s": 21600,
+   "template": "list", "fields": {"items": "selected", "main": "text", "sub": "pages.0.normalizedtitle", "right": "year", "limit": 10},
+   "provider": "Wikimedia feed API", "listed": "public-apis: Open Data (Wikipedia)", "docs": "https://api.wikimedia.org/wiki/Feed_API"}
+ ]
+}

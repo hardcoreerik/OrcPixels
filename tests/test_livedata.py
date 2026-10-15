@@ -46,6 +46,27 @@ ROUTES = {"stations/KPDX": "nws_obs.json", "api.weather.gov/points/": "nws_point
           "wikimedia.org/api/rest_v1/metrics/pageviews": "wiki_top.json"}
 
 
+# free-API sources (2026-10-14; real responses captured 2026-10-14 23:45 PT, trimmed)
+ROUTES.update({
+    "api.open-meteo.com/v1/forecast": "free_openmeteo.json", "ll.thespacedevs.com": "free_ll2.json",
+    "spaceflightnewsapi.net": "free_snapi.json", "people-in-space.json": "free_astros.json",
+    "api.nasa.gov/neo": "free_neo.json", "eonet.gsfc.nasa.gov": "free_eonet.json",
+    "api.alternative.me/fng": "free_fng.json", "mempool.space/api/v1/fees": "free_mempool_fees.json",
+    "mempool.space/api/blocks/tip/height": "free_mempool_height.txt", "debt_to_penny": "free_debt.json",
+    "api.pota.app/spot": "free_pota.json", "ergast/f1/current/next": "free_f1_next.json",
+    "ergast/f1/current/driverstandings": "free_f1_drivers.json", "ergast/f1/current/last": "free_f1_last.json",
+    "freetogame.com": "free_ftg.json", "cheapshark.com": "free_cheapshark.json",
+    "date.nager.at": "free_nager.json", "citybik.es/v2/networks/biketown": "free_citybikes_biketown.json",
+    "citybik.es/v2/networks?": "free_citybikes.json", "githubstatus.com": "free_ghstatus.json",
+    "cloudflarestatus.com": "free_cfstatus.json", "discordstatus.com": "free_discordstatus.json",
+    "status.openai.com": "free_openaistatus.json", "redditstatus.com": "free_redditstatus.json",
+    "status.claude.com": "free_claudestatus.json", "icanhazdadjoke.com": "free_dadjoke.json",
+    "uselessfacts.jsph.pl": "free_useless.json", "zenquotes.io": "free_zenq.json",
+    "api.adviceslip.com": "free_advice.json", "opentdb.com": "free_trivia.json", "xkcd.com": "free_xkcd.json",
+    "onthisday/selected": "free_onthisday.json",
+})
+
+
 class FakeNet:
     def __init__(self):
         self.calls, self.down, self.override = [], False, {}
@@ -243,7 +264,7 @@ def test_polite_poll_intervals():
         assert f.poll_s >= (30 if k == "iss" else 120 if k in MARKETS or k.startswith("sports_") else
                             15 if k.startswith("ft8_") else 300), k
     assert feeds["hf_bands"].poll_s >= 3600 and feeds["aircraft"].poll_s >= 300
-    assert all(f.key_env in (None, "GITHUB_TOKEN", "USGS_API_KEY", "X_BEARER_TOKEN") for f in feeds.values())
+    assert all(f.key_env in (None, "GITHUB_TOKEN", "USGS_API_KEY", "X_BEARER_TOKEN", "NASA_API_KEY") for f in feeds.values())
     assert len(feeds) == len(SC.SCREENS) >= 61 and set(feeds) == set(SC.SCREENS) and SC.OPTIONAL == {"x_feed"}
 
 
@@ -613,7 +634,7 @@ def test_routes_list_preview_config(app):
     assert {s["key"] for s in r["screens"]} == set(SC.SCREENS)
     assert all(s["needs_key"] is (s["key"] == "x_feed") for s in r["screens"])
     assert {s["category"] for s in r["screens"]} == {"apps", "weather", "markets", "news", "space", "ham",
-                                                     "sports", "entertainment", "local"}
+                                                     "sports", "entertainment", "local", "games", "fun"}
     assert [c["id"] for c in r["categories"]][:3] == ["apps", "weather", "markets"]
     st, body = asgi(app, "GET", "/api/livedata/screens/clock/frame.png", query="scale=2")
     assert st == 200 and body[:4] == b"\x89PNG"

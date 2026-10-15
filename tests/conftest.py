@@ -48,6 +48,7 @@ def _fresh_nws_points():
 def _fresh_share_caches():
     """Sports / Entertainment share-caches (45 s / 20 min) must not leak between tests."""
     from orcpixels.live_plugins import entertainment as _E, sports as _S
-    _S._CACHE.clear(); _E._CACHE.clear()
+    from orcpixels import live_templates as _T
+    _S._CACHE.clear(); _E._CACHE.clear(); _T._CACHE.clear()
     yield
-    _S._CACHE.clear(); _E._CACHE.clear()
+    _S._CACHE.clear(); _E._CACHE.clear(); _T._CACHE.clear()

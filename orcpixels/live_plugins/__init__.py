@@ -8,7 +8,8 @@ import importlib
 import logging
 
 log = logging.getLogger("orcpixels.plugins")
-BUILTIN = ("sports", "entertainment")
+BUILTIN = ("sports", "entertainment", "world_weather", "space_more", "markets_more", "ham_spots", "motorsport",
+           "games", "local_more", "status_board")
 
 
 def load(screens: dict) -> list[str]:

@@ -694,6 +694,8 @@ OPTIONAL = {s.key for s in _S2.OPTIONAL2}      # needs a key; listed, never auto
 from . import livedata_ft8 as _FT8  # noqa: E402,F401  (FT8/FT4 from OrcSDR; registers itself in SCREENS)
 from . import live_plugins as _PLUG  # noqa: E402  (Sports, Entertainment, ...: milestone 2)
 _PLUG.load(SCREENS)
+from . import live_catalog as _CATALOG  # noqa: E402  (declarative free-source catalog, 2026-10-14)
+_CATALOG.load_into(SCREENS)
 
 
 def make_feeds() -> dict[str, LF.Feed]:

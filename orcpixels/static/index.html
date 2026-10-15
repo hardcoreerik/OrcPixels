@@ -314,6 +314,14 @@ label.chk{display:inline-flex;gap:5px;align-items:center}
    <div class="muted" id="updinfo"></div>
    <div class="muted" style="font-size:12px">Updates install only when you click Update now: the installer is downloaded, checked against the release's SHA256SUMS, run silently (Windows may ask for admin rights), and OrcPixels restarts. Your settings, displays, playlists and Library stay as they are. Older installers stay on the <a href="https://github.com/hardcoreerik/OrcPixels/releases" target="_blank" rel="noopener">Releases page</a> if you need to go back.</div>
   </div>
+  <div class="card" id="card-free"><h2>Free sources <span class="muted" id="fscur"></span></h2>
+   <div class="muted">Every keyless source is already in the Live tab, sorted into its category and working with no setup: location sources use your home location (or FT8 home grid). <b>Get more free sources</b> downloads the latest source catalog (plain data from the OrcPixels repo, checked before it is used; nothing is installed or run) and adds any new screens without an app update.</div>
+   <div class="row"><button onclick="fsGet()">Get more free sources</button><span class="muted" id="fsmsg"></span></div>
+   <div class="muted mono" id="fsinfo" style="white-space:pre-wrap"></div>
+   <h2 style="margin-top:12px">Free API keys <span class="muted">(optional)</span></h2>
+   <div class="muted">Only for services without a keyless option. Click <b>Get free key</b>, sign up, paste the key, Save. Keys stay on this PC (settings.json) and are never shown again.</div>
+   <div id="fskeys" style="display:grid;grid-template-columns:max-content max-content 1fr max-content;gap:6px 10px;align-items:center;margin-top:6px"></div>
+  </div>
   <div class="card"><h2>Connection</h2>
    <div class="muted">Each display has its own link, settings, rotation, playlists and Live. Pick which one this page controls; signs are only ever connected by their saved address. New panels are found with an explicit scan.</div>
    <div id="displist2" style="margin:6px 0"></div>
@@ -985,6 +993,24 @@ async function updInstall(){ if(!UPD||!UPD.can_install) return;
   if(r.ok){ $('updstate').textContent=`verified; installing v${j.version}. OrcPixels restarts in a moment.`; setTimeout(function w(){ fetch('/api/update').then(x=>x.json()).then(s=>{ if(s.current===j.version){ toast('updated to v'+s.current,'ok',6000); updShow(s); $('updnow').disabled=false; } else setTimeout(w,3000); }).catch(()=>setTimeout(w,3000)); },8000); }
   else { $('updstate').textContent='Update failed: '+(j.detail||r.statusText); $('updnow').disabled=false; } }
 updLoad(); setInterval(updLoad,10*60*1000);
+// ------------------------------------------------------------------ free sources: catalog + keys (2026-10-14)
+function fsShow(c){ if(!c) return; const g=c.catalog||{};
+  $('fscur').textContent=g.count?`${g.count} catalog screens \u00b7 v${g.version||'?'} (${g.source})`:'';
+  const last=g.last?(g.last.ok?`last fetch ${ptTime(g.last.at)} ${TZL}: ${g.last.added} new`:`last fetch failed: ${g.last.error}`):'never fetched (using the bundled catalog)';
+  $('fsinfo').textContent=last+(g.errors&&g.errors.length?'\nskipped: '+g.errors.slice(0,4).join('; '):'');
+  $('fskeys').innerHTML=(c.keys||[]).map(k=>`<b>${esc(k.label)}</b><a href="${esc(k.signup)}" target="_blank" rel="noopener"><button class="alt sm">Get free key</button></a>
+    <input type="password" id="fsk_${k.service}" placeholder="${k.set?'key saved':(k.optional?'optional: using demo key':'paste key')}" autocomplete="off" style="width:100%">
+    <span><button class="alt sm" onclick="fsKey('${k.service}')">Save</button>${k.set?` <button class="alt sm" onclick="fsKey('${k.service}',true)">Clear</button>`:''}</span>
+    <span></span><span class="muted" style="grid-column:2/5;font-size:12px">${k.set?'\u2714 key set':'\u2013 no key'}${k.note?' \u00b7 '+esc(k.note):''}${k.used_by&&k.used_by.length?' \u00b7 used by '+esc(k.used_by.join(', ')):''}</span>`).join('')||'<span class="muted">No service needs a key right now.</span>'; }
+async function fsLoad(){ const r=await fetch('/api/livedata/sources-catalog').catch(()=>null); if(r&&r.ok) fsShow(await r.json()); }
+async function fsGet(){ $('fsmsg').textContent='fetching the catalog\u2026'; const r=await api('/api/livedata/sources-catalog/refresh',{});
+  if(!r){ $('fsmsg').textContent=''; return; } const x=r.result||{};
+  $('fsmsg').textContent=x.ok?(x.added.length?`added ${x.added.length} new: ${x.added.join(', ')}`:'up to date: no new sources'):`could not update (${x.error}); the current catalog stays`;
+  fsShow(r); if(r.screens) ldRender(r); }
+async function fsKey(svc,clear){ const i=$('fsk_'+svc); const v=clear?'':i.value.trim(); if(!clear&&!v) return;
+  const r=await api('/api/livedata/keys',{values:{[svc]:v}}); i.value=''; if(r){ fsShow(r); if(r.screens) ldRender(r); $('fsmsg').textContent=clear?'key cleared':'key saved'; } }
+fsLoad();
+
 if(location.hash==='#update'){ showTab('settings'); setTimeout(()=>$('update').scrollIntoView(),300); }
 // ---- Try the resolution (docs/DESIGN.md)
 const TS_SIZES=['16x16','32x32','64x16','64x32','64x64','96x24','96x32','128x16','128x32','128x64','128x128','256x16','16x64','32x64','custom'];

@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.4 (2026-10-15)
+
+### Free API live sources
+- 31 new Live screens from free, keyless APIs (picked from the public-apis list), already sorted into categories and working with no setup:
+  - **Weather:** world weather now, next 12 h, 7 days and UV (Open-Meteo, works anywhere).
+  - **Space:** next launch countdown and upcoming launches (Launch Library 2), space news, people in space, asteroids this week (NASA), natural events near you (NASA EONET).
+  - **Markets:** crypto Fear & Greed, Bitcoin fees and block height, US national debt.
+  - **Ham Radio:** POTA spots, nearest POTA activators, POTA activity by band.
+  - **Sports:** F1 next race, driver standings and last result.
+  - **Time & Local:** next public holidays, bike share near home.
+  - **Apps:** a service status board (GitHub, Cloudflare, Discord, OpenAI, Reddit, Claude).
+  - **Games** (new category): new free-to-play games, Steam deals.
+  - **Fun & Facts** (new category): dad joke, fun fact, quote of the day, advice, trivia, latest xkcd, on this day.
+- Location sources use your home location, or the FT8 home grid. Units and holidays follow your country.
+- **Settings > Free sources > Get more free sources** downloads the latest source catalog, which is plain data checked before use, and adds new screens without an app update.
+- Services that take a key get a **Get free key** button and one paste field. NASA is the only one, and it is optional: NASA screens use the public demo key until you add your own.
+
 ## 0.2.3 (2026-10-14)
 
 ### RF / Signal presets

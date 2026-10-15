@@ -188,7 +188,7 @@ def render(scr: AdaptiveScreen, feed, k: int, now: float, size) -> Image.Image:
         if (feed.error or "").startswith("NotConfigured"):
             nodata(img, ctx, title, scr.color, "SET UP", AMB, "IN LIVE SOURCES")
         elif getattr(feed, "needs_key", False):
-            nodata(img, ctx, title, scr.color, "SET TOKEN", AMB)
+            nodata(img, ctx, title, scr.color, "SET KEY", AMB, "SETTINGS > FREE SOURCES")
         elif feed.attempt_at is None:
             nodata(img, ctx, title, scr.color, "LOADING", GREY)
         else:
