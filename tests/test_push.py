@@ -266,7 +266,8 @@ def test_engine_streams_legacy_coalesces_and_restores_the_preset(monkeypatch):
         assert sign.sent[-1].getbbox() is not None
         live.board.clear("rsa")
         await until(lambda: played == ["orco_wave"])
-        await until(lambda: not live.enabled)
+        await until(lambda: live.restored is not None)       # set once the restore returned
+        assert not live.enabled
         assert live.restored == "preset orco_wave" and sign.resume_hint["name"] == "orco_wave"
     asyncio.run(run())
 
@@ -282,7 +283,7 @@ def test_engine_restarts_the_live_source_it_replaced():
         assert peer.stops == 1 and not peer.enabled
         await until(lambda: live.sign.sent)
         live.board.clear()
-        await until(lambda: peer.starts == 1)
+        await until(lambda: peer.starts == 1 and live.restored is not None)
         assert live.restored == "Live Data" and not live.enabled
     asyncio.run(run())
 
