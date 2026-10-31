@@ -171,3 +171,9 @@ The Live tab groups 61 code-rendered screens into Apps, Weather, Markets & Money
 ## Updates
 
 The installed app checks GitHub Releases at startup and every 24 h (it can be turned off, and has a stable or beta channel). It installs only when you click **Update now**: the installer is downloaded, checked against SHA256SUMS, run silently, and OrcPixels restarts. Source checkouts only show a `git pull` notice. See [docs/UPDATES.md](docs/UPDATES.md), which covers rollback and code signing.
+
+## Support development
+
+If this project is useful to you, consider supporting its development. Across ORC projects, support helps fund development time, hardware testing, receiver compatibility, and decoder work.
+
+[GitHub Sponsors](https://github.com/sponsors/hardcoreerik) · [Ko-fi](https://ko-fi.com/hardcoreerik) · [PayPal](https://paypal.me/hardcoreerik)
